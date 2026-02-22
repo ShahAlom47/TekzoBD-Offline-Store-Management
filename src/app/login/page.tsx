@@ -5,6 +5,7 @@ import PrimaryButton from "@/Components/CommonComponents/PrimaryButton";
 import { toast, Toaster } from "react-hot-toast";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { loginUser } from "@/lib/allApiRequest/userRequest/userRequest";
 
 type LoginFormInputs = {
   phone: string;
@@ -25,21 +26,15 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const res = await loginUser(data.phone, data.password);
 
-      const result = await res.json();
+      console.log(res)
 
-      if (!res.ok) {
-        throw new Error(result.error || "Login failed");
-      }
+ if (!res.success) {
+        throw new Error(res.message || "Login failed");
+      }    
 
-      toast.success("Login successful!");
+      toast.success(res?.message || "Login successful!");
       router.push("/dashboard");
     } catch (err: Error | unknown) {
       const errorMessage = err instanceof Error ? err.message : "Something went wrong!";
