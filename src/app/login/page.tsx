@@ -49,13 +49,7 @@ export default function LoginPage() {
           </div>
 
           {/* Login Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-2.5 rounded-xl font-medium hover:opacity-90 transition disabled:opacity-60"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
+        
           <PrimaryButton loading={loading}>Login</PrimaryButton>
         </form>
 
