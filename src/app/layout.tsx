@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import RootProvider from "@/Providers/RootProvider/Providers";
 
 export const metadata: Metadata = {
   title: "TekzoBD Offline Store",
@@ -13,10 +14,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={` antialiased`}
-      >
-        {children}
+      <body className={` antialiased`}>
+        <RootProvider>{children}</RootProvider>
       </body>
     </html>
   );
