@@ -1,5 +1,6 @@
 "use client";
 
+import PrimaryButton from "@/Components/CommonComponents/PrimaryButton";
 import { useState } from "react";
 
 export default function LoginPage() {
@@ -55,6 +56,7 @@ export default function LoginPage() {
           >
             {loading ? "Logging in..." : "Login"}
           </button>
+          <PrimaryButton loading={loading}>Login</PrimaryButton>
         </form>
 
         {/* Footer */}
