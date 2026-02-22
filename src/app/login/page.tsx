@@ -6,9 +6,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-red-200 px-4">
       
-      <div className="w-full max-w-md bg-white shadow-2xl rounded-2xl p-8 space-y-6">
+      <div className="w-full max-w-md bg-white/80 shadow-2xl rounded-2xl p-8 space-y-6">
         
         {/* Store Title */}
         <div className="text-center space-y-2">
@@ -21,7 +21,7 @@ export default function LoginPage() {
         </div>
 
         {/* Login Form */}
-        <form className="space-y-5">
+        <form className="space-y-5 text-black">
           
           {/* Phone */}
           <div>
@@ -31,7 +31,7 @@ export default function LoginPage() {
             <input
               type="text"
               placeholder="Enter your phone"
-              className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black transition"
+              className="w-full rounded-xl border border-gray-500 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black transition"
             />
           </div>
 
@@ -65,4 +65,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
+} 
