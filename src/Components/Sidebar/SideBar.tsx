@@ -2,6 +2,7 @@ import React from "react";
 import Logo from "./Logo";
 import Logout from "../CommonComponents/Logout";
 import UserInfo from "../CommonComponents/UserInfo";
+import StoreNavbar from "../CommonComponents/Navbar";
 
 const SideBar = () => {
   return (
@@ -11,7 +12,9 @@ const SideBar = () => {
          <Logo></Logo>
          <UserInfo></UserInfo>
        </div>
-        <div className=" border-t-2 border-gray-500 flex-grow overflow-y-scroll"></div>
+        <div className=" border-t-2 border-gray-500 flex-grow overflow-y-scroll">
+            <StoreNavbar></StoreNavbar>
+        </div>
         <div>
           <Logout></Logout>
         </div>
