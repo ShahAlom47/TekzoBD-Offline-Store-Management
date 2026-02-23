@@ -6,6 +6,7 @@ import { toast, Toaster } from "react-hot-toast";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginUser } from "@/lib/allApiRequest/userRequest/userRequest";
+import { useUser } from "@/context/AuthContext";
 
 type LoginFormInputs = {
   phone: string;
@@ -15,34 +16,43 @@ type LoginFormInputs = {
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { setUser } = useUser();
 
   const {
     register,
     handleSubmit,
+  
     formState: { errors },
-  } = useForm<LoginFormInputs>();
+  } = useForm<LoginFormInputs>({  defaultValues: {
+      phone: "01773133145",
+      password: "123456789",
+    },});
 
-  const onSubmit = async (data: LoginFormInputs) => {
-    setLoading(true);
+const onSubmit = async (data: LoginFormInputs) => {
+setLoading(true);
 
-    try {
-      const res = await loginUser(data.phone, data.password);
+try {
+  const res = await loginUser(data.phone, data.password);
 
-      console.log(res)
+  if (!res.success) {
+    throw new Error(res.message || "Login failed");
+  }
 
- if (!res.success) {
-        throw new Error(res.message || "Login failed");
-      }    
+  // 🔥 Important
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // setUser((res.data as any).user);
 
-      toast.success(res?.message || "Login successful!");
-      router.push("/dashboard");
-    } catch (err: Error | unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Something went wrong!";
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
+    toast.success("Login successful!");
+    router.push("/dashboard");
+
+  } catch (err: unknown) {
+    const errorMessage =
+      err instanceof Error ? err.message : "Something went wrong!";
+    toast.error(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-red-200 px-4">
@@ -67,7 +77,7 @@ export default function LoginPage() {
           {/* Phone */}
           <div>
             <label className="block text-sm font-medium mb-1">
-              Phone / Username
+              Phone 
             </label>
             <input
               {...register("phone", { required: "Phone is required" })}
@@ -89,7 +99,7 @@ export default function LoginPage() {
             </label>
             <input
               {...register("password", { required: "Password is required" })}
-              type="password"
+              type="text"
               placeholder="Enter your password"
               className="w-full rounded-xl border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black transition"
             />

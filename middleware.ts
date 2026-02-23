@@ -1,16 +1,24 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
+import { verify } from "jsonwebtoken";
 
-interface SessionCookie {
-  value: string;
-}
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
-export function middleware(req: NextRequest): NextResponse {
-  const session: SessionCookie | undefined = req.cookies.get("session");
+export function middleware(req: NextRequest) {
+  const token = req.cookies.get("token")?.value;
 
-  if (!session && req.nextUrl.pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(new URL("/login", req.url));
+  if (!token) {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
-  return NextResponse.next();
+  try {
+    verify(token, JWT_SECRET);
+    return NextResponse.next();
+  } catch {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
 }
+
+export const config = {
+  matcher: ["/dashboard/:path*"],
+};

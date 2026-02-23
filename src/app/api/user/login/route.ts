@@ -1,52 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserCollection } from "@/lib/database/db_collections";
+import bcrypt from "bcrypt";
+import { sign } from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { phone } = body;
+    const { phone, password } = await req.json();
 
-    if (!phone) {
+    if (!phone || !password) {
       return NextResponse.json(
-        { error: "Phone number is required" },
+        { success: false, message: "Phone and password required" },
         { status: 400 }
       );
     }
 
     const usersCollection = await getUserCollection();
-
-    // Find user by phone
     const user = await usersCollection.findOne({ phone });
 
     if (!user) {
       return NextResponse.json(
-        { error: "User not found" },
+        { success: false, message: "User not found" },
         { status: 404 }
       );
     }
 
-    // Optional: check if user is active
-    if (!user.isActive) {
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user.passwordHash
+    );
+console.log(isPasswordValid,'hhhh')
+
+
+    if (!isPasswordValid) {
       return NextResponse.json(
-        { error: "User is inactive" },
-        { status: 403 }
+        { success: false, message: "Invalid credentials" },
+        { status: 401 }
       );
     }
 
-    // ✅ Login successful → return minimal info
-    return NextResponse.json({
-      message: "Login successful",
-      user: {
-        _id: user._id,
-        fullName: user.fullName,
-        phone: user.phone,
-        role: user.role,
+    // ✅ Create JWT Token
+    const token = sign(
+      {
+        userId: user?._id,
+        role: user?.role,
       },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    const response = NextResponse.json({
+      success: true,
+      message: "Login successful",
     });
+
+    // ✅ Set HTTP-only Cookie
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 60 * 60 * 24, // 1 day
+    });
+
+    return response;
   } catch (error) {
-    console.error(error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { success: false, message: "Server error" },
       { status: 500 }
     );
   }
