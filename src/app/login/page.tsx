@@ -38,9 +38,10 @@ try {
     throw new Error(res.message || "Login failed");
   }
 
+
   // 🔥 Important
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // setUser((res.data as any).user);
+  setUser(res.data as any);
 
     toast.success("Login successful!");
     router.push("/dashboard");

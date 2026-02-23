@@ -53,6 +53,12 @@ console.log(isPasswordValid,'hhhh')
     const response = NextResponse.json({
       success: true,
       message: "Login successful",
+      data: {
+        _id: user._id.toString(),
+        fullName: user.fullName,
+        phone: user.phone,
+        role: user.role,  
+      }
     });
 
     // ✅ Set HTTP-only Cookie

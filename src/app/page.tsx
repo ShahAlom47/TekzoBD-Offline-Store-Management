@@ -8,7 +8,7 @@ export default function Home() {
   // const session = cookieStore.get("session");
   const {user,loading}= useUser()
 
-  console.log(user,'uder')
+ 
 
   if(loading){  
     return <div>Loading...</div>  
