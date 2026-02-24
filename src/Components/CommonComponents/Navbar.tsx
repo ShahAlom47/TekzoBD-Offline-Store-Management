@@ -10,15 +10,9 @@ export default function StoreNavbar() {
   const menus = [
 
     {
-      name: "Dashboard",
+      name: "Overview",
       href: "/dashboard",
     },
-
-    {
-      name: "POS",
-      href: "/dashboard/pos",
-    },
-
     {
       name: "Products",
       href: "/dashboard/products",
@@ -29,6 +23,10 @@ export default function StoreNavbar() {
       href: "/dashboard/products/add",
     },
 
+    {
+      name: "Sales",
+      href: "/dashboard/sales",
+    },
     {
       name: "Categories",
       href: "/dashboard/categories",
@@ -44,10 +42,6 @@ export default function StoreNavbar() {
       href: "/dashboard/suppliers",
     },
 
-    {
-      name: "Sales",
-      href: "/dashboard/sales",
-    },
 
     {
       name: "Expenses",

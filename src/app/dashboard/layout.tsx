@@ -15,7 +15,7 @@ export default function DashboardLayout({
   if (!user) return null;
 
   return (
-    <div className="min-h-screen flex bg-white border-4 border-gray-500 rounded-md text-black">
+    <div className="min-h-screen flex-col flex md:flex-row   bg-white border-4 border-gray-500 rounded-md text-black">
       <SideBar />
       <main className="flex-1 p-4">{children}</main>
     </div>
