@@ -1,5 +1,7 @@
+import { ObjectId } from "mongodb";
+
 export interface Product {
-  id: string;
+  _id:  ObjectId;
 
   // Basic Info
   name: string;
@@ -37,4 +39,33 @@ export interface Product {
 
   createdAt: Date;
   updatedAt: Date;
+}
+
+
+export interface ProductFormData {
+  // Basic Info
+  name: string;
+  sku: string;
+  barcode?: string;
+  brand?: string;
+  categoryId: string;
+
+  // Pricing
+  costPrice: number;            // Buying price
+  sellingPrice: number;         // Regular price
+  discountPrice?: number;
+  vatPercentage?: number;
+  minimumSellingPrice?: number;
+
+  // Inventory
+  openingStock: number;         // Initial stock
+  currentStock: number;         // Live stock
+  reorderLevel?: number;        // Low stock alert
+  unit: "PCS" | "KG" | "LITER" | "BOX" | "Feet";
+
+  // Supplier
+  supplierId?: string;
+
+  // Status
+  status: "ACTIVE" | "INACTIVE";
 }
