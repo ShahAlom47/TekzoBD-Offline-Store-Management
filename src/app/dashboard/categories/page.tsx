@@ -10,6 +10,14 @@ import { useConfirm } from "@/hook/useConfirm";
 import { Category } from "@/Interfaces/categoryInterfaces";
 import PrimaryButton from "@/Components/CommonComponents/PrimaryButton";
 
+import ErrorPage from "@/app/error";
+import { DashPaginationButton } from "@/Components/CommonComponents/DashPaginationButton";
+import Loading from "@/app/loading";
+import { CustomTable } from "@/Components/CommonComponents/CustomTable";
+import CustomModal from "@/Components/CommonComponents/CustomModal";
+import AddCategory from "@/Components/Categories/AddCategory";
+import EditCategory from "@/Components/Categories/EditCategory";
+
 
 const ManageCategory = () => {
   const { confirm, ConfirmModal } = useConfirm();
@@ -119,7 +127,7 @@ const ManageCategory = () => {
       {isLoading ? (
         <Loading />
       ) : error ? (
-        <ErrorComponent />
+        <ErrorPage />
       ) : (
         <>
           <CustomTable columns={columns} data={data} className="shadow-md" />
