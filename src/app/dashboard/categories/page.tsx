@@ -45,14 +45,15 @@ const ManageCategory = () => {
         currentPage: page,
         limit,
       });
-      if (!response || !response.success) {
-        throw new Error(response.message || "Failed to fetch category data");
-      }
+      // if (!response || !response.success) {
+      //   throw new Error(response.message || "Failed to fetch category data");
+      // }
       return response;
     },
     refetchOnWindowFocus: false,
   });
 
+console.log(category)
   const handleDelete = async (id: string | ObjectId) => {
     const ok = await confirm({
       title: "Delete Category",
@@ -73,7 +74,7 @@ const ManageCategory = () => {
   };
 
   const columns = [
-    { header: "Icon", accessor: "icon" },
+  
     { header: "Name", accessor: "name" },
     { header: "Slug", accessor: "slug" },
     { header: "Parent", accessor: "parentCategory" },

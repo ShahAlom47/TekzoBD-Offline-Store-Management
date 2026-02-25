@@ -6,11 +6,11 @@ import { ObjectId } from "mongodb";
 
 
 export const addCategory = async (data:Category) => {
-  return request("POST", "/category/add", { ...data }, );
+  return request("POST", "/categories/add", { ...data }, );
 }
 
 export const getAllCategories = async ({ currentPage, limit, searchTrim }: GetAllCategoryParams) => {
-  const url = `/category/getAllCategory?currentPage=${currentPage}&pageSize=${limit}` +
+  const url = `/categories/getAllCategory?currentPage=${currentPage}&pageSize=${limit}` +
               (searchTrim ? `&searchTrim=${encodeURIComponent(searchTrim)}` : "");
 
   return request("GET", url);

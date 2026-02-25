@@ -50,7 +50,7 @@ export const DashPaginationButton: React.FC<DashPaginationButtonProps> = ({
       <button
         onClick={handleNext}
         disabled={isLast}
-        className={`  btn-base rounded-none rounded-r-full 
+        className={`  btn-base rounded-none rounded-r-full  
           ${
             isLast
               ? "cursor-not-allowed"
