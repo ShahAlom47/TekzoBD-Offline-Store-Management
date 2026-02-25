@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 
 export interface Category {
-  _id?: ObjectId;
+  _id?: ObjectId | string;
 
   name: string;
   slug: string;

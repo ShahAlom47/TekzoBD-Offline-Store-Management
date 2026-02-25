@@ -1,12 +1,12 @@
 
-import { CategoryType, GetAllCategoryParams } from "@/Interfaces/categoryInterfaces";
+import { Category, GetAllCategoryParams } from "@/Interfaces/categoryInterfaces";
 import { request } from "../apiRequests";
 import { ObjectId } from "mongodb";
 
 
 
-export const addCategory = async (data:CategoryType) => {
-  return request("POST", "/category/addCategory", { ...data }, );
+export const addCategory = async (data:Category) => {
+  return request("POST", "/category/add", { ...data }, );
 }
 
 export const getAllCategories = async ({ currentPage, limit, searchTrim }: GetAllCategoryParams) => {
@@ -20,7 +20,7 @@ export const getSingleCategory = async (id:string|ObjectId,)=>{
   return request("GET",`/category/getSingleCategory/${id}`)
 }
 
-export const updateCategory = async (id:string|ObjectId,data:CategoryType)=>{
+export const updateCategory = async (id:string|ObjectId,data:Category)=>{
   return request("PATCH",`/category/updateCategory/${id}`,{...data})
 }
 
