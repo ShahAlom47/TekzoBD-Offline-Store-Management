@@ -1,77 +1,50 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import CategoryForm from "./CategoryForm";
-import { getSingleCategory, updateCategory } from "@/lib/allApiRequest/categoryRequest/categoryRequest";
-import { CategoryType } from "@/Interfaces/categoryInterfaces";
+import { updateCategory } from "@/lib/allApiRequest/categoryRequest/categoryRequest";
+import { Category } from "@/Interfaces/categoryInterfaces";
 
 interface EditCategoryProps {
-  id: string;
+  category: Category | undefined;
   setOpenModal?: (open: boolean) => void;
 }
 
-const EditCategory: React.FC<EditCategoryProps> = ({ id, setOpenModal }) => {
-  const [defaultValues, setDefaultValues] = useState<Partial<CategoryType> | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+const EditCategory: React.FC<EditCategoryProps> = ({ category, setOpenModal }) => {
+  const [loading, setLoading] = useState<boolean>(false);
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const fetchCategory = async () => {
-      setLoading(true);
-      try {
-        const res = await getSingleCategory(id);
-        if (res?.success && res.data) {
-          setDefaultValues(res.data);
-        } else {
-          toast.error("Failed to load category data");
-        }
-      } catch (error) {
-        console.error("Fetch category error:", error);
-        toast.error("Error fetching category data");
-      } finally {
-        setLoading(false);
+  const handleUpdate = async (data: Category) => {
+    setLoading(true);
+    try {
+      const { _id, ...updateData } = data;
+      const id = _id?.toString() || "";
+
+      const res = await updateCategory(id, updateData);
+
+      if (res?.success) {
+        toast.success("Category updated successfully");
+
+        queryClient.invalidateQueries({ queryKey: ["getAllCategories"] });
+
+        if (setOpenModal) setOpenModal(false);
+      } else {
+        toast.error(res.message || "Update failed");
       }
-    };
-
-    if (id) {
-      fetchCategory();
+    } catch (error) {
+      console.error("Update category error:", error);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
     }
-  }, [id]);
-
- const handleUpdate = async (data: CategoryType) => {
-  setLoading(true);
-  try {
-   
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { _id, ...updateData } = data;
-
-    const res = await updateCategory(id, updateData);
-    if (res?.success) {
-      toast.success("Category updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["getAllCategories"] });
-      if (setOpenModal) setOpenModal(false);
-    } else {
-      toast.error(res.message || "Update failed");
-    }
-  } catch (error) {
-    console.error("Update category error:", error);
-    toast.error("Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-  if (loading || !defaultValues) {
-    return <p className="text-center py-4">Loading...</p>;
-  }
+  };
 
   return (
     <CategoryForm
-      defaultValues={defaultValues}
+      defaultValues={category}
       onSubmit={handleUpdate}
       submitText="Update Category"
       loading={loading}

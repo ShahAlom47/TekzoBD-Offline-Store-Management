@@ -21,7 +21,7 @@ export const getSingleCategory = async (id:string|ObjectId,)=>{
 }
 
 export const updateCategory = async (id:string|ObjectId,data:Category)=>{
-  return request("PATCH",`/category/updateCategory/${id}`,{...data})
+  return request("PATCH",`/category/update/${id}`,{...data})
 }
 
 export const deleteCategory= async (id: string|ObjectId ) => {

@@ -24,13 +24,17 @@ const ManageCategory = () => {
   const [openModal, setOpenModal] = useState(false);
   const [modalContent, setModalContent] = useState<"add" | "edit">("add");
   const [selectedId, setSelectedId] = useState<string | undefined>("");
+  const [selectedCat, setSelectedCat] = useState<Category | undefined>(undefined);
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const handleModal = (content: "add" | "edit", id?: string) => {
+  const handleModal = (content: "add" | "edit", data?: Category) => {
     setOpenModal(true);
     setModalContent(content);
-    if (id) setSelectedId(id);
+    if (data) {
+      setSelectedId(data._id?.toString());
+      setSelectedCat(data);
+    }
   };
 
   const {
@@ -95,7 +99,7 @@ console.log(category)
           <button
             className="btn-bordered"
             onClick={() =>
-              handleModal("edit", typeof cat._id === "string" ? cat._id : cat._id?.toString())
+              handleModal("edit", cat as Category)
             }
           >
             Edit
@@ -149,7 +153,7 @@ console.log(category)
         {modalContent === "add" ? (
           <AddCategory />
         ) : (
-          <EditCategory id={selectedId || ""} setOpenModal={setOpenModal} />
+          <EditCategory category={selectedCat || {}} id={selectedId || ""} setOpenModal={setOpenModal} />
         )}
       </CustomModal>
 
