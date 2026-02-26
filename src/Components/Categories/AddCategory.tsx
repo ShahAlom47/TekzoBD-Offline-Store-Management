@@ -8,7 +8,7 @@ import { addCategory } from "@/lib/allApiRequest/categoryRequest/categoryRequest
 import { Category } from "@/Interfaces/categoryInterfaces";
 import CategoryForm from "./CategoryForm";
 
-const AddCategory: React.FC = () => {
+const AddCategory: React.FC<{  setModalOpen: (open: boolean) => void }> = ({ setModalOpen }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const queryClient = useQueryClient();
 
@@ -19,6 +19,7 @@ const AddCategory: React.FC = () => {
 
       if (res?.success) {
         toast.success(res.message || "Category added!");
+        setModalOpen(false)
         queryClient.invalidateQueries({ queryKey: ["getAllCategories"] });
       } else {
         toast.error(res.message || "Failed to add category");

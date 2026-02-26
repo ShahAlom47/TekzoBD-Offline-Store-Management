@@ -23,7 +23,6 @@ const ManageCategory = () => {
   const { confirm, ConfirmModal } = useConfirm();
   const [openModal, setOpenModal] = useState(false);
   const [modalContent, setModalContent] = useState<"add" | "edit">("add");
-  const [selectedId, setSelectedId] = useState<string | undefined>("");
   const [selectedCat, setSelectedCat] = useState<Category | undefined>(undefined);
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -32,7 +31,6 @@ const ManageCategory = () => {
     setOpenModal(true);
     setModalContent(content);
     if (data) {
-      setSelectedId(data._id?.toString());
       setSelectedCat(data);
     }
   };
@@ -57,7 +55,6 @@ const ManageCategory = () => {
     refetchOnWindowFocus: false,
   });
 
-console.log(category)
   const handleDelete = async (id: string | ObjectId) => {
     const ok = await confirm({
       title: "Delete Category",
@@ -151,9 +148,9 @@ console.log(category)
         title={modalContent === "add" ? "Add Category" : "Edit Category"}
       >
         {modalContent === "add" ? (
-          <AddCategory />
+          <AddCategory  setModalOpen={setOpenModal} />
         ) : (
-          <EditCategory category={selectedCat || {}} id={selectedId || ""} setOpenModal={setOpenModal} />
+          <EditCategory category={selectedCat || undefined} setOpenModal={setOpenModal} />
         )}
       </CustomModal>
 
