@@ -5,25 +5,22 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { ProductFormData } from "@/Interfaces/productInterface";
 import ProductForm from "@/Components/Products/ProductForm";
+import { addProduct } from "@/lib/allApiRequest/productRequest/productRequest";
 
 const AddProduct = () => {
   const router = useRouter();
 
   // Submit handler
   const handleSubmit = async (data: ProductFormData) => {
+   
     try {
-      // Example API call
-      const res = await fetch("/api/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const res = await addProduct({...data});
 
-      if (!res.ok) throw new Error("Failed to add product");
+      if (!res.success) throw new Error("Failed to add product");
 
       toast.success("Product added successfully!");
-      router.push("/dashboard/products"); // redirect after add
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      router.push("/dashboard/products"); 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "Something went wrong");

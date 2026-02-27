@@ -1,8 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import { useForm } from "react-hook-form";
+import { useEffect, useMemo } from "react";
 import { ProductFormData } from "@/Interfaces/productInterface";
-import { useForm, Controller } from "react-hook-form";
+import { useCategories } from "@/hook/useCategory";
+import Input from "../CommonComponents/Input";
+import Select from "../CommonComponents/Select";
+
+/* Reusable Input Component */
+
+
+/* Reusable Select Component */
+
 
 interface ProductFormProps {
   product?: ProductFormData;
@@ -10,7 +19,16 @@ interface ProductFormProps {
 }
 
 export default function ProductForm({ product, onSubmit }: ProductFormProps) {
-  const { register, handleSubmit, control, formState: { errors }, reset } = useForm<ProductFormData>({
+  const { categories } = useCategories();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<ProductFormData>({
     defaultValues: product || {
       name: "",
       sku: "",
@@ -27,17 +45,28 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
       unit: "PCS",
       supplierId: "",
       status: "ACTIVE",
-    }
+    },
   });
+
+  useEffect(() => {
+    if (product) reset(product);
+  }, [product, reset]);
+
+  // 🔥 Category dropdown options
+  const categoryOptions = useMemo(() => {
+    return categories.map((cat) => ({
+      value: cat._id,
+      label: cat.name,
+    }));
+  }, [categories]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 rounded-2xl shadow-md space-y-4">
-
       <div className="grid md:grid-cols-2 gap-4">
         <Input label="Product Name" {...register("name", { required: "Product Name required" })} error={errors.name?.message} />
         <Input label="SKU" {...register("sku", { required: "SKU required" })} error={errors.sku?.message} />
         <Input label="Barcode" {...register("barcode")} />
-        <Select label="Category" {...register("categoryId", { required: "Select category" })} options={[]} error={errors.categoryId?.message} />
+        <Select label="Category" {...register("categoryId", { required: "Select category" })} options={categoryOptions} error={errors.categoryId?.message} />
         <Input label="Brand" {...register("brand")} />
 
         <Input label="Cost Price" type="number" {...register("costPrice", { required: true, min: 0 })} />
@@ -48,9 +77,11 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
         <Input label="Opening Stock" type="number" {...register("openingStock")} />
         <Input label="Current Stock" type="number" {...register("currentStock")} />
         <Input label="Reorder Level" type="number" {...register("reorderLevel")} />
+
         <Select label="Unit" {...register("unit")} options={["PCS","KG","LITER","BOX"]} />
 
         <Select label="Supplier" {...register("supplierId")} options={[]} />
+
         <Select label="Status" {...register("status")} options={["ACTIVE","INACTIVE"]} />
       </div>
 
@@ -63,41 +94,5 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
         </button>
       </div>
     </form>
-  );
-}
-
-/* Reusable Input Component */
-function Input({ label, error, ...props }: any) {
-  return (
-    <div>
-      <label className="text-sm text-gray-600">{label}</label>
-      <input
-        {...props}
-        className={`w-full mt-1 px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition ${error ? "border-red-500" : "border-gray-300"}`}
-      />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    </div>
-  );
-}
-
-/* Reusable Select Component */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function Select({ label, options, error, ...props }: any) {
-  return (
-    <div>
-      <label className="text-sm text-gray-600">{label}</label>
-      <select
-        {...props}
-        className={`w-full mt-1 px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition ${error ? "border-red-500" : "border-gray-300"}`}
-      >
-        <option value="">Select {label}</option>
-        {options.map((opt: any, i: number) => (
-          <option key={i} value={opt.value || opt}>
-            {opt.label || opt}
-          </option>
-        ))}
-      </select>
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-    </div>
   );
 }

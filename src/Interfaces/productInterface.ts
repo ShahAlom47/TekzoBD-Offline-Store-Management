@@ -69,3 +69,21 @@ export interface ProductFormData {
   // Status
   status: "ACTIVE" | "INACTIVE";
 }
+
+export type SortOptions = "asc" | "desc" | "newest" | "popular";
+
+export interface GetAllProductParams {
+  currentPage: number;
+  limit: number;
+  searchTrim?: string;
+  sort?: SortOptions;
+  minPrice?: string | number;
+  maxPrice?: string | number;
+  category?: string;
+  brand?: string;
+  rating?: string;
+   offerOnly?: boolean;         // ✅ new: only active offer products
+  isDashboardRequest?: boolean;
+  stock?:"in-stock"| "out-of-stock";
+  // any more you want
+}
