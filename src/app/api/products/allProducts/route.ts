@@ -95,12 +95,12 @@ console.log(products)
       success: true,
       message: "Products retrieved successfully",
       data: products,
-      pagination: {
+     
         currentPage,
         pageSize,
         totalData: total,
         totalPages: Math.ceil(total / pageSize),
-      },
+      
     });
 
   } catch (error: any) {
