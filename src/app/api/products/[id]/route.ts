@@ -5,15 +5,14 @@ import { ObjectId } from "mongodb";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
-    // 🔹 Validate ObjectId
-    if (!ObjectId.isValid(id)) {
+    if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
-        { message: "Invalid product ID", success: false },
+        { message: "Invalid or missing ID", success: false },
         { status: 400 }
       );
     }
