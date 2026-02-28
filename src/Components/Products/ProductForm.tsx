@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { useEffect, useMemo } from "react";
-import { ProductFormData } from "@/Interfaces/productInterface";
+import { Product, ProductFormData } from "@/Interfaces/productInterface";
 import { useCategories } from "@/hook/useCategory";
 import Input from "../CommonComponents/Input";
 import Select from "../CommonComponents/Select";
@@ -14,7 +14,7 @@ import Select from "../CommonComponents/Select";
 
 
 interface ProductFormProps {
-  product?: ProductFormData;
+  product?: Product;
   onSubmit: (data: ProductFormData) => void;
 }
 

@@ -38,6 +38,12 @@ export const getAllProduct = async (params: GetAllProductParams) => {
 export const addProduct = async (data: ProductFormData) => {
   return request("POST", "/products/add", {...data});
 }
+export const getSingleProduct = async (id: string) => {
+  return request("GET", `/products/${id}`);
+}
+export const updateProduct = async (id: string,data:ProductFormData) => {
+  return request("PATCH", `/products/edit/${id}`,{...data});
+}
 
 
 
