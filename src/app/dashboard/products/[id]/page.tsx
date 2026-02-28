@@ -17,7 +17,7 @@ const EditProduct = () => {
   const productId = params?.id as string;
 
   // ✅ Fetch product using useQuery
-  const { data, isLoading, isError } = useQuery({
+  const { data , isLoading, isError } = useQuery({
     queryKey: ["product", productId],
     queryFn: () => getSingleProduct(productId),
     enabled: !!productId,
@@ -36,16 +36,21 @@ const EditProduct = () => {
       toast.success("Product updated successfully!");
       router.push("/dashboard/products");
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
       toast.error(err.message || "Something went wrong");
     },
   });
 
+  
+
   if (isLoading) return <p className="p-6">Loading...</p>;
   if (isError || !data?.success)
     return <p className="p-6 text-red-500">Failed to load product</p>;
 
-  const product: Product = data.data;
+  const product = data?.data as Product
+
+
 
   return (
     <div className="p-6 md:p-8 bg-gray-50 min-h-screen">
