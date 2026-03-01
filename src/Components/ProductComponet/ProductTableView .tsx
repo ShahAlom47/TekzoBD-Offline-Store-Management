@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import Link from "next/link";
 import { CustomTable } from "../CommonComponents/CustomTable";
@@ -9,53 +9,76 @@ interface Props {
 }
 
 const ProductTableView = ({ products }: Props) => {
-
   const columns = [
     { header: "Name", accessor: "name" },
-    { header: "SKU", accessor: "sku" },
-    { header: "Stock", accessor: "stock" },
-    { header: "Sell Price", accessor: "sell" },
-    { header: "Cost", accessor: "cost" },
+    { header: "Product Code", accessor: "productCode" },
+    { header: "Category", accessor: "category" },
+    { header: "Stock", accessor: "currentStock" },
+    { header: "Selling Price", accessor: "sellingPrice" },
+    { header: "Cost Price", accessor: "costPrice" },
     { header: "Stock Value", accessor: "stockValue" },
     { header: "Status", accessor: "status" },
     { header: "Action", accessor: "action" },
   ];
 
-  const data = products.map((item) => ({
-    name: item.name,
-    sku: item.sku,
-    stock: (
-      <span className={
-        item.currentStock <= (item.reorderLevel || 0)
-          ? "text-red-500 font-semibold"
-          : ""
-      }>
-        {item.currentStock} {item.unit}
-      </span>
-    ),
-    sell: `${item.sellingPrice} TK`,
-    cost: `${item.costPrice} TK`,
-    stockValue: `${item.currentStock * item.costPrice} TK`,
-    status: (
-      <span className={
-        item.status === "ACTIVE"
-          ? "text-green-600"
-          : "text-gray-400"
-      }>
-        {item.status}
-      </span>
-    ),
-    action: (
-      <div className="flex gap-3">
-        <Link href={`/dashboard/products/${item._id}`}>
-          Edit
-        </Link>
-        <button className="text-red-500">
+  const data = products.map((item) => {
+    const stockValue = item.currentStock * item.costPrice;
+
+    return {
+      name: item.name,
+
+      productCode: item.productCode || "N/A",
+
+      category: item.categoryId || "N/A",
+
+      currentStock: (
+        <span
+          className={
+            item.currentStock === 0
+              ? "text-red-500 font-semibold"
+              : item.currentStock < 5
+              ? "text-yellow-600 font-medium"
+              : ""
+          }
+        >
+          {item.currentStock} {item.unit}
+        </span>
+      ),
+
+      sellingPrice: `${item.sellingPrice} TK`,
+
+      costPrice: `${item.costPrice} TK`,
+
+      stockValue: `${stockValue} TK`,
+
+      status: (
+        <span
+          className={
+            item.status === "ACTIVE"
+              ? "text-green-600 font-medium"
+              : "text-gray-400"
+          }
+        >
+          {item.status}
+        </span>
+      ),
+
+      action: (
+        <div className="flex gap-3">
+          <Link
+            href={`/dashboard/products/${item._id}`}
+            className="text-blue-600 hover:underline"
+          >
+            Edit
+          </Link>
+
+          <button className="text-red-500 hover:underline">
             Delete
-        </button>
-      </div>
-    ),
-  }));
+          </button>
+        </div>
+      ),
+    };
+  });
 
   return <CustomTable columns={columns} data={data} />;
 };
