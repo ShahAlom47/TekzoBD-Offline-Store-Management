@@ -5,22 +5,18 @@ export interface Product {
 
   // Basic Info
   name: string;
-  sku: string;
-  barcode?: string;
+  slug: string;
+  productCode?: string;
   brand?: string;
   categoryId: string;
 
   // Pricing
   costPrice: number;              // Buying price
-  sellingPrice: number;           // Regular price
-  discountPrice?: number;
-  vatPercentage?: number;
-  minimumSellingPrice?: number;
+  sellingPrice: number;    
 
   // Inventory
   openingStock: number;           // Initial stock
-  currentStock: number;           // Live stock
-  reorderLevel?: number;          // Low stock alert
+  currentStock: number;          
   unit: "PCS" | "KG" | "LITER" | "BOX" | "Feet" ;
 
   // Auto Tracking (optional but useful)
@@ -45,22 +41,18 @@ export interface Product {
 export interface ProductFormData {
   // Basic Info
   name: string;
-  sku: string;
-  barcode?: string;
+  slug: string;
+  productCode?: string;
   brand?: string;
   categoryId: string;
 
   // Pricing
   costPrice: number;            // Buying price
-  sellingPrice: number;         // Regular price
-  discountPrice?: number;
-  vatPercentage?: number;
-  minimumSellingPrice?: number;
+  sellingPrice: number;   
 
   // Inventory
   openingStock: number;         // Initial stock
-  currentStock: number;         // Live stock
-  reorderLevel?: number;        // Low stock alert
+  currentStock: number;          
   unit: "PCS" | "KG" | "LITER" | "BOX" | "Feet";
 
   // Supplier
