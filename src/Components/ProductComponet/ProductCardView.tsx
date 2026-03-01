@@ -1,5 +1,6 @@
 "use client";
 
+import { useCategories } from "@/hook/useCategory";
 import { Product } from "@/Interfaces/productInterface";
 import Link from "next/link";
 
@@ -8,6 +9,11 @@ interface Props {
 }
 
 const ProductCardView = ({ products }: Props) => {
+  const { categories } = useCategories();
+  const catName = (catId: string) => {
+    const category = categories.find((cat) => cat._id === catId);
+    return category ? category.name : "N/A";
+  }
   return (
     <div className="space-y-4">
       {products.map((item) => {
@@ -23,6 +29,9 @@ const ProductCardView = ({ products }: Props) => {
             {/* Header */}
             <div className="flex justify-between items-center">
               <h2 className="font-semibold text-lg">{item.name}</h2>
+              <h1 className="text-sm font-medium">
+                category: {catName(item.categoryId) || "N/A"}
+            </h1>
 
               <span
                 className={

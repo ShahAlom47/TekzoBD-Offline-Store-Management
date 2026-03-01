@@ -3,12 +3,20 @@
 import Link from "next/link";
 import { CustomTable } from "../CommonComponents/CustomTable";
 import { Product } from "@/Interfaces/productInterface";
+import { useCategories } from "@/hook/useCategory";
 
 interface Props {
   products: Product[];
 }
 
 const ProductTableView = ({ products }: Props) => {
+  const { categories } = useCategories();
+  console.log(categories)
+const catName = (catId: string) => {
+  const category = categories.find((cat) => cat._id === catId);
+  return category ? category.name : "N/A";
+}
+
   const columns = [
     { header: "Name", accessor: "name" },
     { header: "Product Code", accessor: "productCode" },
@@ -29,7 +37,7 @@ const ProductTableView = ({ products }: Props) => {
 
       productCode: item.productCode || "N/A",
 
-      category: item.categoryId || "N/A",
+      category: catName(item.categoryId),
 
       currentStock: (
         <span
