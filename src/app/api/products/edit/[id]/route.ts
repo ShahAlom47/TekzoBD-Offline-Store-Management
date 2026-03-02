@@ -4,12 +4,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { ProductFormData } from "@/Interfaces/productInterface";
 
-export async function PUT(
+export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+ { params }: { params: Promise< { id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
+
+    console.log(id)
 
     if (!ObjectId.isValid(id)) {
       return NextResponse.json(
@@ -31,11 +33,8 @@ export async function PUT(
     const numericFields: (keyof ProductFormData)[] = [
       "costPrice",
       "sellingPrice",
-      "discountPrice",
-      "vatPercentage",
       "openingStock",
       "currentStock",
-      "reorderLevel",
     ];
 
     for (const field of numericFields) {

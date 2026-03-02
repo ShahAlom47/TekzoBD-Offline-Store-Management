@@ -56,7 +56,7 @@ const EditProduct = () => {
   const handleUpdate = async (formData: ProductFormData) => {
   try {
     const res = await updateProduct(productId, formData);
-
+console.log(res)
     if (!res?.success) {
       toast.error("Failed to update product");
       return;
