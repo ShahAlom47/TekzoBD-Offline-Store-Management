@@ -44,6 +44,9 @@ export const getSingleProduct = async (id: string) => {
 export const updateProduct = async (id: string,data:ProductFormData) => {
   return request("PATCH", `/products/edit/${id}`,{...data});
 }
+export const deleteProduct = async (id: string) => {
+  return request("DELETE", `/products/delete/${id}`);
+}
 
 
 

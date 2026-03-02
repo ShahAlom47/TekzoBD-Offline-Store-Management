@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CustomTable } from "../CommonComponents/CustomTable";
 import { Product } from "@/Interfaces/productInterface";
 import { useCategories } from "@/hook/useCategory";
+import DeleteProductButton from "./DeleteProductButton";
 
 interface Props {
   products: Product[];
@@ -80,9 +81,7 @@ const catName = (catId: string) => {
             Edit
           </Link>
 
-          <button className="text-red-500 hover:underline">
-            Delete
-          </button>
+        <DeleteProductButton productId={item._id.toString()}></DeleteProductButton>
         </div>
       ),
     };
