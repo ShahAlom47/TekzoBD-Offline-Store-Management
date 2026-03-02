@@ -64,4 +64,4 @@ const DeleteProductButton = ({ productId }: Props) => {
   );
 };
 
-export default DeleteProductButton;
+export default DeleteProductButton; 

@@ -1,9 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React from "react";
 import { toast } from "react-hot-toast";
 import { useRouter, useParams } from "next/navigation";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+
 import { Product, ProductFormData } from "@/Interfaces/productInterface";
 import ProductForm from "@/Components/Products/ProductForm";
 import {
@@ -14,43 +20,60 @@ import {
 const EditProduct = () => {
   const router = useRouter();
   const params = useParams();
+  const queryClient = useQueryClient();
+
   const productId = params?.id as string;
 
-  // ✅ Fetch product using useQuery
-  const { data , isLoading, isError } = useQuery({
+  // ✅ Fetch Single Product
+  const {
+    data,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["product", productId],
     queryFn: () => getSingleProduct(productId),
     enabled: !!productId,
   });
 
-  // ✅ Update mutation
-  const mutation = useMutation({
-    mutationFn: (formData: ProductFormData) =>
-      updateProduct(productId, formData),
-    onSuccess: (res) => {
-      if (!res.success) {
-        toast.error("Failed to update product");
-        return;
-      }
-
-      toast.success("Product updated successfully!");
-      router.push("/dashboard/products");
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (err: any) => {
-      toast.error(err.message || "Something went wrong");
-    },
-  });
-
   
 
-  if (isLoading) return <p className="p-6">Loading...</p>;
-  if (isError || !data?.success)
-    return <p className="p-6 text-red-500">Failed to load product</p>;
+  // 🔄 Loading state
+  if (isLoading) {
+    return <p className="p-6">Loading...</p>;
+  }
 
-  const product = data?.data as Product
+  // ❌ Error state
+  if (isError || !data?.success) {
+    return (
+      <p className="p-6 text-red-500">
+        Failed to load product
+      </p>
+    );
+  }
 
+  const product = data.data as Product;
 
+  const handleUpdate = async (formData: ProductFormData) => {
+  try {
+    const res = await updateProduct(productId, formData);
+
+    if (!res?.success) {
+      toast.error("Failed to update product");
+      return;
+    }
+
+    toast.success("Product updated successfully!");
+
+    queryClient.invalidateQueries({
+      queryKey: ["products"],
+    });
+
+    router.push("/dashboard/products");
+
+  } catch (error: any) {
+    toast.error(error?.message || "Something went wrong");
+  }
+};
 
   return (
     <div className="p-6 md:p-8 bg-gray-50 min-h-screen">
@@ -60,7 +83,8 @@ const EditProduct = () => {
 
       <ProductForm
         product={product}
-        onSubmit={(formData) => mutation.mutate(formData)}
+        // isSubmitting={mutation.isPending}
+        onSubmit={handleUpdate}
       />
     </div>
   );
