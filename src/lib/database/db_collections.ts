@@ -4,6 +4,7 @@ import clientPromise from "./db_connection";
 import { User } from "@/Interfaces/userInterfaces";
 import { Category } from "@/Interfaces/categoryInterfaces";
 import { Product } from "@/Interfaces/productInterface";
+import { Sale } from "@/Interfaces/saleInterfaces";
 
 
 // Define the User type (you can extend it as needed)
@@ -24,4 +25,9 @@ export const getProductCollection = async (): Promise<Collection<Product>> => {
   const client = await clientPromise;
   const db: Db = client.db("TekzoBD-Offline-Store-DB"); // Replace with your database name
   return db.collection<Product>("products");
+};
+export const getSalesCollection = async (): Promise<Collection<Sale>> => {
+  const client = await clientPromise;
+  const db: Db = client.db("TekzoBD-Offline-Store-DB"); // Replace with your database name
+  return db.collection<Sale>("sales");
 };

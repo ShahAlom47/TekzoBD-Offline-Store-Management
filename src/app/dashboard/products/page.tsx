@@ -15,7 +15,6 @@ const Products = () => {
     const [page, setPage] = useState(1);
   const limit = 10;
 
-  console.log(filters)
 
   const { data, isLoading } = useQuery({
   queryKey: ["products", page, filters],
