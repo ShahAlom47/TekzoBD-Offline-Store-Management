@@ -1,8 +1,8 @@
 "use client";
 
+import { ProductUnit } from "@/Interfaces/productInterface";
 import { getAllProduct } from "@/lib/allApiRequest/productRequest/productRequest";
 import { useQuery } from "@tanstack/react-query";
-import { all } from "axios";
 import React, { useState, useEffect } from "react";
 
 interface Product {
@@ -16,7 +16,9 @@ interface CartItem {
   productId: string;
   name: string;
   quantity: number;
+  unit: string;
   price: number;
+  total: number;
 }
 
 interface Props {
@@ -24,59 +26,74 @@ interface Props {
   setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
 }
 
+const units = ["PCS" , "KG" , "LITER" , "BOX" , "Feet"] as ProductUnit[];
+
 const ProductSelect = ({ cart, setCart }: Props) => {
   const [selectedId, setSelectedId] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [unit, setUnit] = useState("pcs");
+  const [price, setPrice] = useState(0);
 
   // Fetch all products
-  const { data, isLoading ,isError} = useQuery({
-  queryKey: ["products", 1],
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["products"],
     queryFn: async () => {
-      return await getAllProduct({
-        currentPage: 1,
-        limit: 10000,
-      });
+      const res = await getAllProduct({ currentPage: 1, limit: 10000 });
+      return res.data; // assuming API returns { data: Product[] }
     },
   });
 
-  if (isLoading) return <p>Loading...</p>;
 
-  const allProducts = data?.data as Product[] || [];
-  const totalPages = data?.totalPages || 1;
-  console.log(data?.totalPages)
+
+ const allProducts = data as Product[] || [];
+  const selectedProduct = allProducts.find((p) => p._id === selectedId);
+
+  // Update price when product is selected via the select's onChange handler (avoid setting state in effect)
 
   const handleAddProduct = () => {
-    if (!selectedId) return;
+    if (!selectedProduct || quantity <= 0 || price < 0) return;
 
-    const product = allProducts.find((p) => p._id === selectedId);
-    if (!product) return;
+    const total = quantity * price;
 
-    const existing = cart.find((c) => c.productId === product._id);
+    const existing = cart.find((c) => c.productId === selectedProduct._id);
 
     if (existing) {
-      // Increase quantity if already in cart
+      // Update existing cart item
       setCart(
         cart.map((c) =>
-          c.productId === product._id
-            ? { ...c, quantity: c.quantity + 1 }
+          c.productId === selectedProduct._id
+            ? {
+                ...c,
+                quantity: c.quantity + quantity,
+                unit,
+                price,
+                total: (c.quantity + quantity) * price,
+              }
             : c
         )
       );
     } else {
-      // Add new product to cart
+      // Add new cart item
       setCart([
         ...cart,
         {
-          productId: product._id,
-          name: product.name,
-          quantity: 1,
-          price: product.sellingPrice,
+          productId: selectedProduct._id,
+          name: selectedProduct.name,
+          quantity,
+          unit,
+          price,
+          total,
         },
       ]);
     }
 
-    setSelectedId(""); // Reset dropdown
+    // Reset inputs
+    setSelectedId("");
+    setQuantity(1);
+    setUnit("pcs");
+    setPrice(0);
   };
-
+    // Loading / Error
   if (isLoading) return <p>Loading products...</p>;
   if (isError) return <p>Error loading products.</p>;
 
@@ -93,25 +110,74 @@ const ProductSelect = ({ cart, setCart }: Props) => {
         </button>
       </div>
 
-      {/* Product Dropdown */}
-      <select
-        value={selectedId}
-        onChange={(e) => setSelectedId(e.target.value)}
-        className="w-full border p-2 rounded-lg"
-      >
-        <option value="">Select Product</option>
-        {allProducts.map((p) => (
-          <option
-            key={p._id}
-            value={p._id}
-            disabled={p.currentStock === 0}
-          >
-            {p.name} - Stock: {p.currentStock} - ৳{p.sellingPrice}
-          </option>
-        ))}
-      </select>
-      <input type="number" className="w-full border p-2 rounded-lg" placeholder="Quantity" />
-      <input type="number" className="w-full border p-2 rounded-lg" placeholder="price" />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        {/* Product Dropdown */}
+        <select
+          value={selectedId}
+          onChange={(e) => {
+            const id = e.target.value;
+            setSelectedId(id);
+            const prod = allProducts.find((p) => p._id === id);
+            if (prod) {
+              setPrice(prod.sellingPrice);
+            } else {
+              setPrice(0);
+            }
+          }}
+          className="border p-2 rounded-lg"
+        >
+          <option value="">Select Product</option>
+          {allProducts.map((p) => (
+            <option
+              key={p._id}
+              value={p._id}
+              disabled={p.currentStock === 0}
+            >
+              {p.name} - Stock: {p.currentStock} - ৳{p.sellingPrice}
+            </option>
+          ))}
+        </select>
+
+        {/* Quantity Input */}
+        <input
+          type="number"
+          min={1}
+          value={quantity}
+          onChange={(e) => setQuantity(Number(e.target.value))}
+          className="border p-2 rounded-lg"
+          placeholder="Quantity"
+        />
+
+        {/* Unit Select */}
+        <select
+          value={unit}
+          onChange={(e) => setUnit(e.target.value)}
+          className="border p-2 rounded-lg"
+        >
+          {units.map((u) => (
+            <option key={u} value={u}>
+              {u}
+            </option>
+          ))}
+        </select>
+
+        {/* Price Input */}
+        <input
+          type="number"
+          min={0}
+          value={price}
+          onChange={(e) => setPrice(Number(e.target.value))}
+          className="border p-2 rounded-lg"
+          placeholder="Unit Price"
+        />
+      </div>
+
+      {/* Auto Total */}
+      {selectedProduct && (
+        <p className="text-right text-sm font-medium">
+          Total: ৳ {quantity * price}
+        </p>
+      )}
     </div>
   );
 };

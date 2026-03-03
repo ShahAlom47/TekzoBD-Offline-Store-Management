@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
-
+// ProductUnit.ts
+export type ProductUnit = "PCS" | "KG" | "LITER" | "BOX" | "Feet";
 export interface Product {
   _id:  ObjectId;
 
@@ -17,7 +18,7 @@ export interface Product {
   // Inventory
   openingStock: number;           // Initial stock
   currentStock: number;          
-  unit: "PCS" | "KG" | "LITER" | "BOX" | "Feet" ;
+  unit:ProductUnit;
 
   // Auto Tracking (optional but useful)
   totalPurchased?: number;
