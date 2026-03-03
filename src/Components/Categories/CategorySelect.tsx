@@ -38,7 +38,7 @@ const CategorySelect: React.FC<Props> = ({
       }
       className={`my-input w-full ${className}`}
     >
-      {allowNone && <option value="">None</option>}
+      {allowNone && <option value="" className="text-xs">Select Category</option>}
 
       {filteredCategories.map((cat: Category) => (
         <option key={cat._id?.toString()} value={cat._id?.toString()}>

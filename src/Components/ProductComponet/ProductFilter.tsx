@@ -1,39 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import { GetAllProductParams, SortOptions } from "@/Interfaces/productInterface";
+import {
+  GetAllProductParams,
+  SortOptions,
+} from "@/Interfaces/productInterface";
+import { useCategories } from "@/hook/useCategory";
+import CategorySelect from "../Categories/CategorySelect";
 
 interface Props {
   onFilterChange: (filters: Partial<GetAllProductParams>) => void;
 }
 
 export default function ProductFilter({ onFilterChange }: Props) {
-  const [filters, setFilters] = useState({
-    searchTrim: "",
-    category: "",
-    brand: "",
-    minPrice: "",
-    maxPrice: "",
-    sort: "",
-    stock: "",
-  });
 
-  const handleChange = (field: string, value: string) => {
-    const updated = { ...filters, [field]: value };
+    const {categories}=useCategories();
+  const [filters, setFilters] =
+    useState<Partial<GetAllProductParams>>({
+      searchTrim: "",
+      category: "",
+      minPrice: "",
+      maxPrice: "",
+      sort: undefined,
+      stock: undefined,
+    });
+
+  const handleChange = (
+    field: keyof GetAllProductParams,
+    value: string
+  ) => {
+    const updated: Partial<GetAllProductParams> = {
+      ...filters,
+      [field]: value || undefined, // empty হলে undefined
+    };
+
     setFilters(updated);
     onFilterChange(updated);
   };
 
   const handleReset = () => {
-    const resetData = {
-      searchTrim: "",
-      category: "",
-      brand: "",
-      minPrice: "",
-      maxPrice: "",
-      sort: "",
-      stock: "",
-    };
+    const resetData: Partial<GetAllProductParams> = {};
     setFilters(resetData);
     onFilterChange(resetData);
   };
@@ -46,44 +52,37 @@ export default function ProductFilter({ onFilterChange }: Props) {
         <input
           type="text"
           placeholder="Search product..."
-          value={filters.searchTrim}
-          onChange={(e) => handleChange("searchTrim", e.target.value)}
+          value={filters.searchTrim || ""}
+          onChange={(e) =>
+            handleChange("searchTrim", e.target.value)
+          }
           className="border px-3 py-2 rounded-lg w-full"
         />
 
         {/* Category */}
-        <input
+        {/* <input
           type="text"
           placeholder="Category ID"
-          value={filters.category}
-          onChange={(e) => handleChange("category", e.target.value)}
+          value={filters.category || ""}
+          onChange={(e) =>
+            handleChange("category", e.target.value)
+          }
           className="border px-3 py-2 rounded-lg w-full"
+        /> */}
+        {/* CategorySelect use করা হচ্ছে */}
+        <CategorySelect
+          value={filters.category || ""}
+          onChange={(value) => handleChange("category", value || "")}
+          allowNone={true}
         />
 
-      
-
-        {/* Min Price */}
-        <input
-          type="number"
-          placeholder="Min Price"
-          value={filters.minPrice}
-          onChange={(e) => handleChange("minPrice", e.target.value)}
-          className="border px-3 py-2 rounded-lg w-full"
-        />
-
-        {/* Max Price */}
-        <input
-          type="number"
-          placeholder="Max Price"
-          value={filters.maxPrice}
-          onChange={(e) => handleChange("maxPrice", e.target.value)}
-          className="border px-3 py-2 rounded-lg w-full"
-        />
 
         {/* Stock */}
         <select
-          value={filters.stock}
-          onChange={(e) => handleChange("stock", e.target.value)}
+          value={filters.stock || ""}
+          onChange={(e) =>
+            handleChange("stock", e.target.value)
+          }
           className="border px-3 py-2 rounded-lg w-full"
         >
           <option value="">All Stock</option>
@@ -93,9 +92,12 @@ export default function ProductFilter({ onFilterChange }: Props) {
 
         {/* Sort */}
         <select
-          value={filters.sort}
+          value={filters.sort || ""}
           onChange={(e) =>
-            handleChange("sort", e.target.value as SortOptions)
+            handleChange(
+              "sort",
+              e.target.value as SortOptions
+            )
           }
           className="border px-3 py-2 rounded-lg w-full"
         >

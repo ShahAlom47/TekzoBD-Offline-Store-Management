@@ -26,17 +26,17 @@ export async function GET(req: NextRequest) {
     const sort = url.searchParams.get("sort") || "asc";
     const minPrice = url.searchParams.get("minPrice");
     const maxPrice = url.searchParams.get("maxPrice");
-    const categorySlug = url.searchParams.get("category");
+    const categoryId = url.searchParams.get("category");
     const brand = url.searchParams.get("brand");
     const stockParam = url.searchParams.get("stock"); // in-stock / out-of-stock / number
 
     // 🔹 Category slug → categoryId
-    let categoryId: string | null = null;
-    if (categorySlug) {
-      const categoryCollection = await getCategoryCollection();
-      const categoryDoc = await categoryCollection.findOne({ slug: categorySlug });
-      if (categoryDoc?._id) categoryId = categoryDoc._id.toString();
-    }
+    // let categoryId: string | null = null;
+    // if (categorySlug) {
+    //   const categoryCollection = await getCategoryCollection();
+    //   const categoryDoc = await categoryCollection.findOne({ slug: categorySlug });
+    //   if (categoryDoc?._id) categoryId = categoryDoc._id.toString();
+    // }
 
     // 🔹 Build filter
     const filter: any = { isDeleted: { $ne: true } }; // ignore deleted
@@ -46,8 +46,9 @@ export async function GET(req: NextRequest) {
       const regex = { $regex: searchTrim, $options: "i" };
       const orConditions: any[] = [
         { name: regex },
-        { sku: regex },
+        { slug: regex },
         { brand: regex },
+        { productCode: regex },
       ];
       try {
         const id = new ObjectId(searchTrim);
