@@ -11,8 +11,6 @@ export async function PATCH(
   try {
     const { id } = await params;
 
-    console.log(id)
-
     if (!ObjectId.isValid(id)) {
       return NextResponse.json(
         { message: "Invalid product ID", success: false },

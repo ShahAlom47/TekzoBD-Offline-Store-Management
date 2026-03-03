@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     const productCollection = await getProductCollection();
     const isDashboard = req.headers.get("x-from-dashboard") === "true";
 
-    console.log(url)
+ 
 
     // 🔹 Pagination
     const currentPage = parseInt(url.searchParams.get("currentPage") || "1", 10);
