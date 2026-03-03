@@ -1,42 +1,45 @@
-"use client";
+'use client'
 
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAllProduct } from "@/lib/allApiRequest/productRequest/productRequest";
-import ProductCardView from "@/Components/ProductComponet/ProductCardView";
-import ProductFilter from "@/Components/ProductComponet/ProductFilter";
-import { DashPaginationButton } from "@/Components/CommonComponents/DashPaginationButton";
-import { Product, GetAllProductParams } from "@/Interfaces/productInterface";
 import ProductTableView from "@/Components/ProductComponet/ProductTableView ";
+import { GetAllProductParams, Product } from "@/Interfaces/productInterface";
+import ProductCardView from "@/Components/ProductComponet/ProductCardView";
+import { DashPaginationButton } from "@/Components/CommonComponents/DashPaginationButton";
+import ProductFilter from "@/Components/ProductComponet/ProductFilter";
+
 
 const Products = () => {
-  const [page, setPage] = useState(1);
+   const [filters, setFilters] = useState<Partial<GetAllProductParams>>({});
+    const [page, setPage] = useState(1);
   const limit = 10;
 
-  const [filters, setFilters] = useState<Partial<GetAllProductParams>>({});
-
   const { data, isLoading } = useQuery({
-    queryKey: ["products", page, filters], // 🔥 important
+  queryKey: ["products", page, filters],
     queryFn: async () => {
       return await getAllProduct({
         currentPage: page,
         limit: limit,
-        isDashboardRequest: true,
-        ...filters,
+          ...filters,
       });
     },
-    keepPreviousData: true, // 🔥 smooth pagination
+    placeholderData: (prev) => prev, // keep old data while fetching new
   });
+
+  if (isLoading) return <p>Loading...</p>;
 
   const products = data?.data as Product[] || [];
   const totalPages = data?.totalPages || 1;
-  
+  console.log(data?.totalPages)
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold my-3">Stock Products</h1>
+        <div>
+            <h1 className="text-2xl font-bold my-3 ">Stock Products</h1>
+        </div>
 
-      {/* 🔥 Filter Section */}
+              {/* 🔥 Filter Section */}
       <ProductFilter
         onFilterChange={(newFilters) => {
           setPage(1); // filter change করলে page reset
@@ -44,7 +47,7 @@ const Products = () => {
         }}
       />
 
-      {isLoading ? (
+         {isLoading ? (
         <p>Loading...</p>
       ) : (
         <>
@@ -67,8 +70,12 @@ const Products = () => {
           />
         </>
       )}
+
     </div>
   );
 };
 
 export default Products;
+
+
+

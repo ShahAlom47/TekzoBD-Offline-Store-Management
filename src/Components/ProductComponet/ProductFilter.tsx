@@ -60,14 +60,7 @@ export default function ProductFilter({ onFilterChange }: Props) {
           className="border px-3 py-2 rounded-lg w-full"
         />
 
-        {/* Brand */}
-        <input
-          type="text"
-          placeholder="Brand"
-          value={filters.brand}
-          onChange={(e) => handleChange("brand", e.target.value)}
-          className="border px-3 py-2 rounded-lg w-full"
-        />
+      
 
         {/* Min Price */}
         <input
