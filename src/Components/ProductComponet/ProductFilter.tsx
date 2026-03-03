@@ -45,78 +45,98 @@ export default function ProductFilter({ onFilterChange }: Props) {
   };
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow-sm space-y-4 mb-5">
-      <div className="grid md:grid-cols-3 gap-4">
+   <div className="bg-white/80 backdrop-blur-md border border-gray-200 
+rounded-2xl p-5 shadow-sm mb-6">
 
-        {/* Search */}
+  <div className="flex flex-col gap-4">
+
+    {/* Top Row */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      {/* Search */}
+      <div className="relative">
         <input
           type="text"
-          placeholder="Search product..."
+          placeholder="Search products..."
           value={filters.searchTrim || ""}
           onChange={(e) =>
             handleChange("searchTrim", e.target.value)
           }
-          className="border px-3 py-2 rounded-lg w-full"
+          className="w-full border border-gray-200 
+          focus:border-black focus:ring-1 focus:ring-black
+          px-4 py-2.5 rounded-xl text-sm 
+          transition-all duration-200 outline-none"
         />
+      </div>
 
-        {/* Category */}
-        {/* <input
-          type="text"
-          placeholder="Category ID"
-          value={filters.category || ""}
-          onChange={(e) =>
-            handleChange("category", e.target.value)
-          }
-          className="border px-3 py-2 rounded-lg w-full"
-        /> */}
-        {/* CategorySelect use করা হচ্ছে */}
+      {/* Category */}
+      <div>
         <CategorySelect
           value={filters.category || ""}
-          onChange={(value) => handleChange("category", value || "")}
+          onChange={(value) =>
+            handleChange("category", value || "")
+          }
           allowNone={true}
         />
-
-
-        {/* Stock */}
-        <select
-          value={filters.stock || ""}
-          onChange={(e) =>
-            handleChange("stock", e.target.value)
-          }
-          className="border px-3 py-2 rounded-lg w-full"
-        >
-          <option value="">All Stock</option>
-          <option value="in-stock">In Stock</option>
-          <option value="out-of-stock">Out of Stock</option>
-        </select>
-
-        {/* Sort */}
-        <select
-          value={filters.sort || ""}
-          onChange={(e) =>
-            handleChange(
-              "sort",
-              e.target.value as SortOptions
-            )
-          }
-          className="border px-3 py-2 rounded-lg w-full"
-        >
-          <option value="">Sort</option>
-          <option value="asc">Price Low → High</option>
-          <option value="desc">Price High → Low</option>
-          <option value="newest">Newest</option>
-          <option value="popular">Popular</option>
-        </select>
       </div>
 
-      <div className="flex justify-end">
-        <button
-          onClick={handleReset}
-          className="px-4 py-2 border rounded-lg hover:bg-gray-100"
-        >
-          Reset Filters
-        </button>
-      </div>
+      {/* Stock */}
+      <select
+        value={filters.stock || ""}
+        onChange={(e) =>
+          handleChange("stock", e.target.value)
+        }
+        className="w-full border border-gray-200
+        focus:border-black focus:ring-1 focus:ring-black
+        px-4 py-2.5 rounded-xl text-sm
+        outline-none transition-all duration-200"
+      >
+        <option value="">All Stock</option>
+        <option value="in-stock">In Stock</option>
+        <option value="out-of-stock">Out of Stock</option>
+      </select>
+
+      {/* Sort */}
+      <select
+        value={filters.sort || ""}
+        onChange={(e) =>
+          handleChange(
+            "sort",
+            e.target.value as SortOptions
+          )
+        }
+        className="w-full border border-gray-200
+        focus:border-black focus:ring-1 focus:ring-black
+        px-4 py-2.5 rounded-xl text-sm
+        outline-none transition-all duration-200"
+      >
+        <option value="">Sort</option>
+        <option value="asc">Price Low → High</option>
+        <option value="desc">Price High → Low</option>
+        <option value="newest">Newest</option>
+        <option value="popular">Popular</option>
+      </select>
     </div>
+
+    {/* Bottom Row */}
+    <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2">
+
+      <p className="text-xs text-gray-500">
+        Filter and manage your products efficiently
+      </p>
+
+      <button
+        onClick={handleReset}
+        className="px-4 py-2 text-sm font-medium
+        border border-gray-300 rounded-xl
+        hover:bg-black hover:text-white
+        transition-all duration-200"
+      >
+        Reset Filters
+      </button>
+    </div>
+
+  </div>
+</div>
   );
 }
