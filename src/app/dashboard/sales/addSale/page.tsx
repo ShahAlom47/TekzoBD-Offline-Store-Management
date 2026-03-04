@@ -24,7 +24,6 @@ const AddSalePage = () => {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null,
   );
-  const [showModal, setShowModal] = useState(false);
 
   const totalAmount = cart.reduce(
     (acc, item) => acc + item.quantity * item.price,
@@ -47,9 +46,7 @@ const AddSalePage = () => {
     alert("Sale Submitted (Check console)");
   };
 
-  const handleAddCustomer = (customer: Customer) => {
-    setCustomers((prev) => [...prev, customer]);
-  };
+
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
@@ -58,7 +55,6 @@ const AddSalePage = () => {
         customers={customers}
         selectedCustomer={selectedCustomer}
         setSelectedCustomer={setSelectedCustomer}
-        onAddCustomerClick={() => setShowModal(true)}
       />
 
       <ProductSelect cart={cart} setCart={setCart} />

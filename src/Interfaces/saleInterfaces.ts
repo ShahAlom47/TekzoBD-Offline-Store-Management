@@ -3,19 +3,26 @@ import { ObjectId } from "mongodb";
 export interface SaleProduct {
     productId: string;
     quantity: number;
-    sellingPrice: number; // per unit
-    totalPrice: number; // quantity * sellingPrice
+
+    sellingPrice: number;  // per unit
+    costPrice: number;     // per unit cost (from Product DB)
+    
+    totalPrice: number;    // quantity * sellingPrice
+    totalCost: number;     // quantity * costPrice
+    profit: number;        // totalPrice - totalCost
 }
 
 export interface Sale {
   _id?: ObjectId;
-  customerId?: string; // optional, যদি regular customer থাকে
+  customerId?: string;       // optional, walk-in
   products: SaleProduct[];
-  discount?: number; // optional
-  totalAmount: number; // sum of all products - discount
+  discount?: number;         // optional
+  totalAmount: number;       // sum(products totalPrice) - discount
+  totalCost: number;         // sum(products totalCost)
+  totalProfit: number;       // totalAmount - totalCost
   paidAmount: number;
-  dueAmount: number; // totalAmount - paidAmount
-  createdBy?: string; // কে sale করেছে
+  dueAmount: number;         // totalAmount - paidAmount
+  createdBy?: string;        // কোন user sale করেছে
   createdAt: Date;
   saleNumber?: string; 
 }
