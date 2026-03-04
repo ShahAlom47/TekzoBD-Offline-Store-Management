@@ -1,14 +1,18 @@
 "use client";
 
 import ProductSelect from "@/Components/Sales/ProductSelect";
+import { ProductUnit } from "@/Interfaces/productInterface";
 import React, { useState } from "react";
 
-interface CartItem {
+export interface CartItem {
   productId: string;
   name: string;
   quantity: number;
+  unit: ProductUnit;
   price: number;
+  total: number;
 }
+
 
 const AddSalePage = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -23,17 +27,7 @@ const AddSalePage = () => {
   const finalAmount = totalAmount - discount;
   const dueAmount = finalAmount - paidAmount;
 
-  const handleAddFakeProduct = () => {
-    // demo product (later API search দিয়ে replace করবে)
-    const newItem: CartItem = {
-      productId: Date.now().toString(),
-      name: "Demo Product",
-      quantity: 1,
-      price: 500,
-    };
 
-    setCart([...cart, newItem]);
-  };
 
   const handleSubmit = () => {
     const saleData = {

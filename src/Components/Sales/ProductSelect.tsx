@@ -1,9 +1,10 @@
 "use client";
 
+import { CartItem } from "@/app/dashboard/sales/addSale/page";
 import { ProductUnit } from "@/Interfaces/productInterface";
 import { getAllProduct } from "@/lib/allApiRequest/productRequest/productRequest";
 import { useQuery } from "@tanstack/react-query";
-import React, { useState, useEffect } from "react";
+import React, { useState, } from "react";
 
 interface Product {
   _id: string;
@@ -12,14 +13,6 @@ interface Product {
   currentStock: number;
 }
 
-interface CartItem {
-  productId: string;
-  name: string;
-  quantity: number;
-  unit: string;
-  price: number;
-  total: number;
-}
 
 interface Props {
   cart: CartItem[];
@@ -31,7 +24,7 @@ const units = ["PCS" , "KG" , "LITER" , "BOX" , "Feet"] as ProductUnit[];
 const ProductSelect = ({ cart, setCart }: Props) => {
   const [selectedId, setSelectedId] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [unit, setUnit] = useState("pcs");
+  const [unit, setUnit] = useState("PCS" as ProductUnit);
   const [price, setPrice] = useState(0);
 
   // Fetch all products
@@ -90,7 +83,7 @@ const ProductSelect = ({ cart, setCart }: Props) => {
     // Reset inputs
     setSelectedId("");
     setQuantity(1);
-    setUnit("pcs");
+    setUnit("PCS");
     setPrice(0);
   };
     // Loading / Error
@@ -151,7 +144,7 @@ const ProductSelect = ({ cart, setCart }: Props) => {
         {/* Unit Select */}
         <select
           value={unit}
-          onChange={(e) => setUnit(e.target.value)}
+          onChange={(e) => setUnit(e.target.value as ProductUnit)}
           className="border p-2 rounded-lg"
         >
           {units.map((u) => (
