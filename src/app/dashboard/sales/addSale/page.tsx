@@ -1,6 +1,8 @@
 "use client";
 
+import CustomerSelect from "@/Components/CommonComponents/CustomerSelect";
 import ProductSelect from "@/Components/Sales/ProductSelect";
+import { Customer } from "@/Interfaces/customerInterface";
 import { ProductUnit } from "@/Interfaces/productInterface";
 import React, { useState } from "react";
 
@@ -13,21 +15,24 @@ export interface CartItem {
   total: number;
 }
 
-
 const AddSalePage = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [paidAmount, setPaidAmount] = useState(0);
   const [discount, setDiscount] = useState(0);
 
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null,
+  );
+  const [showModal, setShowModal] = useState(false);
+
   const totalAmount = cart.reduce(
     (acc, item) => acc + item.quantity * item.price,
-    0
+    0,
   );
 
   const finalAmount = totalAmount - discount;
   const dueAmount = finalAmount - paidAmount;
-
-
 
   const handleSubmit = () => {
     const saleData = {
@@ -42,10 +47,19 @@ const AddSalePage = () => {
     alert("Sale Submitted (Check console)");
   };
 
+  const handleAddCustomer = (customer: Customer) => {
+    setCustomers((prev) => [...prev, customer]);
+  };
+
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
-
       <h1 className="text-2xl font-bold">🧾 Add New Sale</h1>
+      <CustomerSelect
+        customers={customers}
+        selectedCustomer={selectedCustomer}
+        setSelectedCustomer={setSelectedCustomer}
+        onAddCustomerClick={() => setShowModal(true)}
+      />
 
       <ProductSelect cart={cart} setCart={setCart} />
 
@@ -85,7 +99,6 @@ const AddSalePage = () => {
 
       {/* Summary Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
         {/* Payment Section */}
         <div className="bg-white p-6 rounded-2xl shadow space-y-4">
           <h2 className="font-semibold text-lg">Payment</h2>
