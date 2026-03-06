@@ -61,7 +61,7 @@ export function CustomTable<T extends object>({
               ))}
             </tr>
           </thead>
-          <tbody className="   ">
+          <tbody className=" mt-2   ">
             {data.length > 0 ? (
               data.map((row, rowIndex) => (
                 <tr

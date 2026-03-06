@@ -25,6 +25,7 @@ const AddCustomer = () => {
     try {
       // Backend API call (example)
       const response = await addCustomer(data);
+      console.log(response)
 
       if (!response.success) throw new Error("Failed to add customer");
 

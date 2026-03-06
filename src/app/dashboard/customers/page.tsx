@@ -63,10 +63,10 @@ console.log(customer)
           + Add 
         </button>
 
-        <CustomerTable  customer={customer}></CustomerTable>
+       
 
       </div>
-
+ <CustomerTable  customer={customer}></CustomerTable>
 
  <CustomModal
         open={isOpen}

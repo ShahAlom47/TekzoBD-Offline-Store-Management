@@ -2,6 +2,7 @@
 
 import CustomerSelect from "@/Components/CommonComponents/CustomerSelect";
 import ProductSelect from "@/Components/Sales/ProductSelect";
+import { useCustomers } from "@/hook/useCustomers";
 import { Customer } from "@/Interfaces/customerInterface";
 import { ProductUnit } from "@/Interfaces/productInterface";
 import React, { useState } from "react";
@@ -20,10 +21,12 @@ const AddSalePage = () => {
   const [paidAmount, setPaidAmount] = useState(0);
   const [discount, setDiscount] = useState(0);
 
-  const [customers, setCustomers] = useState<Customer[]>([]);
+
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null,
   );
+
+  const { data: customers } = useCustomers();
 
   const totalAmount = cart.reduce(
     (acc, item) => acc + item.quantity * item.price,
@@ -52,7 +55,7 @@ const AddSalePage = () => {
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <h1 className="text-2xl font-bold">🧾 Add New Sale</h1>
       <CustomerSelect
-        customers={customers}
+        customers={customers || []}
         selectedCustomer={selectedCustomer}
         setSelectedCustomer={setSelectedCustomer}
       />

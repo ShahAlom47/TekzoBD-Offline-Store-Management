@@ -20,6 +20,8 @@ const CustomerSelect = ({
   const [query, setQuery] = useState("");
   const [isOpen,setOpen]= useState<boolean>(false)
 
+  console.log(customers)
+
   const filteredCustomers =
     query === ""
       ? customers
@@ -51,7 +53,7 @@ const CustomerSelect = ({
 
               {filteredCustomers.map((customer) => (
                 <Combobox.Option
-                  key={customer._id}
+                  key={customer._id?.toString()}
                   value={customer}
                   className="p-2 cursor-pointer hover:bg-blue-100"
                 >

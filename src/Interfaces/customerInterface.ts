@@ -1,7 +1,9 @@
 // Interfaces/customerInterface.ts
 
+import { ObjectId } from "mongodb";
+
 export interface Customer {
-  _id: string;
+  _id?: ObjectId|string;
 
   // Basic Info
   name: string;

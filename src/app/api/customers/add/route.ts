@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const collection = await getCustomerCollection();
 
     const newCustomer: Customer = {
-      _id: "", // MongoDB insert করার সময় generate হবে
+  
       name,
       phone,
       email,

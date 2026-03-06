@@ -24,6 +24,16 @@ const CustomerTable = ({ customer, refetch }:TableProps) => {
     phone: customer.phone,
     address: customer.address,
     currentStock: customer.currentDue,
+    status: (<span className={`px-2 py-1 rounded-full text-sm ${customer.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+      {customer.isActive ? 'Active' : 'Inactive'}
+    </span>),
+    action: (
+      <div className="flex gap-2">  
+        <button className="bg-blue-600 text-white px-3 py-1 rounded-lg">View</button>
+        <button className="bg-yellow-600 text-white px-3 py-1 rounded-lg">Edit</button>
+        <button className="bg-red-600 text-white px-3 py-1 rounded-lg">Delete</button>
+      </div>
+    ),      
   }));
 
     return (
