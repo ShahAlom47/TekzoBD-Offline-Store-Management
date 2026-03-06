@@ -44,4 +44,9 @@ width: 100%;
 transition:all 0.2s ease-in-out ;
 }
 
+.bb{
+  border: red;
+  border-width: 6px;
+}
+
   

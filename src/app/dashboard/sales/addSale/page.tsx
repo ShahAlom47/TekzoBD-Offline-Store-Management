@@ -60,7 +60,7 @@ const AddSalePage = () => {
       <ProductSelect cart={cart} setCart={setCart} />
 
       {/* Cart Table */}
-      <div className="bg-white rounded-2xl shadow overflow-hidden">
+      <div className="bg-white rounded-2xl shadow overflow-hidden bb" >
         <table className="w-full text-sm">
           <thead className="bg-gray-100">
             <tr>
@@ -68,6 +68,8 @@ const AddSalePage = () => {
               <th className="p-3 text-center">Qty</th>
               <th className="p-3 text-center">Price</th>
               <th className="p-3 text-right">Total</th>
+              <th className="p-3 text-right">Action</th>
+
             </tr>
           </thead>
           <tbody>
@@ -78,6 +80,18 @@ const AddSalePage = () => {
                 <td className="p-3 text-center">৳ {item.price}</td>
                 <td className="p-3 text-right">
                   ৳ {item.quantity * item.price}
+                </td>
+                <td className="p-3 text-right">
+                  <button
+                  className="bg-red-600 px-2  py-1 rounded-sm text-white"
+                    onClick={() => {
+                      const newCart = [...cart];   
+                      newCart.splice(index, 1);
+                      setCart(newCart);   
+                    }}
+                  >
+                    Remove
+                  </button>
                 </td>
               </tr>
             ))}
