@@ -3,6 +3,11 @@
 import AddCustomer from "@/Components/CommonComponents/AddCustomer";
 import CustomModal from "@/Components/CommonComponents/CustomModal";
 import SearchBox from "@/Components/CommonComponents/SearchBox";
+import CustomerTable from "@/Components/CustomerComponet/CustomarTable";
+import { useConfirm } from "@/hook/useConfirm";
+import { Customer } from "@/Interfaces/customerInterface";
+import { getCustomer } from "@/lib/allApiRequest/customerRequest/customerRequest";
+import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 
 const Customers = () => {
@@ -10,6 +15,33 @@ const Customers = () => {
   const [search, setSearch] = useState("");
   
     const [isOpen,setOpen]= useState<boolean>(false)
+
+         const { confirm, ConfirmModal } = useConfirm();
+      const [page, setPage] = useState(1);
+      const limit = 10;
+     const {
+    data,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["getCustomers", page],
+    queryFn: async () => {
+      const response = await getCustomer({
+        currentPage: page,
+        limit,
+      });
+      // if (!response || !response.success) {
+      //   throw new Error(response.message || "Failed to fetch category data");
+      // }
+      return response;
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  const customer = data?.data as Customer[] || [];
+
+console.log(customer)
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
@@ -30,6 +62,8 @@ const Customers = () => {
         >
           + Add 
         </button>
+
+        <CustomerTable  customer={customer}></CustomerTable>
 
       </div>
 

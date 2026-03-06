@@ -15,6 +15,7 @@ export interface Customer {
   // Financial Info (Derived – DB তে store না করলেও চলবে)
   openingBalance?: number; // যদি পুরানো বাকি নিয়ে শুরু করো
   creditLimit?: number;    // সর্বোচ্চ কত বাকি রাখতে পারবে
+  currentDue?:number;
 
   // Status
   isActive: boolean;
@@ -34,4 +35,10 @@ export  interface AddCustomerFormInputs {
   openingBalance?: number;
   creditLimit?: number;
   isActive: boolean;
+}
+
+export interface GetAllCustomerParams {
+  currentPage: number;
+  limit: number;
+  searchTrim?: string;
 }
