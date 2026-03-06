@@ -3,6 +3,8 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { AddCustomerFormInputs } from "@/Interfaces/customerInterface";
+import { addCustomer } from "@/lib/allApiRequest/customerRequest/customerRequest";
+import toast from "react-hot-toast";
 
 
 
@@ -22,19 +24,15 @@ const AddCustomer = () => {
   const onSubmit: SubmitHandler<AddCustomerFormInputs> = async (data) => {
     try {
       // Backend API call (example)
-      const response = await fetch("/api/customer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, createdAt: new Date(), updatedAt: new Date() }),
-      });
+      const response = await addCustomer(data);
 
-      if (!response.ok) throw new Error("Failed to add customer");
+      if (!response.success) throw new Error("Failed to add customer");
 
-      alert("Customer added successfully!");
+      toast.success("Customer added successfully!");
       reset(); // Clear form
     } catch (err) {
       console.error(err);
-      alert("Error adding customer");
+      toast.error("Error adding customer");
     }
   };
 
