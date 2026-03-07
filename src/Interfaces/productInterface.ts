@@ -2,36 +2,28 @@ import { ObjectId } from "mongodb";
 // ProductUnit.ts
 export type ProductUnit = "PCS" | "KG" | "LITER" | "BOX" | "Feet";
 export interface Product {
-  _id:  ObjectId;
+  _id: ObjectId;
 
-  // Basic Info
   name: string;
   slug: string;
   productCode?: string;
   brand?: string;
   categoryId: string;
 
-  // Pricing
-  costPrice: number;              // Buying price
-  sellingPrice: number;    
+  costPrice: number;
+  sellingPrice: number;
 
-  // Inventory
-  openingStock: number;           // Initial stock
-  currentStock: number;          
-  unit:ProductUnit;
+  unit: ProductUnit;
 
-  // Auto Tracking (optional but useful)
-  totalPurchased?: number;
-  totalSold?: number;
-  stockValue?: number;            // currentStock * costPrice
+  currentStock: number;
+  totalSold: number;
 
-  // Supplier
+  stockValue?: number;
+
   supplierId?: string;
 
-  // Status
   status: "ACTIVE" | "INACTIVE";
 
-  // Soft Delete
   isDeleted?: boolean;
 
   createdAt: Date;

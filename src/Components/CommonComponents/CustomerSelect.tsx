@@ -7,9 +7,12 @@ import CustomModal from "./CustomModal";
 import AddCustomer from "./AddCustomer";
 import { useCustomers } from "@/hook/useCustomers";
 
+
+
 interface Props {
+  customers: Customer[];
   selectedCustomer: Customer | null;
-  setSelectedCustomer: (customer: Customer | null) => void;
+  setSelectedCustomer: React.Dispatch<React.SetStateAction<Customer | null>>;
 }
 
 const CustomerSelect = ({ selectedCustomer, setSelectedCustomer }: Props) => {

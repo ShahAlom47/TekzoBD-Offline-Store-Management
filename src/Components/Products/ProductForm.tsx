@@ -30,7 +30,6 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
           categoryId: product.categoryId,
           costPrice: product.costPrice,
           sellingPrice: product.sellingPrice,
-          openingStock: product.openingStock,
           currentStock: product.currentStock,
           unit: product.unit,
           supplierId: product.supplierId,
@@ -44,7 +43,6 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
           categoryId: "",
           costPrice: 0,
           sellingPrice: 0,
-          openingStock: 0,
           currentStock: 0,
           unit: "PCS",
           supplierId: "",
@@ -62,8 +60,6 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
         categoryId: product.categoryId,
         costPrice: product.costPrice,
         sellingPrice: product.sellingPrice,
-        openingStock: product.openingStock,
-        currentStock: product.currentStock,
         unit: product.unit,
         supplierId: product.supplierId,
         status: product.status,
@@ -138,18 +134,13 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
         />
 
         <Input
-          label="Opening Stock *"
-          type="number"
-          required
-          {...register("openingStock", { required: true, min: 0 })}
-        />
-
-        <Input
-          label="Current Stock *"
+          label="current Stock *"
           type="number"
           required
           {...register("currentStock", { required: true, min: 0 })}
         />
+
+       
 
         <Select
           label="Unit *"
