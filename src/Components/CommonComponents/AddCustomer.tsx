@@ -1,14 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { AddCustomerFormInputs } from "@/Interfaces/customerInterface";
 import { addCustomer } from "@/lib/allApiRequest/customerRequest/customerRequest";
 import toast from "react-hot-toast";
 
-
-
 const AddCustomer = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const {
     register,
     handleSubmit,
@@ -23,15 +22,18 @@ const AddCustomer = () => {
 
   const onSubmit: SubmitHandler<AddCustomerFormInputs> = async (data) => {
     try {
+      setIsLoading(true);
       // Backend API call (example)
       const response = await addCustomer(data);
-      console.log(response)
+      console.log(response);
 
       if (!response.success) throw new Error("Failed to add customer");
 
       toast.success("Customer added successfully!");
-      reset(); // Clear form
+      setIsLoading(false);
+      reset();
     } catch (err) {
+      setIsLoading(false);
       console.error(err);
       toast.error("Error adding customer");
     }
@@ -49,7 +51,9 @@ const AddCustomer = () => {
             {...register("name", { required: "Name is required" })}
             className="w-full border p-2 rounded-lg"
           />
-          {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+          {errors.name && (
+            <p className="text-red-500 text-sm">{errors.name.message}</p>
+          )}
         </div>
 
         {/* Phone */}
@@ -59,7 +63,9 @@ const AddCustomer = () => {
             {...register("phone", { required: "Phone is required" })}
             className="w-full border p-2 rounded-lg"
           />
-          {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
+          {errors.phone && (
+            <p className="text-red-500 text-sm">{errors.phone.message}</p>
+          )}
         </div>
 
         {/* Email */}
@@ -116,20 +122,17 @@ const AddCustomer = () => {
 
         {/* Is Active */}
         <div className="flex items-center space-x-2">
-          <input
-            {...register("isActive")}
-            type="checkbox"
-            defaultChecked
-          />
+          <input {...register("isActive")} type="checkbox" defaultChecked />
           <label className="font-medium">Active</label>
         </div>
 
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+          className={`w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
+          disabled={isLoading}
         >
-          Add Customer
+          {isLoading ? "Loading..." : "Add Customer"}
         </button>
       </form>
     </div>
