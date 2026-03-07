@@ -27,15 +27,14 @@ export async function POST(req: NextRequest) {
 
     const collection = await getCustomerCollection();
 
-    const newCustomer: Customer = {
-  
+    const newCustomer = {
       name,
       phone,
-      email,
-      address,
-      customerType,
-      openingBalance,
-      creditLimit,
+      email: email || "",
+      address: address || "",
+      customerType: customerType || "REGULAR",
+      openingBalance: openingBalance || 0,
+      creditLimit: creditLimit || 0,
       isActive: isActive ?? true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -43,15 +42,23 @@ export async function POST(req: NextRequest) {
 
     const result = await collection.insertOne(newCustomer);
 
+    // 🔥 Final Customer Object
+    const createdCustomer: Customer = {
+      _id: result.insertedId,
+      ...newCustomer,
+    };
+
     return NextResponse.json(
       {
         success: true,
         message: "Customer added successfully",
-        data: { ...newCustomer, _id: result.insertedId },
+        data: createdCustomer,
       },
       { status: 201 }
     );
   } catch (error) {
+    console.error(error);
+
     return NextResponse.json(
       {
         success: false,

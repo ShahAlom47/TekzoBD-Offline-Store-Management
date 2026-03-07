@@ -2,12 +2,17 @@
 
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { AddCustomerFormInputs } from "@/Interfaces/customerInterface";
+import { AddCustomerFormInputs, Customer } from "@/Interfaces/customerInterface";
 import { addCustomer } from "@/lib/allApiRequest/customerRequest/customerRequest";
 import toast from "react-hot-toast";
 
-const AddCustomer = () => {
+interface AddCustomerProps {
+  onSuccess: (customer: Customer) => void;
+}
+
+const AddCustomer = ({ onSuccess }: AddCustomerProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const {
     register,
     handleSubmit,
@@ -23,19 +28,26 @@ const AddCustomer = () => {
   const onSubmit: SubmitHandler<AddCustomerFormInputs> = async (data) => {
     try {
       setIsLoading(true);
-      // Backend API call (example)
-      const response = await addCustomer(data);
-      console.log(response);
 
-      if (!response.success) throw new Error("Failed to add customer");
+      const response = await addCustomer(data);
+
+      if (!response.success) {
+        throw new Error("Failed to add customer");
+      }
+
+      const newCustomer= response?.data as Customer;
 
       toast.success("Customer added successfully!");
-      setIsLoading(false);
+
+      // 🔥 parent component কে new customer পাঠানো
+      onSuccess(newCustomer);
+
       reset();
     } catch (err) {
-      setIsLoading(false);
       console.error(err);
       toast.error("Error adding customer");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -126,13 +138,15 @@ const AddCustomer = () => {
           <label className="font-medium">Active</label>
         </div>
 
-        {/* Submit Button */}
+        {/* Submit */}
         <button
           type="submit"
-          className={`w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors ${isLoading ? "cursor-not-allowed opacity-50" : ""}`}
           disabled={isLoading}
+          className={`w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition ${
+            isLoading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
         >
-          {isLoading ? "Loading..." : "Add Customer"}
+          {isLoading ? "Adding..." : "Add Customer"}
         </button>
       </form>
     </div>
