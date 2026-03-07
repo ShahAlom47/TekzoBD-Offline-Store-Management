@@ -7,10 +7,7 @@ import CustomModal from "./CustomModal";
 import AddCustomer from "./AddCustomer";
 import { useCustomers } from "@/hook/useCustomers";
 
-
-
 interface Props {
-  customers: Customer[];
   selectedCustomer: Customer | null;
   setSelectedCustomer: React.Dispatch<React.SetStateAction<Customer | null>>;
 }
@@ -20,7 +17,7 @@ const CustomerSelect = ({ selectedCustomer, setSelectedCustomer }: Props) => {
   const [query, setQuery] = useState("");
   const [isOpen, setOpen] = useState(false);
 
-  // filter customers by name / phone / address / type
+  // Filter customers by name, phone, address or type
   const filteredCustomers =
     !customers || query === ""
       ? customers || []
@@ -36,64 +33,74 @@ const CustomerSelect = ({ selectedCustomer, setSelectedCustomer }: Props) => {
     <div className="bg-white p-6 rounded-2xl shadow space-y-4">
       <h2 className="text-lg font-semibold">Select Customer</h2>
 
-      {isLoading && <p>Loading customers...</p>}
+      {isLoading && <p className="text-gray-500">Loading customers...</p>}
       {isError && <p className="text-red-500">Failed to load customers</p>}
 
       {customers && (
-        <div className="flex flex-col md:flex-row gap-3">
-          <Combobox value={selectedCustomer} onChange={setSelectedCustomer} >
-            <div className="relative">
-              <Combobox.Input
-                className="w-full border p-2 rounded-lg"
-                displayValue={(customer: Customer | null) => customer?.name || ""}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search or select customer..."
-              />
+        <div className="flex flex-col md:flex-row gap-3 items-start">
+          <div className="flex-1">
+            <Combobox value={selectedCustomer} onChange={setSelectedCustomer}>
+              <div className="relative">
+                <Combobox.Input
+                  className="w-full border p-2 rounded-lg"
+                  displayValue={(customer: Customer | null) =>
+                    customer?.name || ""
+                  }
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search or select customer..."
+                />
 
-              <Combobox.Options className="absolute mt-1 w-full bg-white border rounded-lg shadow max-h-60 overflow-auto z-10">
-                {/* Walk-in Customer */}
-                <Combobox.Option
-                  value={null}
-                  className="p-2 cursor-pointer hover:bg-gray-100"
-                >
-                  Walk-in Customer
-                </Combobox.Option>
-
-                {/* Filtered Customers */}
-                {filteredCustomers.map((customer) => (
+                <Combobox.Options className="absolute mt-1 w-full bg-white border rounded-lg shadow max-h-60 overflow-auto z-10">
+                  {/* Walk-in Customer */}
                   <Combobox.Option
-                    key={customer._id?.toString()}
-                    value={customer}
-                    className="p-2 cursor-pointer hover:bg-blue-100"
+                    value={null}
+                    className="p-2 cursor-pointer hover:bg-gray-100"
                   >
-                    <div className="flex flex-col">
-                      <span className="font-medium">{customer.name}</span>
-                      <span className="text-sm text-gray-500">
-                        {customer.phone}{" "}
-                        {customer.address ? `- ${customer.address}` : ""}
-                      </span>
-                      {customer.customerType && (
-                        <span className="text-xs text-gray-400">
-                          {customer.customerType}
-                        </span>
-                      )}
-                    </div>
+                    Walk-in Customer
                   </Combobox.Option>
-                ))}
 
-                {filteredCustomers.length === 0 && (
-                  <div className="p-2 text-gray-400 text-sm">
-                    No customer found
-                  </div>
-                )}
-              </Combobox.Options>
-            </div>
-          </Combobox>
+                  {/* Filtered Customers */}
+                  {filteredCustomers.map((customer) => (
+                    <Combobox.Option
+                      key={customer._id?.toString()}
+                      value={customer}
+                      className="p-2 cursor-pointer hover:bg-blue-100"
+                    >
+                      {({ active, selected }) => (
+                        <div
+                          className={`flex flex-col ${
+                            active ? "bg-blue-50" : ""
+                          } ${selected ? "font-semibold" : ""}`}
+                        >
+                          <span className="font-medium">{customer.name}</span>
+                          <span className="text-sm text-gray-500">
+                            {customer.phone}{" "}
+                            {customer.address ? `- ${customer.address}` : ""}
+                          </span>
+                          {customer.customerType && (
+                            <span className="text-xs text-gray-400">
+                              {customer.customerType}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </Combobox.Option>
+                  ))}
+
+                  {filteredCustomers.length === 0 && (
+                    <div className="p-2 text-gray-400 text-sm">
+                      No customer found
+                    </div>
+                  )}
+                </Combobox.Options>
+              </div>
+            </Combobox>
+          </div>
 
           {/* Add Customer Button */}
           <button
             onClick={() => setOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg whitespace-nowrap"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg whitespace-nowrap hover:bg-blue-700 transition"
           >
             + Add New Customer
           </button>
@@ -101,7 +108,11 @@ const CustomerSelect = ({ selectedCustomer, setSelectedCustomer }: Props) => {
       )}
 
       {/* Modal for adding new customer */}
-      <CustomModal open={isOpen} onOpenChange={setOpen} title="Add New Customer">
+      <CustomModal
+        open={isOpen}
+        onOpenChange={setOpen}
+        title="Add New Customer"
+      >
         <AddCustomer
           onSuccess={(newCustomer: Customer) => {
             setSelectedCustomer(newCustomer); // select newly added customer

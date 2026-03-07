@@ -3,7 +3,7 @@
 import { ObjectId } from "mongodb";
 
 export interface Customer {
-  _id?: ObjectId|string;
+  _id: ObjectId|string;
 
   // Basic Info
   name: string;

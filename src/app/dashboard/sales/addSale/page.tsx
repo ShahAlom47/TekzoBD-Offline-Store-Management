@@ -26,7 +26,7 @@ const AddSalePage = () => {
   );
 
 
-  console.log(selectedCustomer)
+  console.log(selectedCustomer, cart)
   const { data: customers } = useCustomers();
 
   // ===============================
