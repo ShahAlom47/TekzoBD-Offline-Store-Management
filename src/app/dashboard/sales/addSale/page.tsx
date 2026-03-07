@@ -14,6 +14,8 @@ export interface CartItem {
   unit: ProductUnit;
   price: number;
   costPrice: number;
+  totalPrice: number;
+  totalCost: number;
 }
 
 const AddSalePage = () => {
@@ -25,8 +27,6 @@ const AddSalePage = () => {
     null
   );
 
-
-  console.log(selectedCustomer, cart)
   const { data: customers } = useCustomers();
 
   // ===============================
@@ -37,17 +37,19 @@ const AddSalePage = () => {
     (acc, item) => acc + item.quantity * item.price,
     0
   );
+const totalCost = cart.reduce(
+  (acc, item) => acc + (item.quantity * (item.costPrice || 0)),
+  0
+);
 
-  const totalCost = cart.reduce(
-    (acc, item) => acc + item.quantity * item.costPrice,
-    0
-  );
-
+  
   const finalAmount = totalAmount - discount;
 
   const totalProfit = finalAmount - totalCost;
 
   const dueAmount = Math.max(finalAmount - paidAmount, 0);
+
+  console.log( cart, totalCost,totalProfit)
 
   // ===============================
   // Submit Sale

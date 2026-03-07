@@ -4,7 +4,7 @@ import { CartItem } from "@/app/dashboard/sales/addSale/page";
 import { ProductUnit } from "@/Interfaces/productInterface";
 import { getAllProduct } from "@/lib/allApiRequest/productRequest/productRequest";
 import { useQuery } from "@tanstack/react-query";
-import React, { useState, } from "react";
+import React, { useState } from "react";
 
 interface Product {
   _id: string;
@@ -13,38 +13,34 @@ interface Product {
   currentStock: number;
 }
 
-
 interface Props {
   cart: CartItem[];
   setCart: React.Dispatch<React.SetStateAction<CartItem[]>>;
 }
 
-const units = ["PCS" , "KG" , "LITER" , "BOX" , "Feet"] as ProductUnit[];
+const units: ProductUnit[] = ["PCS", "KG", "LITER", "BOX", "Feet"];
 
 const ProductSelect = ({ cart, setCart }: Props) => {
   const [selectedId, setSelectedId] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [unit, setUnit] = useState("PCS" as ProductUnit);
+  const [unit, setUnit] = useState<ProductUnit>("PCS");
   const [price, setPrice] = useState(0);
 
-  // Fetch all products
+  // Fetch products
   const { data, isLoading, isError } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
       const res = await getAllProduct({ currentPage: 1, limit: 10000 });
-      return res.data; // assuming API returns { data: Product[] }
+      return res.data as Product[];
     },
   });
 
-
-
- const allProducts = data as Product[] || [];
+  const allProducts = data || [];
   const selectedProduct = allProducts.find((p) => p._id === selectedId);
 
-  // Update price when product is selected via the select's onChange handler (avoid setting state in effect)
-
   const handleAddProduct = () => {
-    if (!selectedProduct || quantity <= 0 || price < 0) return;
+    if (!selectedProduct) return;
+    if (quantity <= 0) return;
 
     const total = quantity * price;
 
@@ -75,7 +71,9 @@ const ProductSelect = ({ cart, setCart }: Props) => {
           quantity,
           unit,
           price,
-          total,
+          costPrice: selectedProduct.sellingPrice, // Temporary, can be updated from DB
+          totalPrice: total,
+          totalCost: quantity * selectedProduct.sellingPrice,
         },
       ]);
     }
@@ -86,9 +84,9 @@ const ProductSelect = ({ cart, setCart }: Props) => {
     setUnit("PCS");
     setPrice(0);
   };
-    // Loading / Error
+
   if (isLoading) return <p>Loading products...</p>;
-  if (isError) return <p>Error loading products.</p>;
+  if (isError) return <p className="text-red-500">Error loading products.</p>;
 
   return (
     <div className="bg-white p-4 rounded-2xl shadow space-y-3">
@@ -97,25 +95,23 @@ const ProductSelect = ({ cart, setCart }: Props) => {
         <h2 className="font-semibold text-lg">Products</h2>
         <button
           onClick={handleAddProduct}
-          className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition"
         >
           + Add Product
         </button>
       </div>
 
+      {/* Inputs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        {/* Product Dropdown */}
+        {/* Product Select */}
         <select
           value={selectedId}
           onChange={(e) => {
             const id = e.target.value;
             setSelectedId(id);
+
             const prod = allProducts.find((p) => p._id === id);
-            if (prod) {
-              setPrice(prod.sellingPrice);
-            } else {
-              setPrice(0);
-            }
+            setPrice(prod ? prod.sellingPrice : 0);
           }}
           className="border p-2 rounded-lg"
         >
@@ -131,7 +127,7 @@ const ProductSelect = ({ cart, setCart }: Props) => {
           ))}
         </select>
 
-        {/* Quantity Input */}
+        {/* Quantity */}
         <input
           type="number"
           min={1}
@@ -141,7 +137,7 @@ const ProductSelect = ({ cart, setCart }: Props) => {
           placeholder="Quantity"
         />
 
-        {/* Unit Select */}
+        {/* Unit */}
         <select
           value={unit}
           onChange={(e) => setUnit(e.target.value as ProductUnit)}
@@ -154,7 +150,7 @@ const ProductSelect = ({ cart, setCart }: Props) => {
           ))}
         </select>
 
-        {/* Price Input */}
+        {/* Price */}
         <input
           type="number"
           min={0}

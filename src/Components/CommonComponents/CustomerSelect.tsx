@@ -8,6 +8,7 @@ import AddCustomer from "./AddCustomer";
 import { useCustomers } from "@/hook/useCustomers";
 
 interface Props {
+  customers: Customer[];
   selectedCustomer: Customer | null;
   setSelectedCustomer: React.Dispatch<React.SetStateAction<Customer | null>>;
 }
@@ -17,12 +18,14 @@ const CustomerSelect = ({ selectedCustomer, setSelectedCustomer }: Props) => {
   const [query, setQuery] = useState("");
   const [isOpen, setOpen] = useState(false);
 
+  console.log(customers,query)
+
   // Filter customers by name, phone, address or type
   const filteredCustomers =
     !customers || query === ""
       ? customers || []
       : customers.filter((customer) =>
-          [customer.name, customer.phone, customer.address, customer.customerType]
+          [customer._id?.toString(), customer.name, customer.phone, customer.address, customer.customerType]
             .filter(Boolean)
             .some((field) =>
               field!.toLowerCase().includes(query.toLowerCase())
