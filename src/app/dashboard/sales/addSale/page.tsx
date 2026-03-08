@@ -25,6 +25,7 @@ const AddSalePage = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [paidAmount, setPaidAmount] = useState(0);
   const [discount, setDiscount] = useState(0);
+  const [btnLoading,setBtnLoading]= useState<boolean>(false)
 
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
@@ -59,12 +60,13 @@ const totalCost = cart.reduce(
   // Submit Sale
   // ===============================
 
-  const handleSubmit = async () => {
+ const handleSubmit = async () => {
+  toast?.success("jani na ")
   if (cart.length === 0) {
-    alert("Please add product first");
+    toast.error("Please add product first");
     return;
   }
-
+setBtnLoading(true)
   const saleData: Sale = {
     saleNumber: `SALE-${Date.now()}`,
 
@@ -75,40 +77,40 @@ const totalCost = cart.reduce(
       quantity: item.quantity,
 
       sellingPrice: item.price,
-      costPrice: item.costPrice, // ✅ correct
+      costPrice: item.costPrice,
 
       totalPrice: item.quantity * item.price,
       totalCost: item.quantity * item.costPrice,
 
       profit:
         item.quantity * item.price -
-        item.quantity * item.costPrice, // ✅ correct
+        item.quantity * item.costPrice,
     })),
 
     discount,
-
     totalAmount: finalAmount,
-
     totalCost,
-
     totalProfit,
-
     paidAmount,
-
     dueAmount,
-
     createdAt: new Date(),
   };
 
-  console.log("SALE DATA:", saleData);
-
   const res = await addSale(saleData);
-  if(!res?.success){
-    toast.success(res?.message||"Failed")
-    return
+
+  if (!res?.success) {
+    setBtnLoading(false)
+    toast.error(res?.message || "Failed");
+    return;
   }
-toast?.success(res?.message||"Sale Added Successfully")
-// clear all 
+ setBtnLoading(false)
+  toast.success(res?.message || "Sale Added Successfully");
+
+  // ================= RESET FORM =================
+  setCart([]);
+  setPaidAmount(0);
+  setDiscount(0);
+  setSelectedCustomer(null);
 };
 
   return (
@@ -238,7 +240,8 @@ toast?.success(res?.message||"Sale Added Successfully")
 
           <button
             onClick={handleSubmit}
-            className="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 mt-4"
+            disabled={btnLoading}
+            className={`w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 mt-4 ${btnLoading?"opacity-25":'opacity-100'}`}
           >
             Confirm Sale
           </button>
