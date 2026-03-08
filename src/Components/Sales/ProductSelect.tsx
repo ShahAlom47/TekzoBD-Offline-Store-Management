@@ -1,17 +1,12 @@
 "use client";
 
 import { CartItem } from "@/app/dashboard/sales/addSale/page";
-import { ProductUnit } from "@/Interfaces/productInterface";
+import { Product, ProductUnit } from "@/Interfaces/productInterface";
 import { getAllProduct } from "@/lib/allApiRequest/productRequest/productRequest";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 
-interface Product {
-  _id: string;
-  name: string;
-  sellingPrice: number;
-  currentStock: number;
-}
+
 
 interface Props {
   cart: CartItem[];
@@ -36,7 +31,7 @@ const ProductSelect = ({ cart, setCart }: Props) => {
   });
 
   const allProducts = data || [];
-  const selectedProduct = allProducts.find((p) => p._id === selectedId);
+  const selectedProduct = allProducts.find((p) => p._id.toString() === selectedId);
 
   const handleAddProduct = () => {
     if (!selectedProduct) return;
@@ -44,13 +39,13 @@ const ProductSelect = ({ cart, setCart }: Props) => {
 
     const total = quantity * price;
 
-    const existing = cart.find((c) => c.productId === selectedProduct._id);
+    const existing = cart.find((c) => c.productId.toString() === selectedProduct._id.toString());
 
     if (existing) {
       // Update existing cart item
       setCart(
         cart.map((c) =>
-          c.productId === selectedProduct._id
+          c.productId.toString() === selectedProduct._id.toString()
             ? {
                 ...c,
                 quantity: c.quantity + quantity,
@@ -66,14 +61,14 @@ const ProductSelect = ({ cart, setCart }: Props) => {
       setCart([
         ...cart,
         {
-          productId: selectedProduct._id,
+          productId: selectedProduct._id.toString(),
           name: selectedProduct.name,
           quantity,
           unit,
           price,
-          costPrice: selectedProduct.sellingPrice, // Temporary, can be updated from DB
+          costPrice: selectedProduct.costPrice, 
           totalPrice: total,
-          totalCost: quantity * selectedProduct.sellingPrice,
+          totalCost: quantity * selectedProduct.costPrice,
         },
       ]);
     }
@@ -110,7 +105,7 @@ const ProductSelect = ({ cart, setCart }: Props) => {
             const id = e.target.value;
             setSelectedId(id);
 
-            const prod = allProducts.find((p) => p._id === id);
+            const prod = allProducts.find((p) => p._id.toString() === id);
             setPrice(prod ? prod.sellingPrice : 0);
           }}
           className="border p-2 rounded-lg"
@@ -118,8 +113,8 @@ const ProductSelect = ({ cart, setCart }: Props) => {
           <option value="">Select Product</option>
           {allProducts.map((p) => (
             <option
-              key={p._id}
-              value={p._id}
+              key={p._id.toString()}
+              value={p._id.toString()}
               disabled={p.currentStock === 0}
             >
               {p.name} - Stock: {p.currentStock} - ৳{p.sellingPrice}

@@ -42,6 +42,7 @@ const totalCost = cart.reduce(
   0
 );
 
+
   
   const finalAmount = totalAmount - discount;
 
@@ -60,6 +61,8 @@ const totalCost = cart.reduce(
       alert("Please add product first");
       return;
     }
+
+    console.log(selectedCustomer)
 
     const saleData = {
       saleNumber: `SALE-${Date.now()}`,
