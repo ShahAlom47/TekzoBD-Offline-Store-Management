@@ -5,7 +5,10 @@ import ProductSelect from "@/Components/Sales/ProductSelect";
 import { useCustomers } from "@/hook/useCustomers";
 import { Customer } from "@/Interfaces/customerInterface";
 import { ProductUnit } from "@/Interfaces/productInterface";
+import { Sale } from "@/Interfaces/saleInterfaces";
+import { addSale } from "@/lib/allApiRequest/salesRequest/salesRequest";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 export interface CartItem {
   productId: string;
@@ -56,46 +59,57 @@ const totalCost = cart.reduce(
   // Submit Sale
   // ===============================
 
-  const handleSubmit = () => {
-    if (cart.length === 0) {
-      alert("Please add product first");
-      return;
-    }
+  const handleSubmit = async () => {
+  if (cart.length === 0) {
+    alert("Please add product first");
+    return;
+  }
 
-    console.log(selectedCustomer)
+  const saleData: Sale = {
+    saleNumber: `SALE-${Date.now()}`,
 
-    const saleData = {
-      saleNumber: `SALE-${Date.now()}`,
+    customerId: selectedCustomer?._id?.toString(),
 
-      customerId: selectedCustomer?._id?.toString(),
+    products: cart.map((item) => ({
+      productId: item.productId,
+      quantity: item.quantity,
 
-      products: cart.map((item) => ({
-        productId: item.productId,
-        quantity: item.quantity,
-        price: item.price,
-        totalPrice: item.quantity * item.price,
-        totalCost: item.quantity * item.costPrice,
-      })),
+      sellingPrice: item.price,
+      costPrice: item.costPrice, // ✅ correct
 
-      discount,
+      totalPrice: item.quantity * item.price,
+      totalCost: item.quantity * item.costPrice,
 
-      totalAmount: finalAmount,
+      profit:
+        item.quantity * item.price -
+        item.quantity * item.costPrice, // ✅ correct
+    })),
 
-      totalCost,
+    discount,
 
-      totalProfit,
+    totalAmount: finalAmount,
 
-      paidAmount,
+    totalCost,
 
-      dueAmount,
+    totalProfit,
 
-      createdAt: new Date(),
-    };
+    paidAmount,
 
-    console.log("SALE DATA:", saleData);
+    dueAmount,
 
-    alert("Sale Submitted (Check console)");
+    createdAt: new Date(),
   };
+
+  console.log("SALE DATA:", saleData);
+
+  const res = await addSale(saleData);
+  if(!res?.success){
+    toast.success(res?.message||"Failed")
+    return
+  }
+toast?.success(res?.message||"Sale Added Successfully")
+// clear all 
+};
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">

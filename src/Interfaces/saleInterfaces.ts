@@ -14,7 +14,7 @@ export interface SaleProduct {
 
 export interface Sale {
   _id?: ObjectId;
-  customerId?: string;       // optional, walk-in
+  customerId?: string |undefined;       // optional, walk-in
   products: SaleProduct[];
   discount?: number;         // optional
   totalAmount: number;       // sum(products totalPrice) - discount
