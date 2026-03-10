@@ -6,19 +6,22 @@ import { useConfirm } from "@/hook/useConfirm";
 import { useQueryClient } from "@tanstack/react-query";
 import { deleteCustomer } from "@/lib/allApiRequest/customerRequest/customerRequest";
 
+
 interface Props {
   id: string;
+  refetch?: () => void;
 }
 
-const DeleteProductButton = ({ id }: Props) => {
+const DeleteCustomerButton = ({ id,refetch }: Props) => {
   const [loading, setLoading] = useState(false);
   const { confirm, ConfirmModal } = useConfirm();
   const queryClient = useQueryClient();
 
+
   const handleDelete = async () => {
     const ok = await confirm({
-      title: "Delete Product",
-      message: "Are you sure you want to delete this product?",
+      title: "Delete Customer",
+      message: "Are you sure you want to delete this customer?",
       confirmText: "Yes, Delete",
       cancelText: "Cancel",
     });
@@ -29,9 +32,12 @@ const DeleteProductButton = ({ id }: Props) => {
       setLoading(true);
 
       const res = await deleteCustomer(id);
+      console.log(res)
 
       if (res?.success) {
-        toast.success("Customer deleted!");
+        toast.success(res?.message || "Customer deleted!");
+        // call refetch only if it was provided
+        refetch?.();
 
         // ✅ Invalidate customers query
         queryClient.invalidateQueries({
@@ -39,7 +45,7 @@ const DeleteProductButton = ({ id }: Props) => {
         });
 
       } else {
-        toast.error("Failed to delete customer  ");
+        toast.error(res?.message||"Failed to delete customer  ");
       }
     } catch (error) {
       toast.error("Something went wrong");
@@ -64,4 +70,4 @@ const DeleteProductButton = ({ id }: Props) => {
   );
 };
 
-export default DeleteProductButton; 
+export default DeleteCustomerButton; 

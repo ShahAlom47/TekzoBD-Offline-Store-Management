@@ -12,8 +12,9 @@ export const getCustomer = async ({ currentPage, limit, searchTrim }: GetAllCate
 
   return request("GET", url);
 };
-export const deleteCustomer = async ( id:string) => {
-  const url = `/customers/deleteCustomer/${id}`;
+export const deleteCustomer = async (id:string) => {
+  const url = `/customers/delete/${id}`;
+  console.log(id)
 
   return request("DELETE", url);
 };

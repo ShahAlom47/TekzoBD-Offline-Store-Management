@@ -1,9 +1,9 @@
-import { getCustomerCollection, getSalesCollection,  } from "@/lib/database/db_collections";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { getCustomerCollection, getSalesCollection } from "@/lib/database/db_collections";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
-
     const customerCollection = await getCustomerCollection();
     const saleCollection = await getSalesCollection();
 
@@ -13,15 +13,16 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const search = searchParams.get("search")?.trim() || "";
 
-    const filter = search
-      ? {
-          $or: [
-            { name: { $regex: search, $options: "i" } },
-            { phone: { $regex: search, $options: "i" } },
-            { address: { $regex: search, $options: "i" } },
-          ],
-        }
-      : {};
+    // ✅ Filter: search + exclude soft deleted
+    const filter: any = { isDeleted: { $ne: true } }; // isDeleted true হলে exclude
+
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+        { address: { $regex: search, $options: "i" } },
+      ];
+    }
 
     const total = await customerCollection.countDocuments(filter);
 
@@ -44,8 +45,7 @@ export async function GET(req: NextRequest) {
           0
         );
 
-        const currentDue =
-          (customer.openingBalance || 0) + salesDue;
+        const currentDue = (customer.openingBalance || 0) + salesDue;
 
         return {
           ...customer,
@@ -60,11 +60,14 @@ export async function GET(req: NextRequest) {
       totalPages: Math.ceil(total / limit),
       data: customersWithDue,
     });
-  } catch (error) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error("Error fetching customers:", error);
     return NextResponse.json(
       {
         message: "Failed to fetch customers",
         success: false,
+        error: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     );

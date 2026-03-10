@@ -1,6 +1,5 @@
 // Interfaces/customerInterface.ts
 
-import { em } from "framer-motion/client";
 import { ObjectId } from "mongodb";
 
 export interface Customer {
@@ -22,6 +21,7 @@ export interface Customer {
 
   // Status
   isActive: boolean;
+  isDeleted?:boolean;
 
   // Metadata
   createdAt: Date;

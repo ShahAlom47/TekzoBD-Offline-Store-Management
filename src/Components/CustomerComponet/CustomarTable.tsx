@@ -3,6 +3,7 @@
 import { Customer } from "@/Interfaces/customerInterface";
 import { CustomTable } from "../CommonComponents/CustomTable";
 import DeleteProductButton from "./DeleteCustomerButton";
+import DeleteCustomerButton from "./DeleteCustomerButton";
 
 interface TableProps {
     customer:Customer[];
@@ -13,10 +14,6 @@ const CustomerTable = ({ customer, refetch }:TableProps) => {
  
 
 
-  const handleDelete = (id: string) => {
-
-    console.log("Delete customer with ID:", id);
-  };
 
  const columns = [
     { header: "Name", accessor: "name" },
@@ -39,7 +36,7 @@ const CustomerTable = ({ customer, refetch }:TableProps) => {
       <div className="flex gap-2">  
         <button className="bg-blue-600 text-white px-3 py-1 rounded-lg">View</button>
         <button className="bg-yellow-600 text-white px-3 py-1 rounded-lg">Edit</button>
-        <DeleteProductButton id={customer?._id.toString()} ></DeleteProductButton>
+        <DeleteCustomerButton id={customer?._id.toString()} refetch={refetch} ></DeleteCustomerButton>
       </div>
     ),      
   }));
