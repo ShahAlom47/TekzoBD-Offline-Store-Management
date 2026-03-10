@@ -3,14 +3,14 @@
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useConfirm } from "@/hook/useConfirm";
-import { deleteProduct } from "@/lib/allApiRequest/productRequest/productRequest";
 import { useQueryClient } from "@tanstack/react-query";
+import { deleteCustomer } from "@/lib/allApiRequest/customerRequest/customerRequest";
 
 interface Props {
-  productId: string;
+  id: string;
 }
 
-const DeleteProductButton = ({ productId }: Props) => {
+const DeleteProductButton = ({ id }: Props) => {
   const [loading, setLoading] = useState(false);
   const { confirm, ConfirmModal } = useConfirm();
   const queryClient = useQueryClient();
@@ -28,18 +28,18 @@ const DeleteProductButton = ({ productId }: Props) => {
     try {
       setLoading(true);
 
-      const res = await deleteProduct(productId);
+      const res = await deleteCustomer(id);
 
       if (res?.success) {
-        toast.success("Product deleted!");
+        toast.success("Customer deleted!");
 
-        // ✅ Invalidate products query
+        // ✅ Invalidate customers query
         queryClient.invalidateQueries({
-          queryKey: ["getCustomers"],
+          queryKey: ["customers"],
         });
 
       } else {
-        toast.error("Failed to delete Customer");
+        toast.error("Failed to delete customer  ");
       }
     } catch (error) {
       toast.error("Something went wrong");
