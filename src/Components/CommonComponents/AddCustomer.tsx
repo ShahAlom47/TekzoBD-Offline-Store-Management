@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { AddCustomerFormInputs, Customer } from "@/Interfaces/customerInterface";
 import { addCustomer } from "@/lib/allApiRequest/customerRequest/customerRequest";
-import toast from "react-hot-toast";
+import toast, {  Toaster } from "react-hot-toast";
 
 interface AddCustomerProps {
-  onSuccess: (customer: Customer) => void;
+  onSuccess?: (customer: Customer) => void;
 }
 
 const AddCustomer = ({ onSuccess }: AddCustomerProps) => {
@@ -29,10 +29,15 @@ const AddCustomer = ({ onSuccess }: AddCustomerProps) => {
     try {
       setIsLoading(true);
 
+
       const response = await addCustomer(data);
+            console.log(data,response)
 
       if (!response.success) {
-        throw new Error("Failed to add customer");
+        console.log('gg')
+        toast.error(response.message || "Failed to add customer");
+      
+        return
       }
 
       const newCustomer= response?.data as Customer;
@@ -40,9 +45,12 @@ const AddCustomer = ({ onSuccess }: AddCustomerProps) => {
       toast.success("Customer added successfully!");
 
       // 🔥 parent component কে new customer পাঠানো
-      onSuccess(newCustomer);
+      if (onSuccess) {
+        onSuccess(newCustomer);
+      }
 
       reset();
+      return
     } catch (err) {
       console.error(err);
       toast.error("Error adding customer");
@@ -88,15 +96,19 @@ const AddCustomer = ({ onSuccess }: AddCustomerProps) => {
             type="email"
             className="w-full border p-2 rounded-lg"
           />
+          
         </div>
 
         {/* Address */}
         <div>
           <label className="block mb-1 font-medium">Address</label>
           <textarea
-            {...register("address")}
+             {...register("address", { required: "address is required" })}
             className="w-full border p-2 rounded-lg"
           />
+           {errors.address && (
+            <p className="text-red-500 text-sm">{errors.address.message}</p>
+          )}
         </div>
 
         {/* Customer Type */}
@@ -149,6 +161,7 @@ const AddCustomer = ({ onSuccess }: AddCustomerProps) => {
           {isLoading ? "Adding..." : "Add Customer"}
         </button>
       </form>
+            <Toaster position="top-right" />
     </div>
   );
 };
