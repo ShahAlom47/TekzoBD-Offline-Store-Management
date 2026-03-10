@@ -26,7 +26,7 @@ export const DashPaginationButton: React.FC<DashPaginationButtonProps> = ({
 
   return (
     <div
-      className={`flex items-center justify-center my-2 space-x-2 ${className}`}
+      className={`flex items-center justify-center my-2 space-x-2 ${totalPages < 1 ? 'hidden' : ''} ${className}`}
       role="navigation"
       aria-label="Pagination Navigation"
     >

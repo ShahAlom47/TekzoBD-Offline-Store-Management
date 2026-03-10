@@ -2,6 +2,7 @@
 
 import { Customer } from "@/Interfaces/customerInterface";
 import { CustomTable } from "../CommonComponents/CustomTable";
+import { useConfirm } from "@/hook/useConfirm";
 
 interface TableProps {
     customer:Customer[];
@@ -9,6 +10,13 @@ interface TableProps {
 }
 
 const CustomerTable = ({ customer, refetch }:TableProps) => {
+  const { confirm } = useConfirm();
+
+
+  const handleDelete = (id: string) => {
+
+    console.log("Delete customer with ID:", id);
+  };
 
  const columns = [
     { header: "Name", accessor: "name" },
@@ -31,7 +39,7 @@ const CustomerTable = ({ customer, refetch }:TableProps) => {
       <div className="flex gap-2">  
         <button className="bg-blue-600 text-white px-3 py-1 rounded-lg">View</button>
         <button className="bg-yellow-600 text-white px-3 py-1 rounded-lg">Edit</button>
-        <button className="bg-red-600 text-white px-3 py-1 rounded-lg">Delete</button>
+        <button onClick={() => handleDelete(customer?._id.toString())} className="bg-red-600 text-white px-3 py-1 rounded-lg">Delete</button>
       </div>
     ),      
   }));
