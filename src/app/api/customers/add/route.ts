@@ -17,7 +17,6 @@ export async function POST(req: NextRequest) {
       isActive,
     } = body;
 
-    // Validation
     if (!name || !phone) {
       return NextResponse.json(
         { success: false, message: "Name and phone are required" },
@@ -26,6 +25,19 @@ export async function POST(req: NextRequest) {
     }
 
     const collection = await getCustomerCollection();
+
+    // 🔥 Duplicate Check
+    const existingCustomer = await collection.findOne({ phone });
+
+    if (existingCustomer) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Customer with this phone already exists",
+        },
+        { status: 409 }
+      );
+    }
 
     const newCustomer = {
       name,
@@ -42,7 +54,6 @@ export async function POST(req: NextRequest) {
 
     const result = await collection.insertOne(newCustomer);
 
-    // 🔥 Final Customer Object
     const createdCustomer: Customer = {
       _id: result.insertedId,
       ...newCustomer,
@@ -56,8 +67,19 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error) {
-    console.error(error);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+
+    // MongoDB Duplicate Error
+    if (error.code === 11000) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Customer already exists",
+        },
+        { status: 409 }
+      );
+    }
 
     return NextResponse.json(
       {

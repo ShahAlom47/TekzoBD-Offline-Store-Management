@@ -1,5 +1,6 @@
 // Interfaces/customerInterface.ts
 
+import { em } from "framer-motion/client";
 import { ObjectId } from "mongodb";
 
 export interface Customer {
@@ -26,6 +27,10 @@ export interface Customer {
   createdAt: Date;
   updatedAt: Date;
 }
+
+
+ export type CustomerWithOutId = Omit<Customer, "_id">;
+
 
 
 export  interface AddCustomerFormInputs {
