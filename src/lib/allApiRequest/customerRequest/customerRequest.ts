@@ -14,7 +14,9 @@ export const getCustomer = async ({ currentPage, limit, searchTrim }: GetAllCate
 };
 export const deleteCustomer = async (id:string) => {
   const url = `/customers/delete/${id}`;
-  console.log(id)
-
   return request("DELETE", url);
+};
+export const updateCustomer = async (id:string,data:AddCustomerFormInputs) => {
+  const url = `/customers/edit/${id}`;
+  return request("PATCH", url,{...data});
 };

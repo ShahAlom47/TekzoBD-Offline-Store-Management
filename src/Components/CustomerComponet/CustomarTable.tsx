@@ -2,8 +2,10 @@
 
 import { Customer } from "@/Interfaces/customerInterface";
 import { CustomTable } from "../CommonComponents/CustomTable";
-import DeleteProductButton from "./DeleteCustomerButton";
 import DeleteCustomerButton from "./DeleteCustomerButton";
+import CustomModal from "../CommonComponents/CustomModal";
+import EditCustomer from "./EditCustomer";
+import { useState } from "react";
 
 interface TableProps {
     customer:Customer[];
@@ -11,8 +13,17 @@ interface TableProps {
 }
 
 const CustomerTable = ({ customer, refetch }:TableProps) => {
+
+  const [selectedCustomer,setCustomer] = useState<Customer|null>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
  
 
+  const handleEdit = (customer:Customer) => {
+    setCustomer(customer);
+    setIsOpen(true);
+
+    console.log(selectedCustomer,'kkkkkkkkkkkkkkkkkkkkkkkk')
+  }
 
 
  const columns = [
@@ -35,7 +46,7 @@ const CustomerTable = ({ customer, refetch }:TableProps) => {
     action: (
       <div className="flex gap-2">  
         <button className="bg-blue-600 text-white px-3 py-1 rounded-lg">View</button>
-        <button className="bg-yellow-600 text-white px-3 py-1 rounded-lg">Edit</button>
+        <button onClick={()=>handleEdit(customer)} className="bg-yellow-600 text-white px-3 py-1 rounded-lg">Edit</button>
         <DeleteCustomerButton id={customer?._id.toString()} refetch={refetch} ></DeleteCustomerButton>
       </div>
     ),      
@@ -44,6 +55,9 @@ const CustomerTable = ({ customer, refetch }:TableProps) => {
     return (
         <div>
             <CustomTable columns={columns} data={data} />
+            <CustomModal open={isOpen} onOpenChange={() => setIsOpen(false)}>
+                <EditCustomer customer={selectedCustomer||null} />
+            </CustomModal>
         </div>
     );
 };
