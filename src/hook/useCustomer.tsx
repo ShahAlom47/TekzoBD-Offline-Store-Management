@@ -4,6 +4,7 @@ import { getSingleCustomer } from "@/lib/allApiRequest/customerRequest/customerR
 
 const fetchCustomer = async (id: string): Promise<Customer> => {
   const res = await getSingleCustomer(id);
+  console.log(res)
 
   if (!res.success) {
     throw new Error("Failed to fetch customer");
