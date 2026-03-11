@@ -17,6 +17,6 @@ export const deleteCustomer = async (id:string) => {
   return request("DELETE", url);
 };
 export const updateCustomer = async (id:string,data:AddCustomerFormInputs) => {
-  const url = `/customers/edit/${id}`;
-  return request("PATCH", url,{...data});
+
+  return request("PATCH", `/customers/edit/${id}`,{...data});
 };
