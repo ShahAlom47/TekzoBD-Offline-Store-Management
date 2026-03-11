@@ -9,9 +9,11 @@ import toast, { Toaster } from "react-hot-toast";
 interface EditCustomerProps {
   customer: Customer | null;
   onSuccess?: (customer: Customer) => void;
+  refetch: () => void;
+  setIsOpen: (open: boolean) => void;
 }
 
-const EditCustomer = ({ customer, onSuccess }: EditCustomerProps) => {
+const EditCustomer = ({ customer, onSuccess,refetch,setIsOpen }: EditCustomerProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const {
@@ -50,6 +52,8 @@ const EditCustomer = ({ customer, onSuccess }: EditCustomerProps) => {
 
       if (!response.success) {
         toast.error(response.message || "Failed to update customer");
+        setIsOpen(false)
+        refetch();
         return;
       }
 

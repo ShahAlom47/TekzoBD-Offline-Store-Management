@@ -56,7 +56,7 @@ const CustomerTable = ({ customer, refetch }:TableProps) => {
         <div>
             <CustomTable columns={columns} data={data} />
             <CustomModal open={isOpen} onOpenChange={() => setIsOpen(false)}>
-                <EditCustomer customer={selectedCustomer||null} />
+                <EditCustomer customer={selectedCustomer||null} refetch={refetch || (() => {})} setIsOpen={setIsOpen} />
             </CustomModal>
         </div>
     );
