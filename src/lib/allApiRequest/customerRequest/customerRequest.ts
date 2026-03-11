@@ -20,3 +20,7 @@ export const updateCustomer = async (id:string,data:AddCustomerFormInputs) => {
 
   return request("PATCH", `/customers/edit/${id}`,{...data});
 };
+export const getSingleCustomer = async (id:string) => {
+
+  return request("GET", `/customers/${id}`);
+};

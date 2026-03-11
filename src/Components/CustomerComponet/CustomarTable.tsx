@@ -6,6 +6,7 @@ import DeleteCustomerButton from "./DeleteCustomerButton";
 import CustomModal from "../CommonComponents/CustomModal";
 import EditCustomer from "./EditCustomer";
 import { useState } from "react";
+import Link from "next/link";
 
 interface TableProps {
     customer:Customer[];
@@ -22,7 +23,6 @@ const CustomerTable = ({ customer, refetch }:TableProps) => {
     setCustomer(customer);
     setIsOpen(true);
 
-    console.log(selectedCustomer,'kkkkkkkkkkkkkkkkkkkkkkkk')
   }
 
 
@@ -45,7 +45,10 @@ const CustomerTable = ({ customer, refetch }:TableProps) => {
     </span>),
     action: (
       <div className="flex gap-2">  
-        <button className="bg-blue-600 text-white px-3 py-1 rounded-lg">View</button>
+       
+        <Link href={`/dashboard/customers/${customer?._id.toString()}`} className="bg-blue-600 text-white px-3 py-1 rounded-lg">
+          View
+        </Link>
         <button onClick={()=>handleEdit(customer)} className="bg-yellow-600 text-white px-3 py-1 rounded-lg">Edit</button>
         <DeleteCustomerButton id={customer?._id.toString()} refetch={refetch} ></DeleteCustomerButton>
       </div>
