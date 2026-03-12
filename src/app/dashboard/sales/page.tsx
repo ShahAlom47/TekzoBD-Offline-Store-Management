@@ -1,7 +1,9 @@
+'use client';
 import { DashPaginationButton } from '@/Components/CommonComponents/DashPaginationButton';
 import { getAllSales } from '@/lib/allApiRequest/salesRequest/salesRequest';
-import { useQueries, useQuery } from '@tanstack/react-query';
-import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+
 
 const Sales = () => {
       const [page, setPage] = useState(1);
