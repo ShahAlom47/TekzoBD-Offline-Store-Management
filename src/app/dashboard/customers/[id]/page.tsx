@@ -1,131 +1,110 @@
 "use client";
 
+import CustomerSaleHistoryTable from "@/Components/CustomerComponet/CustomerSaleHistoryTable";
 import { useCustomer } from "@/hook/useCustomer";
+import { Customer } from "@/Interfaces/customerInterface";
 import { useParams } from "next/navigation";
+import { Phone, Mail, MapPin, Wallet } from "lucide-react";
 
 const CustomerDetails = () => {
   const { id } = useParams();
   const { data, isLoading } = useCustomer(id?.toString() || "");
 
   if (isLoading) {
-    return <div className="p-6 text-center">Loading...</div>;
+    return (
+      <div className="p-10 text-center text-gray-500 animate-pulse">
+        Loading customer data...
+      </div>
+    );
   }
 
-  const customer = data?.customer;
+  const customer = data?.customer as Customer;
   const sales = data?.sales || [];
   const summary = data?.summary;
 
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
-      
-      {/* Customer Info Card */}
-      <div className="bg-white shadow rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div>
-          <h2 className="text-xl md:text-2xl font-semibold">{customer?.name}</h2>
-          <p className="text-gray-500">{customer?.phone}</p>
-          <p className="text-gray-500">{customer?.email}</p>
-          <p className="text-gray-500">{customer?.address}</p>
+    <div className="p-2 md:p-4 space-y-6 max-w-7xl mx-auto">
 
-          <span className="inline-block mt-2 text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700">
+      {/* Customer Header */}
+      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-xl rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+
+        <div>
+          <h2 className="text-2xl md:text-3xl font-bold">{customer?.name}</h2>
+
+          <div className="space-y-1 mt-2 text-sm opacity-90">
+
+            <p className="flex items-center gap-2">
+              <Phone size={16}/> {customer?.phone}
+            </p>
+
+            <p className="flex items-center gap-2">
+              <Mail size={16}/> {customer?.email}
+            </p>
+
+            <p className="flex items-center gap-2">
+              <MapPin size={16}/> {customer?.address}
+            </p>
+
+          </div>
+
+          <span className="inline-block mt-3 text-xs px-3 py-1 rounded-full bg-white/20 backdrop-blur">
             {customer?.customerType}
           </span>
         </div>
 
         <div className="text-right">
-          <p className="text-sm text-gray-500">Current Due</p>
-          <p className="text-2xl font-bold text-red-500">
-            ৳ {summary?.currentDue || 0}
+          <p className="text-sm opacity-80">Current Due</p>
+
+          <p className="text-3xl font-bold flex items-center gap-2 justify-end">
+            <Wallet size={20}/> ৳ {summary?.currentDue || 0}
           </p>
         </div>
       </div>
 
+
       {/* Financial Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        
-        <div className="bg-white p-4 rounded-xl shadow">
-          <p className="text-sm text-gray-500">Total Purchase</p>
-          <p className="text-lg font-semibold">
+
+        <div className="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+          <p className="text-xs text-gray-500">Total Purchase</p>
+          <p className="text-lg font-semibold text-indigo-600">
             ৳ {summary?.totalPurchase || 0}
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow">
-          <p className="text-sm text-gray-500">Total Paid</p>
+        <div className="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+          <p className="text-xs text-gray-500">Total Paid</p>
           <p className="text-lg font-semibold text-green-600">
             ৳ {summary?.totalPaid || 0}
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow">
-          <p className="text-sm text-gray-500">Total Due</p>
+        <div className="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+          <p className="text-xs text-gray-500">Total Due</p>
           <p className="text-lg font-semibold text-red-500">
             ৳ {summary?.totalDue || 0}
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl shadow">
-          <p className="text-sm text-gray-500">Opening Balance</p>
-          <p className="text-lg font-semibold">
+        <div className="bg-white p-4 rounded-xl shadow hover:shadow-lg transition">
+          <p className="text-xs text-gray-500">Opening Balance</p>
+          <p className="text-lg font-semibold text-gray-700">
             ৳ {summary?.openingBalance || 0}
           </p>
         </div>
 
       </div>
 
+
       {/* Sales History */}
-      <div className="bg-white shadow rounded-2xl p-4 md:p-6">
-        <h3 className="text-lg font-semibold mb-4">Sales History</h3>
+      <div className="bg-white rounded-2xl shadow p-4">
+        <h3 className="text-lg font-semibold mb-4">
+          Sales History
+        </h3>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            
-            <thead>
-              <tr className="border-b text-gray-600">
-                <th className="text-left py-2">Sale No</th>
-                <th className="text-left py-2">Date</th>
-                <th className="text-right py-2">Total</th>
-                <th className="text-right py-2">Paid</th>
-                <th className="text-right py-2">Due</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {sales.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="text-center py-6 text-gray-400">
-                    No sales found
-                  </td>
-                </tr>
-              )}
-
-              {sales.map((sale: any) => (
-                <tr key={sale._id} className="border-b hover:bg-gray-50">
-                  
-                  <td className="py-3">{sale.saleNumber}</td>
-
-                  <td>
-                    {new Date(sale.createdAt).toLocaleDateString()}
-                  </td>
-
-                  <td className="text-right">
-                    ৳ {sale.totalAmount}
-                  </td>
-
-                  <td className="text-right text-green-600">
-                    ৳ {sale.paidAmount}
-                  </td>
-
-                  <td className="text-right text-red-500">
-                    ৳ {sale.dueAmount}
-                  </td>
-
-                </tr>
-              ))}
-            </tbody>
-
-          </table>
-        </div>
+        <CustomerSaleHistoryTable saleData={sales} />
       </div>
+
     </div>
   );
 };

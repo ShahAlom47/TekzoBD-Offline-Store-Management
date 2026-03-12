@@ -1,6 +1,7 @@
 // Interfaces/customerInterface.ts
 
 import { ObjectId } from "mongodb";
+import { Sale } from "./saleInterfaces";
 
 export interface Customer {
   _id: ObjectId|string;
@@ -48,4 +49,26 @@ export interface GetAllCustomerParams {
   currentPage: number;
   limit: number;
   searchTrim?: string;
+}
+
+
+export interface CustomerSummary {
+  totalSales: number;
+  totalPurchase: number;
+  totalPaid: number;
+  totalDue: number;
+  openingBalance: number;
+  currentDue: number;
+}
+
+export interface CustomerDetailsData {
+  customer: Customer;
+  sales: Sale[];
+  summary: CustomerSummary;
+}
+
+export interface CustomerDetailsResponse {
+  success: boolean;
+  data: CustomerDetailsData;
+  message?: string;
 }
