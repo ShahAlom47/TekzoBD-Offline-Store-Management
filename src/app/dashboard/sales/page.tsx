@@ -1,5 +1,7 @@
 'use client';
 import { DashPaginationButton } from '@/Components/CommonComponents/DashPaginationButton';
+import SalesDataTable from '@/Components/Sales/SalesDataTable';
+import { Sale } from '@/Interfaces/saleInterfaces';
 import { getAllSales } from '@/lib/allApiRequest/salesRequest/salesRequest';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -24,12 +26,12 @@ const Sales = () => {
 
   if (isLoading) return <p>Loading...</p>;
   const totalPages = data?.totalPages || 0;
-  const salesData = data?.data || [];
+  const salesData = (data?.data as Sale[]) || [];
 
   console.log(salesData,data)
     return (
         <div>
-            Sales
+            <SalesDataTable sales={salesData}></SalesDataTable>
             <DashPaginationButton totalPages={totalPages} currentPage={page} onPageChange={setPage} />
         </div>
     );
