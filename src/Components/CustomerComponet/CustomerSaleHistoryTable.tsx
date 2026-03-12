@@ -38,7 +38,7 @@ const CustomerSaleHistoryTable = ({saleData}:PropsType) => {
 
     return (
         <div>
-            <CustomTable  columns={columns} data={data}></CustomTable>
+            <CustomTable  columns={columns} data={data} className='border border-blue-900 rounded-sm p-4'></CustomTable>
         </div>
     );
 };

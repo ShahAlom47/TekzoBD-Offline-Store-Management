@@ -1,6 +1,31 @@
 import { Sale } from "@/Interfaces/saleInterfaces";
 import { request } from "../apiRequests";
 
+interface ParamsType {
+  currentPage: number;
+  limit: number;
+  searchTrim?: string;
+}
+
 export const addSale = async (data: Sale) => {
   return request("POST", "/sales/add", {...data});
 }
+export const getAllSales = async (params:ParamsType ) => {
+  const {
+    currentPage,
+    limit,
+    searchTrim,
+  } = params;
+
+  const queryParams = new URLSearchParams();
+
+  queryParams.set("currentPage", String(currentPage));
+  queryParams.set("pageSize", String(limit));
+
+  if (searchTrim) queryParams.set("searchTrim", searchTrim);
+
+  const url = `/sales/allSales?${queryParams.toString()}`;
+
+  
+  return request("GET", url, undefined, undefined, undefined);
+};

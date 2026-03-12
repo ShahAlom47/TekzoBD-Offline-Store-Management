@@ -45,7 +45,7 @@ export function CustomTable<T extends object>({
   };
 
   return (
-    <div className={`w-full bg-gray-200/15   ${className} `}>
+    <div className={`w-full bg-gray-200/15     ${className} `}>
       {/*  Desktop Table */}
       <div className="hidden md:block overflow-x-auto ">
         <table className="min-w-full  rounded-md overflow-hidden bg-transparent">
