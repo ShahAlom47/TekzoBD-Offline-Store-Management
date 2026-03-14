@@ -1,14 +1,15 @@
 import { SaleProduct } from "@/Interfaces/saleInterfaces";
-import ProductTableView from "../ProductComponet/ProductTableView ";
 import { CustomTable } from "../CommonComponents/CustomTable";
 
 interface PropsType {
   products: SaleProduct[];
 }
 const SaleProductTable = ({ products }: PropsType) => {
+console.log(products)
+
+
   const columns = [
     { header: "Name", accessor: "name" },
-    { header: "Product ID", accessor: "productCode" },
     { header: "Quantity", accessor: "quantity" },
     { header: "Selling Price", accessor: "sellingPrice" },
     { header: "Cost ", accessor: "cost" },
@@ -19,11 +20,10 @@ const SaleProductTable = ({ products }: PropsType) => {
   const data = products.map((item: SaleProduct) => {
     return {
       name: item.productName,
-
-      productId: item.productId || "N/A",
       quantity: item?.quantity,
       sellingPrice: item?.sellingPrice,
       cost: item?.totalCost,
+      total: item.totalPrice,
       profit: item?.profit,
     };
   });

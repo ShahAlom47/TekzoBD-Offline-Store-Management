@@ -96,6 +96,10 @@ setBtnLoading(true)
     createdAt: new Date(),
   };
 
+
+console.log(saleData)
+
+
   const res = await addSale(saleData);
 
   if (!res?.success) {
@@ -107,10 +111,10 @@ setBtnLoading(true)
   toast.success(res?.message || "Sale Added Successfully");
 
   // ================= RESET FORM =================
-  setCart([]);
-  setPaidAmount(0);
-  setDiscount(0);
-  setSelectedCustomer(null);
+  // setCart([]);
+  // setPaidAmount(0);
+  // setDiscount(0);
+  // setSelectedCustomer(null);
 };
 
   return (
