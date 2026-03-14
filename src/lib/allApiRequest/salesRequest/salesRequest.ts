@@ -29,3 +29,8 @@ export const getAllSales = async (params:ParamsType ) => {
   
   return request("GET", url, undefined, undefined, undefined);
 };
+
+
+export  const getSaleById = async (id:string) => {
+  return request("GET", `/sales/${id}`);
+} 

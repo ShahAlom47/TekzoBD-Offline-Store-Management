@@ -1,13 +1,16 @@
 'use client'
+import { getSaleById } from '@/lib/allApiRequest/salesRequest/salesRequest';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import React from 'react';
 
 const SaleDetails = () => {
 const {id}= useParams()
-const {}=useQuery({
+const {data}=useQuery({
    queryKey:[] ,
-   queryFn:()=>{
+   queryFn: async()=>{
+    const  res = await getSaleById(id?.toString())
+    return res
     
    }
 })
