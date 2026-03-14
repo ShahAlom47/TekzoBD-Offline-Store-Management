@@ -1,5 +1,7 @@
 "use client";
 
+import ProductTableView from "@/Components/ProductComponet/ProductTableView ";
+import SaleProductTable from "@/Components/Sales/SaleProductTable";
 import { useCustomer } from "@/hook/useCustomer";
 import { Sale, SaleProduct } from "@/Interfaces/saleInterfaces";
 import { getSaleById } from "@/lib/allApiRequest/salesRequest/salesRequest";
@@ -121,52 +123,10 @@ const sale= data?.data as Sale
         <div className="p-6 border-b">
           <h2 className="font-semibold text-lg">Products</h2>
         </div>
-
-        <table className="w-full text-sm">
-          <thead className="bg-gray-100 text-gray-600">
-            <tr>
-              <th className="p-3 text-left">Product ID</th>
-              <th className="p-3 text-center">Qty</th>
-              <th className="p-3 text-center">Sell Price</th>
-              <th className="p-3 text-center">Cost</th>
-              <th className="p-3 text-center">Total</th>
-              <th className="p-3 text-center">Profit</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {sale.products?.map((item: SaleProduct, index: number) => (
-              <tr key={index} className="border-t hover:bg-gray-50">
-
-                <td className="p-3">
-                  {item.productId}
-                </td>
-
-                <td className="p-3 text-center">
-                  {item.quantity}
-                </td>
-
-                <td className="p-3 text-center">
-                  ৳ {item.sellingPrice}
-                </td>
-
-                <td className="p-3 text-center">
-                  ৳ {item.costPrice}
-                </td>
-
-                <td className="p-3 text-center font-medium">
-                  ৳ {item.totalPrice}
-                </td>
-
-                <td className="p-3 text-center text-green-600 font-medium">
-                  ৳ {item.profit}
-                </td>
-
-              </tr>
-            ))}
-          </tbody>
-        </table>
+<SaleProductTable products={sale?.products}></SaleProductTable>
       </div>
+
+   
 
       {/* SUMMARY */}
       <div className="bg-white shadow rounded-xl p-6">
