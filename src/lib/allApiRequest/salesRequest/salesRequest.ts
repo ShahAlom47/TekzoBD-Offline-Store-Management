@@ -34,3 +34,8 @@ export const getAllSales = async (params:ParamsType ) => {
 export  const getSaleById = async (id:string) => {
   return request("GET", `/sales/${id}`);
 } 
+
+
+export  const saleDelete = async (id:string) => {
+  return request("DELETE", `/sales/delete/${id}`);
+} 

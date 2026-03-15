@@ -5,7 +5,9 @@ interface PropsType {
   products: SaleProduct[];
 }
 const SaleProductTable = ({ products }: PropsType) => {
-console.log(products)
+
+
+  
 
 
   const columns = [
