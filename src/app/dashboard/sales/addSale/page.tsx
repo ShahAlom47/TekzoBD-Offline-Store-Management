@@ -61,11 +61,17 @@ const totalCost = cart.reduce(
   // ===============================
 
  const handleSubmit = async () => {
-  toast?.success("jani na ")
+
   if (cart.length === 0) {
     toast.error("Please add product first");
     return;
   }
+ if(dueAmount>0 && !selectedCustomer){
+
+  toast.error("Please select customer for due amount");
+  return;
+ }
+
 setBtnLoading(true)
   const saleData: Sale = {
     saleNumber: `SALE-${Date.now()}`,

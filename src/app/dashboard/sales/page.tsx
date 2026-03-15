@@ -28,7 +28,7 @@ const Sales = () => {
   const totalPages = data?.totalPages || 0;
   const salesData = (data?.data as Sale[]) || [];
 
-  console.log(salesData,data)
+
     return (
         <div>
             <SalesDataTable sales={salesData}></SalesDataTable>

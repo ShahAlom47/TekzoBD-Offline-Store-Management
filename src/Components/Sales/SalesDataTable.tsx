@@ -6,6 +6,7 @@ import { Sale } from "@/Interfaces/saleInterfaces";
 import { saleDelete } from "@/lib/allApiRequest/salesRequest/salesRequest";
 import { queryClient } from "@/Providers/QueryProvider";
 import Link from "next/link";
+import { useState } from "react";
 import toast from "react-hot-toast/headless";
 
 interface Props {
@@ -13,11 +14,10 @@ interface Props {
 }
 
 const SalesDataTable = ({ sales }: Props) => {
-  const {confirm,ConfirmModal}= useConfirm()
+  const { confirm, ConfirmModal } = useConfirm();
+  const [loading, setLoading] = useState<boolean>(false);
 
- 
-
-   const handleDelete = async (saleId:string|undefined) => {
+  const handleDelete = async (saleId: string | undefined) => {
     const ok = await confirm({
       title: "Delete Sale",
       message: "Are you sure you want to delete this sale?",
@@ -28,17 +28,18 @@ const SalesDataTable = ({ sales }: Props) => {
     if (!ok) return;
 
     try {
+      setLoading(true);
 
       const res = await saleDelete(saleId || "");
 
       if (res?.success) {
         toast.success("Product deleted!");
+        setLoading(false);
 
         // ✅ Invalidate products query
         queryClient.invalidateQueries({
           queryKey: ["sales"],
         });
-
       } else {
         toast.error("Failed to delete Customer");
       }
@@ -46,6 +47,7 @@ const SalesDataTable = ({ sales }: Props) => {
       toast.error("Something went wrong");
       console.error(error);
     } finally {
+      setLoading(false);
     }
   };
 
@@ -97,10 +99,11 @@ const SalesDataTable = ({ sales }: Props) => {
         </Link>
 
         <button
+          disabled={loading}
           onClick={() => handleDelete(sale._id?.toString())}
           className="bg-red-600 text-white px-3 py-1 rounded-lg"
         >
-          Delete
+         {loading?" Deleting....":" Delete"}
         </button>
       </div>
     ),
