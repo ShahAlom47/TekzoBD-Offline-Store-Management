@@ -25,10 +25,10 @@ const AddSalePage = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [paidAmount, setPaidAmount] = useState(0);
   const [discount, setDiscount] = useState(0);
-  const [btnLoading,setBtnLoading]= useState<boolean>(false)
+  const [btnLoading, setBtnLoading] = useState<boolean>(false);
 
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null
+    null,
   );
 
   const { data: customers } = useCustomers();
@@ -39,89 +39,81 @@ const AddSalePage = () => {
 
   const totalAmount = cart.reduce(
     (acc, item) => acc + item.quantity * item.price,
-    0
+    0,
   );
-const totalCost = cart.reduce(
-  (acc, item) => acc + (item.quantity * (item.costPrice || 0)),
-  0
-);
+  const totalCost = cart.reduce(
+    (acc, item) => acc + item.quantity * (item.costPrice || 0),
+    0,
+  );
 
-
-  
   const finalAmount = totalAmount - discount;
 
   const totalProfit = finalAmount - totalCost;
 
   const dueAmount = Math.max(finalAmount - paidAmount, 0);
 
-  console.log( cart, totalCost,totalProfit)
+  console.log(cart, totalCost, totalProfit);
 
   // ===============================
   // Submit Sale
   // ===============================
 
- const handleSubmit = async () => {
+  const handleSubmit = async () => {
+    if (cart.length === 0) {
+      toast.error("Please add product first");
+      return;
+    }
+    if (dueAmount > 0 && !selectedCustomer) {
+      toast.error("Please select customer for due amount");
+      return;
+    }
 
-  if (cart.length === 0) {
-    toast.error("Please add product first");
-    return;
-  }
- if(dueAmount>0 && !selectedCustomer){
+    setBtnLoading(true);
+    const saleData: Sale = {
+      saleNumber: `SALE-${Date.now()}`,
 
-  toast.error("Please select customer for due amount");
-  return;
- }
+      customerId: selectedCustomer?._id?.toString(),
 
-setBtnLoading(true)
-  const saleData: Sale = {
-    saleNumber: `SALE-${Date.now()}`,
+      products: cart.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
 
-    customerId: selectedCustomer?._id?.toString(),
+        sellingPrice: item.price,
+        costPrice: item.costPrice,
 
-    products: cart.map((item) => ({
-      productId: item.productId,
-      quantity: item.quantity,
+        totalPrice: item.quantity * item.price,
+        totalCost: item.quantity * item.costPrice,
 
-      sellingPrice: item.price,
-      costPrice: item.costPrice,
+        profit: item.quantity * item.price - item.quantity * item.costPrice,
+      })),
 
-      totalPrice: item.quantity * item.price,
-      totalCost: item.quantity * item.costPrice,
+      discount,
+      totalAmount: finalAmount,
+      totalCost,
+      totalProfit,
+      paidAmount,
+      dueAmount,
+      createdAt: new Date(),
+    };
 
-      profit:
-        item.quantity * item.price -
-        item.quantity * item.costPrice,
-    })),
+    console.log(saleData);
 
-    discount,
-    totalAmount: finalAmount,
-    totalCost,
-    totalProfit,
-    paidAmount,
-    dueAmount,
-    createdAt: new Date(),
+    const res = await addSale(saleData);
+
+    if (!res?.success) {
+      setBtnLoading(false);
+      toast.error(res?.message || "Failed");
+      return;
+    }
+    setBtnLoading(false);
+    toast.success(res?.message || "Sale Added Successfully");
+
+    // ================= RESET FORM =================
+    setCart([]);
+    setPaidAmount(0);
+    setDiscount(0);
+    setSelectedCustomer(null);
   };
-
-
-console.log(saleData)
-
-
-  const res = await addSale(saleData);
-
-  if (!res?.success) {
-    setBtnLoading(false)
-    toast.error(res?.message || "Failed");
-    return;
-  }
- setBtnLoading(false)
-  toast.success(res?.message || "Sale Added Successfully");
-
-  // ================= RESET FORM =================
-  setCart([]);
-  setPaidAmount(0);
-  setDiscount(0);
-  setSelectedCustomer(null);
-};
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
@@ -251,7 +243,7 @@ console.log(saleData)
           <button
             onClick={handleSubmit}
             disabled={btnLoading}
-            className={`w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 mt-4 ${btnLoading?"opacity-25":'opacity-100'}`}
+            className={`w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 mt-4 ${btnLoading ? "opacity-25" : "opacity-100"}`}
           >
             Confirm Sale
           </button>

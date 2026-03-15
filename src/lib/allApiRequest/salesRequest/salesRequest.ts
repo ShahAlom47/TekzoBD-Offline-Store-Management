@@ -5,6 +5,9 @@ interface ParamsType {
   currentPage: number;
   limit: number;
   searchTrim?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: string;
 }
 
 export const addSale = async (data: Sale) => {
