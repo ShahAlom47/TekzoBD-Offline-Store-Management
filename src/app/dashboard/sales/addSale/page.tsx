@@ -111,10 +111,10 @@ console.log(saleData)
   toast.success(res?.message || "Sale Added Successfully");
 
   // ================= RESET FORM =================
-  // setCart([]);
-  // setPaidAmount(0);
-  // setDiscount(0);
-  // setSelectedCustomer(null);
+  setCart([]);
+  setPaidAmount(0);
+  setDiscount(0);
+  setSelectedCustomer(null);
 };
 
   return (
