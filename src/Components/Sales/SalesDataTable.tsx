@@ -1,18 +1,52 @@
 "use client";
 
 import { CustomTable } from "@/Components/CommonComponents/CustomTable";
+import { useConfirm } from "@/hook/useConfirm";
 import { Sale } from "@/Interfaces/saleInterfaces";
+import { saleDelete } from "@/lib/allApiRequest/salesRequest/salesRequest";
+import { queryClient } from "@/Providers/QueryProvider";
 import Link from "next/link";
+import toast from "react-hot-toast/headless";
 
 interface Props {
   sales: Sale[];
 }
 
 const SalesDataTable = ({ sales }: Props) => {
-  console.log(sales);
+  const {confirm,ConfirmModal}= useConfirm()
 
-  const handleDelete = (saleId: string | undefined) => {
-    console.log(saleId);
+ 
+
+   const handleDelete = async (saleId:string|undefined) => {
+    const ok = await confirm({
+      title: "Delete Sale",
+      message: "Are you sure you want to delete this sale?",
+      confirmText: "Yes, Delete",
+      cancelText: "Cancel",
+    });
+
+    if (!ok) return;
+
+    try {
+
+      const res = await saleDelete(saleId || "");
+
+      if (res?.success) {
+        toast.success("Product deleted!");
+
+        // ✅ Invalidate products query
+        queryClient.invalidateQueries({
+          queryKey: ["sales"],
+        });
+
+      } else {
+        toast.error("Failed to delete Customer");
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+      console.error(error);
+    } finally {
+    }
   };
 
   const columns = [
@@ -75,6 +109,7 @@ const SalesDataTable = ({ sales }: Props) => {
   return (
     <div>
       <CustomTable columns={columns} data={data} />
+      {ConfirmModal}
     </div>
   );
 };
