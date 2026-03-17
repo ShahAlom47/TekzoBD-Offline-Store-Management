@@ -26,37 +26,18 @@ const SaleFilter = ({
   setStatus,
   clearFilters,
 }: Props) => {
-
-
-
-const handleSearch = () => {
-  console.log("API CALL:", search);
-};
   return (
     <div className="bg-white shadow-sm border rounded-xl p-4 mb-5">
-
       <div className="grid md:grid-cols-5 gap-3 items-end">
-
         {/* Search */}
         <div className="md:col-span-2">
-          <label className="text-sm text-gray-500 mb-1 block">
-            Search
-          </label>
-
-         <SearchBox
-  value={search}
-  setValue={setSearch}
-  onSearch={handleSearch}
-/>;
-          
-          
+          <label className="text-sm text-gray-500 mb-1 block">Search</label>
+          <SearchBox value={search} setValue={setSearch} />
         </div>
 
         {/* Start Date */}
         <div>
-          <label className="text-sm text-gray-500 mb-1 block">
-            Start Date
-          </label>
+          <label className="text-sm text-gray-500 mb-1 block">Start Date</label>
 
           <input
             type="date"
@@ -68,9 +49,7 @@ const handleSearch = () => {
 
         {/* End Date */}
         <div>
-          <label className="text-sm text-gray-500 mb-1 block">
-            End Date
-          </label>
+          <label className="text-sm text-gray-500 mb-1 block">End Date</label>
 
           <input
             type="date"
@@ -97,7 +76,6 @@ const handleSearch = () => {
             <option value="due">Due</option>
           </select>
         </div>
-
       </div>
 
       {/* Clear Button */}
@@ -109,7 +87,6 @@ const handleSearch = () => {
           Clear Filters
         </button>
       </div>
-
     </div>
   );
 };
