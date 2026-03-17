@@ -31,9 +31,14 @@ export async function GET(req: NextRequest) {
     // 🔹 Search param
     const searchTrim = url.searchParams.get("searchTrim")?.trim() || "";
 
+    // 🔹 Date params
+    const startDate = url.searchParams.get("startDate");
+    const endDate = url.searchParams.get("endDate");
+
     // 🔹 Filter
     const filter: any = {};
 
+    // ✅ Search filter
     if (searchTrim) {
       const orConditions: any[] = [
         { saleNumber: { $regex: searchTrim, $options: "i" } },
@@ -48,7 +53,22 @@ export async function GET(req: NextRequest) {
       filter.$or = orConditions;
     }
 
-    // 🔹 Get latest sales first
+    // ✅ Date filter
+    if (startDate || endDate) {
+      filter.createdAt = {};
+
+      if (startDate) {
+        filter.createdAt.$gte = new Date(startDate);
+      }
+
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999); // full day include
+        filter.createdAt.$lte = end;
+      }
+    }
+
+    // 🔹 Get data
     const sales = await salesCollection
       .find(filter)
       .sort({ createdAt: -1 }) // latest first

@@ -24,7 +24,7 @@ const Sales = () => {
   console.log(search,startDate,endDate)
 
   const { data, isLoading } = useQuery({
-    queryKey: ["sales", page],
+    queryKey: ["sales", page,search,startDate,endDate],
     queryFn: async () => {
       return await getAllSales({
         currentPage: page,
