@@ -40,8 +40,11 @@ const SaleFilter = ({
           <SearchBox
             placeholder="Sale number / customer / product"
             value={search}
-            onChange={(e: any) => setSearch(e.target.value)}
+            setValue={(e: any) =>{
+               setSearch(e)}}
           />
+          
+          
         </div>
 
         {/* Start Date */}

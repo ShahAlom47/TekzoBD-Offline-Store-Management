@@ -21,6 +21,8 @@ const Sales = () => {
     setStatus("");
   };
 
+  console.log(search,startDate,endDate)
+
   const { data, isLoading } = useQuery({
     queryKey: ["sales", page],
     queryFn: async () => {
