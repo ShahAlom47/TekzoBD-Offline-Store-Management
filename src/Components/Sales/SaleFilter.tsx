@@ -26,6 +26,12 @@ const SaleFilter = ({
   setStatus,
   clearFilters,
 }: Props) => {
+
+
+
+const handleSearch = () => {
+  console.log("API CALL:", search);
+};
   return (
     <div className="bg-white shadow-sm border rounded-xl p-4 mb-5">
 
@@ -37,12 +43,11 @@ const SaleFilter = ({
             Search
           </label>
 
-          <SearchBox
-            placeholder="Sale number / customer / product"
-            value={search}
-            setValue={(e: any) =>{
-               setSearch(e)}}
-          />
+         <SearchBox
+  value={search}
+  setValue={setSearch}
+  onSearch={handleSearch}
+/>;
           
           
         </div>
