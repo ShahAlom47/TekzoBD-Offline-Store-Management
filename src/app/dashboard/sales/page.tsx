@@ -5,6 +5,7 @@ import SalesDataTable from "@/Components/Sales/SalesDataTable";
 import { Sale } from "@/Interfaces/saleInterfaces";
 import { getAllSales } from "@/lib/allApiRequest/salesRequest/salesRequest";
 import { useQuery } from "@tanstack/react-query";
+import { stat } from "fs";
 import { useState } from "react";
 
 const Sales = () => {
@@ -21,7 +22,6 @@ const Sales = () => {
     setStatus("");
   };
 
-  console.log(search,startDate,endDate)
 
   const { data, isLoading } = useQuery({
     queryKey: ["sales", page,search,startDate,endDate],
@@ -41,6 +41,8 @@ const Sales = () => {
   if (isLoading) return <p>Loading...</p>;
   const totalPages = data?.totalPages || 0;
   const salesData = (data?.data as Sale[]) || [];
+
+  // console.log(data);
 
   return (
     <div>

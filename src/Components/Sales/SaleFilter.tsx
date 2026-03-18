@@ -72,8 +72,8 @@ const SaleFilter = ({
           >
             <option value="">All</option>
             <option value="paid">Paid</option>
-            <option value="partial">Partial</option>
             <option value="due">Due</option>
+            <option value="unpaid">Unpaid</option>
           </select>
         </div>
       </div>

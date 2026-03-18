@@ -28,12 +28,11 @@ export async function GET(req: NextRequest) {
 
     const skip = (currentPage - 1) * pageSize;
 
-    // 🔹 Search param
+    // 🔹 Params
     const searchTrim = url.searchParams.get("searchTrim")?.trim() || "";
-
-    // 🔹 Date params
     const startDate = url.searchParams.get("startDate");
     const endDate = url.searchParams.get("endDate");
+    const status = url.searchParams.get("status");
 
     // 🔹 Filter
     const filter: any = {};
@@ -63,15 +62,26 @@ export async function GET(req: NextRequest) {
 
       if (endDate) {
         const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999); // full day include
+        end.setHours(23, 59, 59, 999);
         filter.createdAt.$lte = end;
+      }
+    }
+
+    // ✅ Status filter (🔥 dynamic)
+    if (status) {
+      if (status === "paid") {
+        filter.dueAmount = 0;
+      } else if (status === "due") {
+        filter.dueAmount = { $gt: 0 };
+      } else if (status === "unpaid") {
+        filter.paidAmount = 0;
       }
     }
 
     // 🔹 Get data
     const sales = await salesCollection
       .find(filter)
-      .sort({ createdAt: -1 }) // latest first
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(pageSize)
       .toArray();
@@ -82,7 +92,6 @@ export async function GET(req: NextRequest) {
       success: true,
       message: "Sales retrieved successfully",
       data: sales,
-
       currentPage,
       pageSize,
       totalData: total,
