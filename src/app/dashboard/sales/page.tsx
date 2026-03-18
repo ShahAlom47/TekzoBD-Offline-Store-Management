@@ -1,4 +1,5 @@
 "use client";
+import Loading from "@/app/loading";
 import { DashPaginationButton } from "@/Components/CommonComponents/DashPaginationButton";
 import SaleFilter from "@/Components/Sales/SaleFilter";
 import SalesDataTable from "@/Components/Sales/SalesDataTable";
@@ -38,7 +39,7 @@ const Sales = () => {
     placeholderData: (prev) => prev, // keep old data while fetching new
   });
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isLoading) return <Loading></Loading>;
   const totalPages = data?.totalPages || 0;
   const salesData = (data?.data as Sale[]) || [];
 

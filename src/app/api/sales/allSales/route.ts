@@ -34,6 +34,8 @@ export async function GET(req: NextRequest) {
     const endDate = url.searchParams.get("endDate");
     const status = url.searchParams.get("status");
 
+    console.log(status)
+
     // 🔹 Filter
     const filter: any = {};
 
@@ -68,15 +70,15 @@ export async function GET(req: NextRequest) {
     }
 
     // ✅ Status filter (🔥 dynamic)
-    if (status) {
-      if (status === "paid") {
-        filter.dueAmount = 0;
-      } else if (status === "due") {
-        filter.dueAmount = { $gt: 0 };
-      } else if (status === "unpaid") {
-        filter.paidAmount = 0;
-      }
-    }
+   if (status && status !== "all") {
+  if (status === "paid") {
+    filter.dueAmount = 0;
+  } else if (status === "due") {
+    filter.dueAmount = { $gt: 0 };
+  } else if (status === "unpaid") {
+    filter.paidAmount = 0;
+  }
+}
 
     // 🔹 Get data
     const sales = await salesCollection
