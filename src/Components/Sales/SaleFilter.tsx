@@ -28,9 +28,9 @@ const SaleFilter = ({
 }: Props) => {
   return (
     <div className="bg-white shadow-sm border rounded-xl p-4 mb-5">
-      <div className="grid md:grid-cols-5 gap-3 items-end">
+      <div className="grid md:grid-cols-6 gap-3 items-end">
         {/* Search */}
-        <div className="md:col-span-2">
+        <div className="md:col-span-3">
           <label className="text-sm text-gray-500 mb-1 block">Search</label>
           <SearchBox value={search} setValue={setSearch} />
         </div>
@@ -55,7 +55,7 @@ const SaleFilter = ({
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full  border border-blue-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
           />
         </div>
 
