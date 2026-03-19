@@ -16,7 +16,6 @@ export default function StoreNavbar() {
     { name: "Customers", href: "/dashboard/customers" },
     { name: "Categories", href: "/dashboard/categories" },
     { name: "Suppliers", href: "/dashboard/suppliers" },
-    { name: "Expenses", href: "/dashboard/expenses" },
     { name: "Reports", href: "/dashboard/reports" },
     { name: "Settings", href: "/dashboard/settings" },
   ];

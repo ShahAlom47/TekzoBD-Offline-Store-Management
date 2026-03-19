@@ -1,5 +1,7 @@
 "use client";
 
+import { expenseCategoryOptions } from "@/Interfaces/expensesInterface";
+import { addExpenses } from "@/lib/allApiRequest/expensesRequest/expensesRequest";
 import React, { useState } from "react";
 
 interface Props {
@@ -31,6 +33,8 @@ const AddExpenseForm = ({ onSuccess }: Props) => {
 
     console.log("Expense Data:", payload);
 
+    const res= await addExpenses(payload)
+
     // 🔥 later API call দিবি এখানে
 
     onSuccess(); // modal close
@@ -60,20 +64,19 @@ const AddExpenseForm = ({ onSuccess }: Props) => {
         required
       />
 
-      {/* Category */}
-      <select
-        name="category"
-        value={form.category}
-        onChange={handleChange}
-        className="w-full border p-2 rounded"
-      >
-        <option value="food">Food</option>
-        <option value="rent">Rent</option>
-        <option value="bill">Bill</option>
-        <option value="salary">Salary</option>
-        <option value="transport">Transport</option>
-        <option value="others">Others</option>
-      </select>
+   {/* Category */}
+<select
+  name="category"
+  value={form.category}
+  onChange={handleChange}
+  className="w-full border p-2 rounded"
+>
+  {expenseCategoryOptions.map((item) => (
+    <option key={item.value} value={item.value}>
+      {item.label}
+    </option>
+  ))}
+</select>
 
       {/* Note */}
       <input
