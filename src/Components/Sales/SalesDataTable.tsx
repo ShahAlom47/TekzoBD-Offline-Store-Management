@@ -8,14 +8,28 @@ import { queryClient } from "@/Providers/QueryProvider";
 import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast/headless";
+import { Sale as BaseSale } from "@/Interfaces/saleInterfaces";
+import Loading from "@/app/loading";
+
+export interface SaleWithPayment extends BaseSale {
+  paidAmount: number;  // total paid from payment collection
+  dueAmount: number;   // totalAmount - paidAmount
+}
 
 interface Props {
-  sales: Sale[];
+  sales: SaleWithPayment[];
 }
 
 const SalesDataTable = ({ sales }: Props) => {
   const { confirm, ConfirmModal } = useConfirm();
   const [loading, setLoading] = useState<boolean>(false);
+    const salesData = sales || []; // default empty array
+
+  if(sales.length<=0){
+    return(
+      <Loading></Loading>
+    )
+  }
 
   const handleDelete = async (saleId: string | undefined) => {
     const ok = await confirm({
@@ -62,28 +76,28 @@ const SalesDataTable = ({ sales }: Props) => {
     { header: "Action", accessor: "action" },
   ];
 
-  const data = sales?.map((sale) => ({
-    saleNumber: <h1 className="font-medium">{sale.saleNumber || "N/A"}</h1>,
+  const data = salesData?.map((sale) => ({
+    saleNumber: <h1 className="font-medium">{sale?.saleNumber || "N/A"}</h1>,
 
-    date: new Date(sale.createdAt).toLocaleDateString(),
+    date: new Date(sale?.createdAt).toLocaleDateString(),
 
-    products: sale.products.length,
+    products: sale?.products.length,
 
     totalAmount: <span className="font-semibold">৳ {sale.totalAmount}</span>,
 
-    // paidAmount: (
-    //   <span className="text-green-600 font-medium">৳ {sale.paidAmount}</span>
-    // ),
+    paidAmount: (
+      <span className="text-green-600 font-medium">৳ {sale.paidAmount}</span>
+    ),
 
-    // dueAmount: (
-    //   <span
-    //     className={`font-semibold ${
-    //       sale.dueAmount > 0 ? "text-red-500" : "text-green-600"
-    //     }`}
-    //   >
-    //     ৳ {sale.dueAmount}
-    //   </span>
-    // ),
+    dueAmount: (
+      <span
+        className={`font-semibold ${
+          sale.dueAmount > 0 ? "text-red-500" : "text-green-600"
+        }`}
+      >
+        ৳ {sale.dueAmount}
+      </span>
+    ),
 
     profit: (
       <span className="text-blue-600 font-medium">৳ {sale.totalProfit}</span>

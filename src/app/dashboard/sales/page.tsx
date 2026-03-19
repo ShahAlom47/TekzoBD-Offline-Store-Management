@@ -2,7 +2,7 @@
 import Loading from "@/app/loading";
 import { DashPaginationButton } from "@/Components/CommonComponents/DashPaginationButton";
 import SaleFilter from "@/Components/Sales/SaleFilter";
-import SalesDataTable from "@/Components/Sales/SalesDataTable";
+import SalesDataTable, { SaleWithPayment } from "@/Components/Sales/SalesDataTable";
 import { Sale } from "@/Interfaces/saleInterfaces";
 import { getAllSales } from "@/lib/allApiRequest/salesRequest/salesRequest";
 import { useQuery } from "@tanstack/react-query";
@@ -40,8 +40,8 @@ const Sales = () => {
 
   if (isLoading) return <Loading></Loading>;
   const totalPages = data?.totalPages || 0;
-  const salesData = (data?.data as Sale[]) || [];
-  console.log(data,salesData)
+  const salesData = (data?.data as SaleWithPayment[]) || [];
+  
 
   // console.log(data);
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import {
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
 
     const {
       sale,
-      payment, // ✅ new
+      payment, // { amount: number, method?: "CASH" | "BKASH" | "BANK" | "CARD", note?: string }
     } = body;
 
     const {
@@ -32,14 +33,13 @@ export async function POST(req: NextRequest) {
 
     const productCollection = await getProductCollection();
     const salesCollection = await getSalesCollection();
-    const paymentsCollection = await getPaymentsCollection(); // ✅
+    const paymentsCollection = await getPaymentsCollection();
 
     const saleProducts: SaleProduct[] = [];
-
     let totalAmount = 0;
     let totalCost = 0;
 
-    // 1️⃣ Validate stock + calculate
+    // 1️⃣ Validate stock & calculate totals
     for (const item of products) {
       const product = await productCollection.findOne({
         _id: new ObjectId(item.productId),
@@ -47,17 +47,14 @@ export async function POST(req: NextRequest) {
 
       if (!product) {
         return NextResponse.json(
-          { success: false, message: "Product not found" },
+          { success: false, message: `Product not found: ${item.productId}` },
           { status: 404 }
         );
       }
 
       if (product.currentStock < item.quantity) {
         return NextResponse.json(
-          {
-            success: false,
-            message: `${product.name} stock not enough`,
-          },
+          { success: false, message: `${product.name} stock not enough` },
           { status: 400 }
         );
       }
@@ -89,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     // 2️⃣ Create Sale
     const saleData: Sale = {
-      customerId: customerId ? new ObjectId(customerId) : undefined,
+      customerId: customerId ? new ObjectId(customerId) : undefined, // optional walk-in
       products: saleProducts,
       discount,
       totalAmount,
@@ -102,15 +99,15 @@ export async function POST(req: NextRequest) {
 
     const saleResult = await salesCollection.insertOne(saleData);
 
-    // 3️⃣ Insert Payment (if exists) 🔥
-    if (payment && payment.amount > 0 && customerId) {
+    // 3️⃣ Insert Payment (always, even walk-in)
+    if (payment && payment.amount > 0) {
       await paymentsCollection.insertOne({
-        customerId: new ObjectId(customerId),
+        customerId: customerId ? new ObjectId(customerId) : '', // walk-in handled
         saleId: saleResult.insertedId,
         amount: payment.amount,
         method: payment.method || "CASH",
         type: "SALE_PAYMENT",
-        note: payment.note,
+        note: payment.note || (customerId ? "Sale payment" : "Walk-in payment"),
         createdAt: new Date(),
       });
     }
@@ -134,10 +131,10 @@ export async function POST(req: NextRequest) {
       saleId: saleResult.insertedId,
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("SALE ERROR:", error);
     return NextResponse.json(
-      { success: false, message: "Server error" },
+      { success: false, message: "Server error", error: error.message || error },
       { status: 500 }
     );
   }
