@@ -6,7 +6,6 @@ import SalesDataTable from "@/Components/Sales/SalesDataTable";
 import { Sale } from "@/Interfaces/saleInterfaces";
 import { getAllSales } from "@/lib/allApiRequest/salesRequest/salesRequest";
 import { useQuery } from "@tanstack/react-query";
-import { stat } from "fs";
 import { useState } from "react";
 
 const Sales = () => {
@@ -42,6 +41,7 @@ const Sales = () => {
   if (isLoading) return <Loading></Loading>;
   const totalPages = data?.totalPages || 0;
   const salesData = (data?.data as Sale[]) || [];
+  console.log(data,salesData)
 
   // console.log(data);
 

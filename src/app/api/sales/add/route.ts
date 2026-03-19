@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
-import { getSalesCollection, getProductCollection } from "@/lib/database/db_collections";
+import {
+  getSalesCollection,
+  getProductCollection, 
+  getPaymentsCollection
+} from "@/lib/database/db_collections";
 import { Sale, SaleProduct } from "@/Interfaces/saleInterfaces";
 
 export async function POST(req: NextRequest) {
@@ -8,12 +12,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const {
+      sale,
+      payment, // ✅ new
+    } = body;
+
+    const {
       customerId,
       products,
       discount = 0,
-      paidAmount = 0,
       createdBy,
-    } = body;
+    } = sale;
 
     if (!products || products.length === 0) {
       return NextResponse.json(
@@ -24,6 +32,7 @@ export async function POST(req: NextRequest) {
 
     const productCollection = await getProductCollection();
     const salesCollection = await getSalesCollection();
+    const paymentsCollection = await getPaymentsCollection(); // ✅
 
     const saleProducts: SaleProduct[] = [];
 
@@ -76,20 +85,16 @@ export async function POST(req: NextRequest) {
     }
 
     totalAmount = totalAmount - discount;
-
     const totalProfit = totalAmount - totalCost;
-    const dueAmount = totalAmount - paidAmount;
 
     // 2️⃣ Create Sale
     const saleData: Sale = {
-      customerId: customerId || undefined,
+      customerId: customerId ? new ObjectId(customerId) : undefined,
       products: saleProducts,
       discount,
       totalAmount,
       totalCost,
       totalProfit,
-      paidAmount,
-      dueAmount,
       createdBy,
       createdAt: new Date(),
       saleNumber: `SALE-${Date.now()}`,
@@ -97,7 +102,20 @@ export async function POST(req: NextRequest) {
 
     const saleResult = await salesCollection.insertOne(saleData);
 
-    // 3️⃣ Update stock
+    // 3️⃣ Insert Payment (if exists) 🔥
+    if (payment && payment.amount > 0 && customerId) {
+      await paymentsCollection.insertOne({
+        customerId: new ObjectId(customerId),
+        saleId: saleResult.insertedId,
+        amount: payment.amount,
+        method: payment.method || "CASH",
+        type: "SALE_PAYMENT",
+        note: payment.note,
+        createdAt: new Date(),
+      });
+    }
+
+    // 4️⃣ Update stock
     for (const item of products) {
       await productCollection.updateOne(
         { _id: new ObjectId(item.productId) },

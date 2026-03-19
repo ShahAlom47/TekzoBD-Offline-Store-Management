@@ -5,7 +5,7 @@ import ProductSelect from "@/Components/Sales/ProductSelect";
 import { useCustomers } from "@/hook/useCustomers";
 import { Customer } from "@/Interfaces/customerInterface";
 import { ProductUnit } from "@/Interfaces/productInterface";
-import { Sale } from "@/Interfaces/saleInterfaces";
+import { AddSaleRequest } from "@/Interfaces/saleInterfaces";
 import { addSale } from "@/lib/allApiRequest/salesRequest/salesRequest";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
@@ -58,18 +58,21 @@ const AddSalePage = () => {
   // Submit Sale
   // ===============================
 
-  const handleSubmit = async () => {
-    if (cart.length === 0) {
-      toast.error("Please add product first");
-      return;
-    }
-    if (dueAmount > 0 && !selectedCustomer) {
-      toast.error("Please select customer for due amount");
-      return;
-    }
+ const handleSubmit = async () => {
+  if (cart.length === 0) {
+    toast.error("Please add product first");
+    return;
+  }
 
-    setBtnLoading(true);
-    const saleData: Sale = {
+  if (dueAmount > 0 && !selectedCustomer) {
+    toast.error("Please select customer for due amount");
+    return;
+  }
+
+  setBtnLoading(true);
+
+  const saleData: AddSaleRequest = {
+    sale: {
       saleNumber: `SALE-${Date.now()}`,
 
       customerId: selectedCustomer?._id?.toString(),
@@ -84,36 +87,46 @@ const AddSalePage = () => {
         totalPrice: item.quantity * item.price,
         totalCost: item.quantity * item.costPrice,
 
-        profit: item.quantity * item.price - item.quantity * item.costPrice,
+        profit:
+          item.quantity * item.price -
+          item.quantity * item.costPrice,
       })),
 
       discount,
       totalAmount: finalAmount,
       totalCost,
       totalProfit,
-      paidAmount,
-      dueAmount,
-      createdAt: new Date(),
-    };
+    },
 
-    console.log(saleData);
-
-    const res = await addSale(saleData);
-
-    if (!res?.success) {
-      setBtnLoading(false);
-      toast.error(res?.message || "Failed");
-      return;
-    }
-    setBtnLoading(false);
-    toast.success(res?.message || "Sale Added Successfully");
-
-    // ================= RESET FORM =================
-    setCart([]);
-    setPaidAmount(0);
-    setDiscount(0);
-    setSelectedCustomer(null);
+    // 👉 payment only if paidAmount > 0
+    ...(paidAmount > 0 && {
+      payment: {
+        amount: paidAmount,
+        method: "CASH", // later dynamic korte parba
+        note: "Sale payment",
+      },
+    }),
   };
+
+  console.log(saleData);
+
+  const res = await addSale(saleData);
+
+  if (!res?.success) {
+    setBtnLoading(false);
+    toast.error(res?.message || "Failed");
+    return;
+  }
+
+  setBtnLoading(false);
+  toast.success(res?.message || "Sale Added Successfully");
+
+  // RESET
+  setCart([]);
+  setPaidAmount(0);
+  setDiscount(0);
+  setSelectedCustomer(null);
+};
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">

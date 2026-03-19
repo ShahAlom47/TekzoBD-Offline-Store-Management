@@ -12,6 +12,7 @@ export default function StoreNavbar() {
     { name: "Add Product", href: "/dashboard/products/add" },
     { name: "Sales", href: "/dashboard/sales" },
     { name: "Add Sale", href: "/dashboard/sales/addSale" },
+    { name: "Payments", href: "/dashboard/payments" },
     { name: "Expenses", href: "/dashboard/expenses" },
     { name: "Customers", href: "/dashboard/customers" },
     { name: "Categories", href: "/dashboard/categories" },

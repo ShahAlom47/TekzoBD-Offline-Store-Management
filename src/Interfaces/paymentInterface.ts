@@ -1,33 +1,28 @@
-// Interfaces/paymentInterface.ts
-
 import { ObjectId } from "mongodb";
 
+export type ID = ObjectId | string;
+
+export type PaymentMethod = "CASH" | "BKASH" | "BANK" | "CARD";
+
+export type PaymentType = "SALE_PAYMENT" | "DUE_PAYMENT";
+
 export interface Payment {
-  _id:ObjectId| string;                // Unique Payment ID
+  _id?: ID;
 
-  // Customer & Sale reference
-  customerId: string;         // এই payment কোন customer এর
-  saleId?: string;            // Optional: যদি specific sale এর জন্য হয়
+  // Reference
+  customerId: ID;
+  saleId?: ID;
 
-  // Payment details
-  amount: number;             // Paid amount
-  method: "CASH" | "BKASH" | "BANK" | "CARD"; // Payment method
-  note?: string;              // Optional note, e.g. "Partial Payment", "Advance"
+  // Payment info
+  amount: number;
+  method: PaymentMethod;
+  type: PaymentType;
+
+  note?: string;
+  transactionId?: string;
 
   // Metadata
-  createdAt: Date;            // Payment created date
-  updatedAt?: Date;           // Optional: if edited later
+  createdBy?: ID;
+  createdAt: Date;
+  updatedAt?: Date;
 }
-
-
-// export interface Payment {
-//   _id?: ObjectId;
-//   customerId: string;
-
-//   amount: number;
-
-//   saleId?: string; // optional (specific sale er jonno)
-  
-//   note?: string;
-//   createdAt: Date;
-// }

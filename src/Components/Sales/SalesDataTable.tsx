@@ -62,7 +62,7 @@ const SalesDataTable = ({ sales }: Props) => {
     { header: "Action", accessor: "action" },
   ];
 
-  const data = sales.map((sale) => ({
+  const data = sales?.map((sale) => ({
     saleNumber: <h1 className="font-medium">{sale.saleNumber || "N/A"}</h1>,
 
     date: new Date(sale.createdAt).toLocaleDateString(),
@@ -71,19 +71,19 @@ const SalesDataTable = ({ sales }: Props) => {
 
     totalAmount: <span className="font-semibold">৳ {sale.totalAmount}</span>,
 
-    paidAmount: (
-      <span className="text-green-600 font-medium">৳ {sale.paidAmount}</span>
-    ),
+    // paidAmount: (
+    //   <span className="text-green-600 font-medium">৳ {sale.paidAmount}</span>
+    // ),
 
-    dueAmount: (
-      <span
-        className={`font-semibold ${
-          sale.dueAmount > 0 ? "text-red-500" : "text-green-600"
-        }`}
-      >
-        ৳ {sale.dueAmount}
-      </span>
-    ),
+    // dueAmount: (
+    //   <span
+    //     className={`font-semibold ${
+    //       sale.dueAmount > 0 ? "text-red-500" : "text-green-600"
+    //     }`}
+    //   >
+    //     ৳ {sale.dueAmount}
+    //   </span>
+    // ),
 
     profit: (
       <span className="text-blue-600 font-medium">৳ {sale.totalProfit}</span>

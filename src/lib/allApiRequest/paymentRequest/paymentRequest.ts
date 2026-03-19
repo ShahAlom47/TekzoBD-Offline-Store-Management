@@ -1,4 +1,3 @@
-import { AddSaleRequest, Sale } from "@/Interfaces/saleInterfaces";
 import { request } from "../apiRequests";
 
 interface ParamsType {
@@ -10,10 +9,7 @@ interface ParamsType {
   status?: string;
 }
 
-export const addSale = async (data: AddSaleRequest) => {
-  return request("POST", "/sales/add", {...data});
-}
-export const getAllSales = async (params: ParamsType) => {
+export const getPayments = async (params: ParamsType) => {
   const {
     currentPage,
     limit,
@@ -33,17 +29,7 @@ export const getAllSales = async (params: ParamsType) => {
   if (endDate) queryParams.set("endDate", endDate);
   if (status) queryParams.set("status", status);
 
-  const url = `/sales/allSales?${queryParams.toString()}`;
+  const url = `/payment/allPayment?${queryParams.toString()}`;
 
   return request("GET", url, undefined, undefined, undefined);
 };
-
-
-export  const getSaleById = async (id:string) => {
-  return request("GET", `/sales/${id}`);
-} 
-
-
-export  const saleDelete = async (id:string) => {
-  return request("DELETE", `/sales/delete/${id}`);
-} 

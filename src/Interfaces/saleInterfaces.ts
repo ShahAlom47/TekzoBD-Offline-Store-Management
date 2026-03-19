@@ -1,56 +1,83 @@
 import { ObjectId } from "mongodb";
 
-export interface SaleProduct {
-    productId: string;
-    productName?: string; // optional, for display purposes
-    quantity: number;
+export type ID = ObjectId | string;
 
-    sellingPrice: number;  // per unit
-    costPrice: number;     // per unit cost (from Product DB)
-    
-    totalPrice: number;    // quantity * sellingPrice
-    totalCost: number;     // quantity * costPrice
-    profit: number;        // totalPrice - totalCost
+export type PaymentMethod = "CASH" | "BKASH" | "BANK" | "CARD";
+
+export type PaymentType = "SALE_PAYMENT" | "DUE_PAYMENT";
+
+
+export interface SaleProduct {
+  productId: ID;
+  productName?: string;
+
+  quantity: number;
+
+  sellingPrice: number;
+  costPrice: number;
+
+  totalPrice: number;
+  totalCost: number;
+  profit: number;
 }
 
-// export interface Sale {
-//   _id?: ObjectId;
-//   customerId?: string |undefined;       // optional, walk-in
-//   products: SaleProduct[];
-//   discount?: number;         // optional
-//   totalAmount: number;       // sum(products totalPrice) - discount
-//   totalCost: number;         // sum(products totalCost)
-//   totalProfit: number;       // totalAmount - totalCost
-//   paidAmount: number;
-//   dueAmount: number;         // totalAmount - paidAmount
-//   createdBy?: string;        // কোন user sale করেছে
-//   createdAt: Date;
-//   saleNumber?: string; 
-// }
+
 
 export interface Sale {
-  _id?: ObjectId;
-  customerId?: string;
+  _id?: ID;
+
+  customerId?: ID; // optional (walk-in customer)
+
   products: SaleProduct[];
+
   discount?: number;
 
   totalAmount: number;
   totalCost: number;
   totalProfit: number;
 
-  createdBy?: string;
-  createdAt: Date;
   saleNumber?: string;
+
+  createdBy?: ID;
+  createdAt: Date;
 }
 
-export interface Payment {
-  _id?: ObjectId;
-  customerId: string;
+
+
+
+export interface AddSaleRequest {
+  sale: {
+    customerId?: ID;
+    products: SaleProduct[];
+
+    discount?: number;
+      saleNumber?: string;
+
+    totalAmount: number;
+    totalCost: number;
+    totalProfit: number;
+  };
+
+  payment?: {
+    amount: number;
+    method: PaymentMethod;
+    note?: string;
+  };
+}
+
+export interface AddPaymentRequest {
+  customerId: ID;
 
   amount: number;
+  method: PaymentMethod;
 
-  saleId?: string; // optional (specific sale er jonno)
-  
   note?: string;
-  createdAt: Date;
+}
+
+export interface CustomerSummary {
+  customerId: ID;
+
+  totalSales: number;
+  totalPaid: number;
+  dueAmount: number;
 }

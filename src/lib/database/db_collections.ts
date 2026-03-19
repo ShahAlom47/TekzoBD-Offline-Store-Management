@@ -5,7 +5,8 @@ import { User } from "@/Interfaces/userInterfaces";
 import { Category } from "@/Interfaces/categoryInterfaces";
 import { Product } from "@/Interfaces/productInterface";
 import { Sale } from "@/Interfaces/saleInterfaces";
-import { Customer, CustomerWithOutId } from "@/Interfaces/customerInterface";
+import { CustomerWithOutId } from "@/Interfaces/customerInterface";
+import { Payment } from "@/Interfaces/paymentInterface";
 
 
 // Define the User type (you can extend it as needed)
@@ -37,8 +38,8 @@ export const getCustomerCollection = async (): Promise<Collection<CustomerWithOu
   const db: Db = client.db("TekzoBD-Offline-Store-DB"); // Replace with your database name
   return db.collection<CustomerWithOutId>("customers");
 };
-export const getPaymentCollection = async (): Promise<Collection<CustomerWithOutId>> => {
+export const getPaymentsCollection = async (): Promise<Collection<Payment>> => {
   const client = await clientPromise;
   const db: Db = client.db("TekzoBD-Offline-Store-DB"); // Replace with your database name
-  return db.collection<CustomerWithOutId>("payments");
+  return db.collection<Payment>("payments");
 };
