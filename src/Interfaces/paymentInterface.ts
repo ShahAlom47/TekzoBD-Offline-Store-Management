@@ -1,7 +1,9 @@
 // Interfaces/paymentInterface.ts
 
+import { ObjectId } from "mongodb";
+
 export interface Payment {
-  _id: string;                // Unique Payment ID
+  _id:ObjectId| string;                // Unique Payment ID
 
   // Customer & Sale reference
   customerId: string;         // এই payment কোন customer এর
@@ -16,3 +18,16 @@ export interface Payment {
   createdAt: Date;            // Payment created date
   updatedAt?: Date;           // Optional: if edited later
 }
+
+
+// export interface Payment {
+//   _id?: ObjectId;
+//   customerId: string;
+
+//   amount: number;
+
+//   saleId?: string; // optional (specific sale er jonno)
+  
+//   note?: string;
+//   createdAt: Date;
+// }

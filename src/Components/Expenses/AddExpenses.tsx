@@ -1,17 +1,18 @@
 "use client";
 
-import { expenseCategoryOptions } from "@/Interfaces/expensesInterface";
+import { expenseCategoryOptions, ExpenseFormType } from "@/Interfaces/expensesInterface";
 import { addExpenses } from "@/lib/allApiRequest/expensesRequest/expensesRequest";
 import React, { useState } from "react";
+import toast from "react-hot-toast/headless";
 
 interface Props {
   onSuccess: () => void;
 }
 
 const AddExpenseForm = ({ onSuccess }: Props) => {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<ExpenseFormType>({
     title: "",
-    amount: "",
+    amount: 0,
     category: "others",
     note: "",
   });
@@ -34,7 +35,11 @@ const AddExpenseForm = ({ onSuccess }: Props) => {
     console.log("Expense Data:", payload);
 
     const res= await addExpenses(payload)
-
+    if(!res?.success){
+      toast.error(res?.message||"fail")
+      return
+    }
+toast.success(res?.message||"success")
     // 🔥 later API call দিবি এখানে
 
     onSuccess(); // modal close

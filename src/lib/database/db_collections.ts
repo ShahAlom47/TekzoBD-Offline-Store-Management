@@ -37,3 +37,8 @@ export const getCustomerCollection = async (): Promise<Collection<CustomerWithOu
   const db: Db = client.db("TekzoBD-Offline-Store-DB"); // Replace with your database name
   return db.collection<CustomerWithOutId>("customers");
 };
+export const getPaymentCollection = async (): Promise<Collection<CustomerWithOutId>> => {
+  const client = await clientPromise;
+  const db: Db = client.db("TekzoBD-Offline-Store-DB"); // Replace with your database name
+  return db.collection<CustomerWithOutId>("payments");
+};
