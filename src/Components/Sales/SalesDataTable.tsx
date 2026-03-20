@@ -30,7 +30,7 @@ const SalesDataTable = ({ sales }: Props) => {
       <Loading></Loading>
     )
   }
-
+console.log(sales)
   const handleDelete = async (saleId: string | undefined) => {
     const ok = await confirm({
       title: "Delete Sale",

@@ -1,21 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getCustomerCollection, getSalesCollection } from "@/lib/database/db_collections";
+import {
+  getCustomerCollection,
+  getSalesCollection,
+  getPaymentsCollection,
+} from "@/lib/database/db_collections";
+import { address } from "framer-motion/client";
+import { ObjectId } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
     const customerCollection = await getCustomerCollection();
     const saleCollection = await getSalesCollection();
+    const paymentsCollection = await getPaymentsCollection();
 
     const { searchParams } = new URL(req.url);
-
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
     const search = searchParams.get("search")?.trim() || "";
 
-    // ✅ Filter: search + exclude soft deleted
-    const filter: any = { isDeleted: { $ne: true } }; // isDeleted true হলে exclude
-
+    // 🔹 Filter customers
+    const filter: any = { isDeleted: { $ne: true } };
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -33,26 +38,75 @@ export async function GET(req: NextRequest) {
       .limit(limit)
       .toArray();
 
-    // 👉 each customer এর due calculate
-    const customersWithDue = await Promise.all(
-      customers.map(async (customer) => {
-        const sales = await saleCollection
-          .find({ customerId: customer._id.toString() })
-          .toArray();
+    if (!customers.length) {
+      return NextResponse.json({
+        success: true,
+        total,
+        totalPages: Math.ceil(total / limit),
+        data: [],
+      });
+    }
 
-        const salesDue = sales.reduce(
-          (sum, sale) => sum + (sale.dueAmount || 0),
-          0
+    // 🔹 Convert customerIds to string
+    const customerIds = customers.map((c) => c._id.toString());
+
+    // 🔹 Fetch only sales where customerId exists and in our list
+
+    const customerObjectIds = customerIds
+  .filter(Boolean) // remove empty string
+  .map((id) => new ObjectId(id)); // convert string to ObjectId
+
+const sales = await saleCollection
+  .find({
+    customerId: { $in: customerObjectIds },
+  })
+  .toArray();
+
+
+    // 🔹 Fetch payments for sales which exist
+ // saleIds as ObjectId
+const saleObjectIds = sales
+  .map((s) => s._id)
+  .filter(Boolean); // already ObjectId in DB
+
+const payments = await paymentsCollection
+  .find({
+    saleId: { $in: saleObjectIds }, // match ObjectId type
+  })
+  .toArray();
+
+    // 🔹 Map each customer with currentDue
+    const customersWithDue = customers.map((customer) => {
+      const customerSales = sales.filter(
+        (s) =>
+          s.customerId && // ensure customerId exists
+          s.customerId.toString() === customer._id.toString()
+      );
+
+      let totalDue = 0;
+
+      customerSales.forEach((sale) => {
+        const relatedPayments = payments.filter(
+          (p) =>
+            p.saleId && // ensure saleId exists
+            p.saleId.toString() === sale._id.toString()
         );
 
-        const currentDue = (customer.openingBalance || 0) + salesDue;
+        const paid = relatedPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+        const due = Math.max((sale.totalAmount || 0) - paid, 0);
+        totalDue += due;
+      });
 
-        return {
-          ...customer,
-          currentDue,
-        };
-      })
-    );
+      const currentDue = (customer.openingBalance || 0) + totalDue;
+
+      return {
+        _id: customer._id,
+        name: customer.name,
+        address:customer?.address,
+        phone: customer.phone,
+        currentDue,
+      };
+    });
 
     return NextResponse.json({
       success: true,
@@ -60,7 +114,6 @@ export async function GET(req: NextRequest) {
       totalPages: Math.ceil(total / limit),
       data: customersWithDue,
     });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error fetching customers:", error);
     return NextResponse.json(

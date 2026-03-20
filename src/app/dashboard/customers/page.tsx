@@ -43,11 +43,11 @@ const Customers = () => {
       <h1 className="text-2xl font-bold">All Customer</h1>
 
       <div className="flex gap-2 justify-between  items-center  border-b-2 border-gray-900  p-2">
-        <SearchBox
+        {/* <SearchBox
           placeholder="Search customer..."
           value={search}
           onChange={setSearch}
-        />
+        /> */}
 
         <button
           onClick={() => setOpen(true)}
