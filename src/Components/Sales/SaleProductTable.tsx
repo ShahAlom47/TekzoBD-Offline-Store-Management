@@ -1,3 +1,4 @@
+
 import { SaleProduct } from "@/Interfaces/saleInterfaces";
 import { CustomTable } from "../CommonComponents/CustomTable";
 
@@ -24,7 +25,7 @@ const SaleProductTable = ({ products }: PropsType) => {
       name: item.productName,
       quantity: item?.quantity,
       sellingPrice: item?.sellingPrice,
-      cost: item?.totalCost,
+      cost: item?.totalPrice,
       total: item.totalPrice,
       profit: item?.profit,
     };

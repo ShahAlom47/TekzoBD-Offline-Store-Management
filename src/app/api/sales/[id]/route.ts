@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {  getSalesCollection } from "@/lib/database/db_collections";
+import { getSalesCollection, getPaymentsCollection } from "@/lib/database/db_collections";
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 
@@ -18,7 +18,9 @@ export async function GET(
     }
 
     const saleCollection = await getSalesCollection();
+    const paymentsCollection = await getPaymentsCollection();
 
+    // 🔹 Get Sale
     const sale = await saleCollection.findOne({
       _id: new ObjectId(id),
     });
@@ -30,11 +32,28 @@ export async function GET(
       );
     }
 
+    // 🔹 Get Payments for this sale
+    const payments = await paymentsCollection
+      .find({ saleId: new ObjectId(id) })
+      .toArray();
+
+    // 🔹 Calculate paid & due
+    const totalPaid = payments.reduce((acc, p) => acc + (p.amount || 0), 0);
+    const dueAmount = Math.max((sale.totalAmount || 0) - totalPaid, 0);
+
+    // 🔹 Final Data
+    const saleWithPayment = {
+      ...sale,
+      paidAmount: totalPaid,
+      dueAmount,
+      payments, // চাইলে remove করতে পারিস
+    };
+
     return NextResponse.json(
       {
         message: "Sale fetched successfully",
         success: true,
-        data: sale,
+        data: saleWithPayment,
       },
       { status: 200 }
     );

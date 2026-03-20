@@ -1,20 +1,38 @@
 "use client";
 
-import ProductTableView from "@/Components/ProductComponet/ProductTableView ";
 import SaleProductTable from "@/Components/Sales/SaleProductTable";
 import { useCustomer } from "@/hook/useCustomer";
-import { Sale, SaleProduct } from "@/Interfaces/saleInterfaces";
+import {  SaleProduct } from "@/Interfaces/saleInterfaces";
 import { getSaleById } from "@/lib/allApiRequest/salesRequest/salesRequest";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import React from "react";
 
+
+
+export interface SaleDetailsType {
+  _id: string;
+  saleNumber?: string;
+  customerId?: string;
+
+  createdAt?: string;
+
+  totalAmount: number;
+  totalCost: number;
+  totalProfit: number;
+  discount?: number;
+
+  paidAmount?: number;
+  dueAmount?: number;
+
+  products?: SaleProduct[];
+}
+
 const SaleDetails = () => {
   const params = useParams();
   const id = params?.id as string;
 
-
-
+  // 🔹 Sale Query
   const { data, isLoading, isError } = useQuery({
     queryKey: ["sale", id],
     queryFn: async () => {
@@ -24,10 +42,14 @@ const SaleDetails = () => {
     enabled: !!id,
   });
 
-const sale= data?.data as Sale
-  const {data:customer}=useCustomer(sale?.customerId ?? "")
+  const sale = data?.data as SaleDetailsType ;
 
-  console.log(customer)
+console.log(sale)
+
+  const customerId = sale?.customerId || '' ;
+
+  // 🔹 Customer Query (only when sale exists)
+  const { data: customer, isLoading: customerLoading } = useCustomer(customerId);
 
   if (isLoading) {
     return (
@@ -47,7 +69,7 @@ const sale= data?.data as Sale
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      
+
       {/* HEADER */}
       <div className="bg-white shadow rounded-xl p-6 flex justify-between items-center">
         <div>
@@ -67,7 +89,7 @@ const sale= data?.data as Sale
         </div>
       </div>
 
-      {/* PAYMENT INFO */}
+      {/* CUSTOMER + PAYMENT */}
       <div className="grid md:grid-cols-2 gap-6">
 
         {/* CUSTOMER */}
@@ -75,12 +97,16 @@ const sale= data?.data as Sale
           <h2 className="font-semibold text-lg mb-3">Customer</h2>
 
           {sale.customerId ? (
-            <p className="text-gray-700">
-              Customer ID: {sale.customerId}
-              <span className="block text-sm text-gray-500">
-                Customer Name: {customer?.customer?.name ?? "N/A"}
-              </span>
-            </p>
+            <div className="text-gray-700">
+              <p>Customer ID: {sale.customerId}</p>
+
+              <p className="text-sm text-gray-500">
+                Customer Name:{" "}
+                {customerLoading
+                  ? "Loading..."
+                  : customer?.customer?.name ?? "N/A"}
+              </p>
+            </div>
           ) : (
             <p className="text-gray-500">Walk-in Customer</p>
           )}
@@ -95,21 +121,21 @@ const sale= data?.data as Sale
             <div className="flex justify-between">
               <span>Total Amount</span>
               <span className="font-medium">
-                ৳ {sale.totalAmount}
+                ৳ {sale.totalAmount ?? 0}
               </span>
             </div>
 
             <div className="flex justify-between">
               <span>Paid</span>
               <span className="text-green-600 font-medium">
-                ৳ {sale.paidAmount}
+                ৳ {sale.paidAmount ?? 0}
               </span>
             </div>
 
             <div className="flex justify-between">
               <span>Due</span>
               <span className="text-red-500 font-medium">
-                ৳ {sale.dueAmount}
+                ৳ {sale.dueAmount ?? 0}
               </span>
             </div>
 
@@ -123,10 +149,9 @@ const sale= data?.data as Sale
         <div className="p-6 border-b">
           <h2 className="font-semibold text-lg">Products</h2>
         </div>
-<SaleProductTable products={sale?.products}></SaleProductTable>
-      </div>
 
-   
+        <SaleProductTable products={sale?.products ?? []} />
+      </div>
 
       {/* SUMMARY */}
       <div className="bg-white shadow rounded-xl p-6">
@@ -139,21 +164,21 @@ const sale= data?.data as Sale
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-gray-500">Total Sales</p>
             <p className="text-xl font-bold">
-              ৳ {sale.totalAmount}
+              ৳ {sale.totalAmount ?? 0}
             </p>
           </div>
 
           <div className="p-4 bg-gray-50 rounded-lg">
             <p className="text-gray-500">Total Cost</p>
             <p className="text-xl font-bold">
-              ৳ {sale.totalCost}
+              ৳ {sale.totalCost ?? 0}
             </p>
           </div>
 
           <div className="p-4 bg-green-50 rounded-lg">
             <p className="text-gray-500">Total Profit</p>
             <p className="text-xl font-bold text-green-600">
-              ৳ {sale.totalProfit}
+              ৳ {sale.totalProfit ?? 0}
             </p>
           </div>
 
