@@ -104,6 +104,7 @@ const payments = await paymentsCollection
         name: customer.name,
         address:customer?.address,
         phone: customer.phone,
+        isActive:customer?.isActive,
         currentDue,
       };
     });
