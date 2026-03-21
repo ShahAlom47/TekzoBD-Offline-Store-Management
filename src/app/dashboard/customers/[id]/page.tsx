@@ -6,12 +6,22 @@ import { useCustomer } from "@/hook/useCustomer";
 import { Customer } from "@/Interfaces/customerInterface";
 import { useParams } from "next/navigation";
 import { Phone, Mail, MapPin, Wallet } from "lucide-react";
+interface FormType{
+  amount:number;
+  method:"CASH"|"CASH"|"BANK"|"CARD";
+  note?:string;
+}
 
 const CustomerDetails = () => {
   const { id } = useParams();
   const { data, isLoading } = useCustomer(id?.toString() || "");
 
   const [openPayment, setOpenPayment] = useState(false);
+  const [formData, setFormData] = useState({
+  amount: 0,
+  method: "CASH",
+  note: "",
+});
 
   if (isLoading) {
     return (
@@ -24,6 +34,40 @@ const CustomerDetails = () => {
   const customer = data?.customer as Customer;
   const sales = data?.sales || [];
   const summary = data?.summary;
+
+  const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
+  setFormData({
+    ...formData,
+    [e.target.name]: e.target.value,
+  });
+};
+
+const handlePayDue = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  const payload = {
+    customerId: id,
+    amount: Number(formData.amount),
+    method: formData.method,
+    note: formData.note,
+  };
+
+  console.log(payload);
+
+  // 👉 API call
+  // await addPayment(payload)
+
+  // reset
+  setFormData({
+    amount: 0,
+    method: "CASH",
+    note: "",
+  });
+
+  setOpenPayment(false);
+};
 
   return (
     <div className="p-2 md:p-4 space-y-6 max-w-7xl mx-auto">
@@ -142,66 +186,70 @@ const CustomerDetails = () => {
             </div>
 
             {/* Form */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                // 👉 API call here
-                setOpenPayment(false);
-              }}
-              className="space-y-4"
-            >
+          <form onSubmit={handlePayDue} className="space-y-4">
 
-              {/* Amount */}
-              <div>
-                <label className="text-sm">Amount</label>
-                <input
-                  type="number"
-                  required
-                  placeholder="Enter amount"
-                  className="w-full border rounded-lg p-2 mt-1 focus:ring-2 focus:ring-indigo-400 outline-none"
-                />
-              </div>
+  {/* Amount */}
+  <div>
+    <label className="text-sm">Amount</label>
+    <input
+      type="number"
+      name="amount"
+      required
+      value={formData.amount}
+      onChange={handleChange}
+      placeholder="Enter amount"
+      className="w-full border rounded-lg p-2 mt-1 focus:ring-2 focus:ring-indigo-400 outline-none"
+    />
+  </div>
 
-              {/* Method */}
-              <div>
-                <label className="text-sm">Payment Method</label>
-                <select className="w-full border rounded-lg p-2 mt-1">
-                  <option value="CASH">Cash</option>
-                  <option value="BKASH">bKash</option>
-                  <option value="BANK">Bank</option>
-                  <option value="CARD">Card</option>
-                </select>
-              </div>
+  {/* Method */}
+  <div>
+    <label className="text-sm">Payment Method</label>
+    <select
+      name="method"
+      value={formData.method}
+      onChange={handleChange}
+      className="w-full border rounded-lg p-2 mt-1"
+    >
+      <option value="CASH">Cash</option>
+      <option value="BKASH">bKash</option>
+      <option value="BANK">Bank</option>
+      <option value="CARD">Card</option>
+    </select>
+  </div>
 
-              {/* Note */}
-              <div>
-                <label className="text-sm">Note</label>
-                <input
-                  type="text"
-                  placeholder="Optional note"
-                  className="w-full border rounded-lg p-2 mt-1"
-                />
-              </div>
+  {/* Note */}
+  <div>
+    <label className="text-sm">Note</label>
+    <input
+      type="text"
+      name="note"
+      value={formData.note}
+      onChange={handleChange}
+      placeholder="Optional note"
+      className="w-full border rounded-lg p-2 mt-1"
+    />
+  </div>
 
-              {/* Buttons */}
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setOpenPayment(false)}
-                  className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
-                >
-                  Cancel
-                </button>
+  {/* Buttons */}
+  <div className="flex justify-end gap-2 pt-2">
+    <button
+      type="button"
+      onClick={() => setOpenPayment(false)}
+      className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+    >
+      Cancel
+    </button>
 
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
-                >
-                  Save Payment
-                </button>
-              </div>
+    <button
+      type="submit"
+      className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+    >
+      Save Payment
+    </button>
+  </div>
 
-            </form>
+</form>
           </div>
         </div>
       )}
