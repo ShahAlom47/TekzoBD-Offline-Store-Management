@@ -22,6 +22,8 @@ const CustomerDetails = () => {
   const sales = data?.sales || [];
   const summary = data?.summary;
 
+  console.log(data)
+
   return (
     <div className="p-2 md:p-4 space-y-6 max-w-7xl mx-auto">
 
