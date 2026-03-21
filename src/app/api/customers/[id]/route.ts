@@ -54,24 +54,26 @@ export async function GET(
       .toArray();
 
     // 🔹 Add paid & due per sale
-    const salesWithCalc = sales.map((sale) => {
-      const relatedPayments = payments.filter(
-        (p) => p.saleId && p.saleId.equals(sale._id)
-      );
+ const salesWithCalc = sales.map((sale) => {
+  const saleId = sale._id?.toString();
 
-      const paidAmount = relatedPayments.reduce(
-        (sum, p) => sum + (p.amount || 0),
-        0
-      );
+  const relatedPayments = payments.filter(
+    (p) => p.saleId && p.saleId.toString() === saleId
+  );
 
-      const dueAmount = Math.max((sale.totalAmount || 0) - paidAmount, 0);
+  const paidAmount = relatedPayments.reduce(
+    (sum, p) => sum + (p.amount || 0),
+    0
+  );
 
-      return {
-        ...sale,
-        paidAmount,
-        dueAmount,
-      };
-    });
+  const dueAmount = Math.max((sale.totalAmount || 0) - paidAmount, 0);
+
+  return {
+    ...sale,
+    paidAmount,
+    dueAmount,
+  };
+});
 
     // 🔹 Summary Calculation
     const totalPurchase = salesWithCalc.reduce(
