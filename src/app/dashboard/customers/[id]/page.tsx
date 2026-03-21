@@ -49,17 +49,22 @@ const CustomerDetails = () => {
 
           </div>
 
-          <span className="inline-block mt-3 text-xs px-3 py-1 rounded-full bg-white/20 backdrop-blur">
+          <div>
+            <span className="inline-block mt-3 text-xs px-3 py-1 rounded-full bg-white/20 backdrop-blur">
             {customer?.customerType}
           </span>
+        
+          </div>
         </div>
 
-        <div className="text-right">
+        <div className="text-right space-y-2">
           <p className="text-sm opacity-80">Current Due</p>
 
           <p className="text-3xl font-bold flex items-center gap-2 justify-end">
             <Wallet size={20}/> ৳ {summary?.currentDue || 0}
           </p>
+
+            <button className=" bg-blue-700 border border-white px-2 py-1 rounded-sm font-bold hover:scale-95 cursor-pointer">Add Pay</button>
         </div>
       </div>
 
