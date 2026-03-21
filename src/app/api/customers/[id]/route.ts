@@ -1,6 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
-import { getCustomerCollection, getSalesCollection } from "@/lib/database/db_collections";
+import {
+  getCustomerCollection,
+  getSalesCollection,
+  getPaymentsCollection,
+} from "@/lib/database/db_collections";
 
 export async function GET(
   req: NextRequest,
@@ -18,10 +23,13 @@ export async function GET(
 
     const customerCollection = await getCustomerCollection();
     const saleCollection = await getSalesCollection();
+    const paymentsCollection = await getPaymentsCollection();
 
-    // customer
+    const customerId = new ObjectId(id);
+
+    // 🔹 Customer
     const customer = await customerCollection.findOne({
-      _id: new ObjectId(id),
+      _id: customerId,
       isDeleted: { $ne: true },
     });
 
@@ -32,28 +40,69 @@ export async function GET(
       );
     }
 
-    // sales history
+    // 🔹 Sales
     const sales = await saleCollection
-      .find({ customerId: id })
+      .find({ customerId: customerId })
       .sort({ createdAt: -1 })
       .toArray();
 
-    // calculations
-    const totalPurchase = sales.reduce((sum, sale) => sum + sale.totalAmount, 0);
-    const totalPaid = sales.reduce((sum, sale) => sum + sale.paidAmount, 0);
-    const totalDue = sales.reduce((sum, sale) => sum + sale.dueAmount, 0);
+    const saleIds = sales.map((s) => s._id);
+
+    // 🔹 Payments
+    const payments = await paymentsCollection
+      .find({ saleId: { $in: saleIds } })
+      .toArray();
+
+    // 🔹 Add paid & due per sale
+    const salesWithCalc = sales.map((sale) => {
+      const relatedPayments = payments.filter(
+        (p) => p.saleId && p.saleId.equals(sale._id)
+      );
+
+      const paidAmount = relatedPayments.reduce(
+        (sum, p) => sum + (p.amount || 0),
+        0
+      );
+
+      const dueAmount = Math.max((sale.totalAmount || 0) - paidAmount, 0);
+
+      return {
+        ...sale,
+        paidAmount,
+        dueAmount,
+      };
+    });
+
+    // 🔹 Summary Calculation
+    const totalPurchase = salesWithCalc.reduce(
+      (sum, sale) => sum + (sale.totalAmount || 0),
+      0
+    );
+
+    const totalPaid = salesWithCalc.reduce(
+      (sum, sale) => sum + (sale.paidAmount || 0),
+      0
+    );
+
+    const totalDue = salesWithCalc.reduce(
+      (sum, sale) => sum + (sale.dueAmount || 0),
+      0
+    );
 
     const openingBalance = customer.openingBalance || 0;
 
-    const currentDue = totalDue + openingBalance;
+    const currentDue = openingBalance + totalDue;
 
     return NextResponse.json({
       success: true,
       data: {
-        customer,
-        sales,
+        customer: {
+          ...customer,
+          currentDue, // 🔥 add here
+        },
+        sales: salesWithCalc,
         summary: {
-          totalSales: sales.length,
+          totalSales: salesWithCalc.length,
           totalPurchase,
           totalPaid,
           totalDue,
@@ -62,7 +111,6 @@ export async function GET(
         },
       },
     });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error fetching customer:", error);
 
