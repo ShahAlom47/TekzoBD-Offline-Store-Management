@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
-import { ObjectId } from "mongodb";
 import { getPaymentsCollection } from "@/lib/database/db_collections";
 
 export async function POST(req: NextRequest) {
@@ -13,7 +12,7 @@ export async function POST(req: NextRequest) {
       amount,
       method = "CASH",
       note,
-      transactionId,
+      transactionId
       createdBy,
     } = body;
 
@@ -39,16 +38,13 @@ export async function POST(req: NextRequest) {
 
     // ✅ Create Payment
     const paymentData = {
-      customerId: new ObjectId(customerId),
-      saleId: saleId ? new ObjectId(saleId) : undefined,
+      customerId: customerId,
+      saleId: saleId ? saleId : undefined,
       amount,
       method,
       type: paymentType,
       note:
-        note ||
-        (paymentType === "DUE_PAYMENT"
-          ? "Due payment"
-          : "Sale payment"),
+        note ,
       transactionId: transactionId || null,
       createdBy,
       createdAt: new Date(),
