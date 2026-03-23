@@ -42,38 +42,42 @@ export async function GET(
 
     // 🔹 Sales
     const sales = await saleCollection
-      .find({ customerId: customerId })
+      .find({ customerId })
       .sort({ createdAt: -1 })
       .toArray();
 
     const saleIds = sales.map((s) => s._id);
 
-    // 🔹 Payments
+    // 🔹 Payments (including due payments with no saleId)
     const payments = await paymentsCollection
-      .find({ saleId: { $in: saleIds } })
+      .find({ customerId })
       .toArray();
 
     // 🔹 Add paid & due per sale
- const salesWithCalc = sales.map((sale) => {
-  const saleId = sale._id?.toString();
+    const salesWithCalc = sales.map((sale) => {
+      const saleIdStr = sale._id?.toString();
 
-  const relatedPayments = payments.filter(
-    (p) => p.saleId && p.saleId.toString() === saleId
-  );
+      const relatedPayments = payments.filter(
+        (p) => p.saleId && p.saleId.toString() === saleIdStr
+      );
 
-  const paidAmount = relatedPayments.reduce(
-    (sum, p) => sum + (p.amount || 0),
-    0
-  );
+      const paidAmount = relatedPayments.reduce(
+        (sum, p) => sum + (p.amount || 0),
+        0
+      );
 
-  const dueAmount = Math.max((sale.totalAmount || 0) - paidAmount, 0);
+      const dueAmount = Math.max((sale.totalAmount || 0) - paidAmount, 0);
 
-  return {
-    ...sale,
-    paidAmount,
-    dueAmount,
-  };
-});
+      return {
+        ...sale,
+        paidAmount,
+        dueAmount,
+      };
+    });
+
+    // 🔹 Include due payments not linked to any sale
+    const duePayments = payments.filter((p) => !p.saleId);
+    const totalDuePayments = duePayments.reduce((sum, p) => sum + (p.amount || 0), 0);
 
     // 🔹 Summary Calculation
     const totalPurchase = salesWithCalc.reduce(
@@ -81,28 +85,33 @@ export async function GET(
       0
     );
 
-    const totalPaid = salesWithCalc.reduce(
+    const totalPaidSales = salesWithCalc.reduce(
       (sum, sale) => sum + (sale.paidAmount || 0),
       0
     );
 
-    const totalDue = salesWithCalc.reduce(
+    const totalPaid = totalPaidSales + totalDuePayments;
+
+    const totalDueSales = salesWithCalc.reduce(
       (sum, sale) => sum + (sale.dueAmount || 0),
       0
     );
 
+    const totalDue = totalDueSales; // duePayments already counted in totalPaid
+
     const openingBalance = customer.openingBalance || 0;
 
-    const currentDue = openingBalance + totalDue;
+    const currentDue = Math.max(openingBalance + totalDue - totalPaid, 0);
 
     return NextResponse.json({
       success: true,
       data: {
         customer: {
           ...customer,
-          currentDue, // 🔥 add here
+          currentDue,
         },
         sales: salesWithCalc,
+        duePayments, // 🔥 optional, frontend can show these
         summary: {
           totalSales: salesWithCalc.length,
           totalPurchase,

@@ -6,20 +6,18 @@ import { useCustomer } from "@/hook/useCustomer";
 import { Customer } from "@/Interfaces/customerInterface";
 import { useParams } from "next/navigation";
 import { Phone, Mail, MapPin, Wallet } from "lucide-react";
-interface FormType{
-  amount:number;
-  method:"CASH"|"CASH"|"BANK"|"CARD";
-  note?:string;
-  transactionId:string;
-  paymentDate:string;
-}
+import { AddPaymentFormType } from "@/Interfaces/paymentInterface";
+import { addPayment } from "@/lib/allApiRequest/paymentRequest/paymentRequest";
+import toast from "react-hot-toast/headless";
+import { Toaster } from "react-hot-toast";
+
 
 const CustomerDetails = () => {
   const { id } = useParams();
   const { data, isLoading } = useCustomer(id?.toString() || "");
 
   const [openPayment, setOpenPayment] = useState(false);
-  const [formData, setFormData] = useState<FormType>({
+  const [formData, setFormData] = useState<AddPaymentFormType>({
   amount: 0,
   method: "CASH",
   note: "",
@@ -54,12 +52,12 @@ const handlePayDue = async (e: React.FormEvent<HTMLFormElement>) => {
   try {
     // 🔴 basic validation
     if (!formData.amount || Number(formData.amount) <= 0) {
-      alert("Enter valid amount");
+      toast.success("Enter valid amount");
       return;
     }
 
     if (!id) {
-      alert("Customer not found");
+      toast.success("Customer not found");
       return;
     }
 
@@ -73,33 +71,27 @@ const handlePayDue = async (e: React.FormEvent<HTMLFormElement>) => {
       transactionId:
         formData.method !== "CASH"
           ? formData.transactionId
-          : undefined,
+          : '',
 
       // ✅ payment date (fallback today)
       paymentDate: formData.paymentDate
-        ? new Date(formData.paymentDate)
-        : new Date(),
+        ? new Date(formData.paymentDate).toISOString()
+        : new Date().toISOString(),
     };
 
     console.log("PAYLOAD:", payload);
 
     // 🔥 API CALL
-    const res = await fetch("/api/payments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+    const res = await addPayment(payload)
+    console.log(res)
 
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.message || "Payment failed");
+    if (!res.success) {
+      toast.error(res.message || "Payment failed");
+      return
     }
 
     // ✅ success
-    alert("✅ Payment added successfully");
+    toast.success(res.message||"✅ Payment added successfully");
 
     // 🔄 reset form (correct way)
     setFormData({
@@ -333,6 +325,8 @@ const handlePayDue = async (e: React.FormEvent<HTMLFormElement>) => {
         </div>
 
       </form>
+                <Toaster position="top-right" />
+
     </div>
   </div>
 )}

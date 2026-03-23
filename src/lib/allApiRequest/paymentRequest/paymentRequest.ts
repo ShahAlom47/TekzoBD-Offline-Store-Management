@@ -1,3 +1,4 @@
+import { AddPaymentFormType, Payment } from "@/Interfaces/paymentInterface";
 import { request } from "../apiRequests";
 
 interface ParamsType {
@@ -32,4 +33,8 @@ export const getPayments = async (params: ParamsType) => {
   const url = `/payment/allPayment?${queryParams.toString()}`;
 
   return request("GET", url, undefined, undefined, undefined);
+};
+
+export const addPayment = async (data: AddPaymentFormType) => {
+  return request("POST",  `/payment/addPayment`, { ...data },);
 };

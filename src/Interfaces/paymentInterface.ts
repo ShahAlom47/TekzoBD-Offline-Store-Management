@@ -26,3 +26,11 @@ paymentDate:string;
   createdAt: string;
   updatedAt?: string;
 }
+
+export interface AddPaymentFormType{
+  amount:number;
+  method:"CASH"|"CASH"|"BANK"|"CARD";
+  note?:string;
+  transactionId:string;
+  paymentDate:string;
+}

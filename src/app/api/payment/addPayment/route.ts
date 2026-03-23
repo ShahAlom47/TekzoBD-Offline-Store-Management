@@ -6,6 +6,7 @@ import { PaymentType } from "@/Interfaces/paymentInterface";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+    console.log(body)
 
     const {
       customerId,
@@ -48,12 +49,19 @@ const paymentType = (saleId
       type: paymentType,
       note:note ,
       transactionId: transactionId || null,
-      paymentDate:paymentDate,
+      paymentDate:new Date(paymentDate).toISOString(),
       createdBy,
       createdAt: new Date().toISOString(),
     };
 
     const result = await paymentsCollection.insertOne(paymentData);
+    if(!result?.insertedId){
+            return NextResponse.json({
+      success: false,
+      message: "Failed",
+    });
+
+    }
 
     return NextResponse.json({
       success: true,
