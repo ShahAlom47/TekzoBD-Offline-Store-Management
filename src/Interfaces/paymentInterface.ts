@@ -17,12 +17,12 @@ export interface Payment {
   amount: number;
   method: PaymentMethod;
   type: PaymentType;
-
+paymentDate:string;
   note?: string;
   transactionId?: string;
 
   // Metadata
   createdBy?: ID;
-  createdAt: Date;
-  updatedAt?: Date;
+  createdAt: string;
+  updatedAt?: string;
 }

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { getPaymentsCollection } from "@/lib/database/db_collections";
+import { PaymentType } from "@/Interfaces/paymentInterface";
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,7 +13,8 @@ export async function POST(req: NextRequest) {
       amount,
       method = "CASH",
       note,
-      transactionId
+      paymentDate,
+      transactionId,
       createdBy,
     } = body;
 
@@ -34,8 +36,9 @@ export async function POST(req: NextRequest) {
     const paymentsCollection = await getPaymentsCollection();
 
     // ✅ Detect payment type
-    const paymentType = saleId ? "SALE_PAYMENT" : "DUE_PAYMENT";
-
+const paymentType = (saleId
+  ? "SALE_PAYMENT"
+  : "DUE_PAYMENT") as PaymentType;
     // ✅ Create Payment
     const paymentData = {
       customerId: customerId,
@@ -43,11 +46,11 @@ export async function POST(req: NextRequest) {
       amount,
       method,
       type: paymentType,
-      note:
-        note ,
+      note:note ,
       transactionId: transactionId || null,
+      paymentDate:paymentDate,
       createdBy,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     };
 
     const result = await paymentsCollection.insertOne(paymentData);

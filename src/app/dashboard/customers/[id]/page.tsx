@@ -10,6 +10,8 @@ interface FormType{
   amount:number;
   method:"CASH"|"CASH"|"BANK"|"CARD";
   note?:string;
+  transactionId:string;
+  paymentDate:string;
 }
 
 const CustomerDetails = () => {
@@ -17,10 +19,12 @@ const CustomerDetails = () => {
   const { data, isLoading } = useCustomer(id?.toString() || "");
 
   const [openPayment, setOpenPayment] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormType>({
   amount: 0,
   method: "CASH",
   note: "",
+  transactionId:'',
+  paymentDate:'',
 });
 
   if (isLoading) {
@@ -64,6 +68,8 @@ const handlePayDue = async (e: React.FormEvent<HTMLFormElement>) => {
     amount: 0,
     method: "CASH",
     note: "",
+    transactionId: "",
+    paymentDate: "",
   });
 
   setOpenPayment(false);
@@ -161,99 +167,126 @@ const handlePayDue = async (e: React.FormEvent<HTMLFormElement>) => {
       </div>
 
 
-      {/* 🔥 PAYMENT MODAL */}
-      {openPayment && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4 animate-scaleIn">
+{/* 🔥 PAYMENT MODAL */}
+{openPayment && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4 animate-scaleIn">
 
-            {/* Header */}
-            <div className="flex justify-between items-center">
-              <h2 className="text-lg font-semibold">Add Payment</h2>
-              <button
-                onClick={() => setOpenPayment(false)}
-                className="text-gray-400 hover:text-red-500"
-              >
-                ✕
-              </button>
-            </div>
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">Add Payment</h2>
+        <button
+          onClick={() => setOpenPayment(false)}
+          className="text-gray-400 hover:text-red-500"
+        >
+          ✕
+        </button>
+      </div>
 
-            {/* Due Info */}
-            <div className="bg-gray-100 rounded-lg p-3 text-sm">
-              Current Due:{" "}
-              <span className="font-bold text-red-500">
-                ৳ {summary?.currentDue}
-              </span>
-            </div>
+      {/* Due Info */}
+      <div className="bg-gray-100 rounded-lg p-3 text-sm">
+        Current Due:{" "}
+        <span className="font-bold text-red-500">
+          ৳ {summary?.currentDue}
+        </span>
+      </div>
 
-            {/* Form */}
-          <form onSubmit={handlePayDue} className="space-y-4">
+      {/* Form */}
+      <form onSubmit={handlePayDue} className="space-y-4">
 
-  {/* Amount */}
-  <div>
-    <label className="text-sm">Amount</label>
-    <input
-      type="number"
-      name="amount"
-      required
-      value={formData.amount}
-      onChange={handleChange}
-      placeholder="Enter amount"
-      className="w-full border rounded-lg p-2 mt-1 focus:ring-2 focus:ring-indigo-400 outline-none"
-    />
-  </div>
-
-  {/* Method */}
-  <div>
-    <label className="text-sm">Payment Method</label>
-    <select
-      name="method"
-      value={formData.method}
-      onChange={handleChange}
-      className="w-full border rounded-lg p-2 mt-1"
-    >
-      <option value="CASH">Cash</option>
-      <option value="BKASH">bKash</option>
-      <option value="BANK">Bank</option>
-      <option value="CARD">Card</option>
-    </select>
-  </div>
-
-  {/* Note */}
-  <div>
-    <label className="text-sm">Note</label>
-    <input
-      type="text"
-      name="note"
-      value={formData.note}
-      onChange={handleChange}
-      placeholder="Optional note"
-      className="w-full border rounded-lg p-2 mt-1"
-    />
-  </div>
-
-  {/* Buttons */}
-  <div className="flex justify-end gap-2 pt-2">
-    <button
-      type="button"
-      onClick={() => setOpenPayment(false)}
-      className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
-    >
-      Cancel
-    </button>
-
-    <button
-      type="submit"
-      className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
-    >
-      Save Payment
-    </button>
-  </div>
-
-</form>
-          </div>
+        {/* Amount */}
+        <div>
+          <label className="text-sm">Amount</label>
+          <input
+            type="number"
+            name="amount"
+            required
+            min="1"
+            value={formData.amount}
+            onChange={handleChange}
+            placeholder="Enter amount"
+            className="w-full border rounded-lg p-2 mt-1 focus:ring-2 focus:ring-indigo-400 outline-none"
+          />
         </div>
-      )}
 
+        {/* Method */}
+        <div>
+          <label className="text-sm">Payment Method</label>
+          <select
+            name="method"
+            value={formData.method}
+            onChange={handleChange}
+            className="w-full border rounded-lg p-2 mt-1"
+          >
+            <option value="CASH">Cash</option>
+            <option value="BKASH">bKash</option>
+            <option value="BANK">Bank</option>
+            <option value="CARD">Card</option>
+          </select>
+        </div>
+
+        {/* 🔥 Transaction ID (Conditional) */}
+        {formData.method !== "CASH" && (
+          <div>
+            <label className="text-sm">Transaction ID</label>
+            <input
+              type="text"
+              name="transactionId"
+              value={formData.transactionId}
+              onChange={handleChange}
+              placeholder="Enter transaction ID"
+              className="w-full border rounded-lg p-2 mt-1"
+            />
+          </div>
+        )}
+
+        {/* 🔥 Payment Date */}
+        <div>
+          <label className="text-sm">Payment Date</label>
+          <input
+            type="date"
+            name="paymentDate"
+            value={formData.paymentDate}
+            onChange={handleChange}
+            className="w-full border rounded-lg p-2 mt-1"
+          />
+        </div>
+
+        {/* Note */}
+        <div>
+          <label className="text-sm">Note</label>
+          <input
+            type="text"
+            name="note"
+            value={formData.note}
+            onChange={handleChange}
+            placeholder="Optional note"
+            className="w-full border rounded-lg p-2 mt-1"
+          />
+        </div>
+
+        {/* Buttons */}
+        <div className="flex justify-end gap-2 pt-2">
+          <button
+            type="button"
+            onClick={() => setOpenPayment(false)}
+            className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+          >
+            Save Payment
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+)}
     </div>
   );
 };

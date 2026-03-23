@@ -107,8 +107,9 @@ export async function POST(req: NextRequest) {
         amount: payment.amount,
         method: payment.method || "CASH",
         type: "SALE_PAYMENT",
+        paymentDate:new Date().toISOString(),
         note: payment.note || (customerId ? "Sale payment" : "Walk-in payment"),
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       });
     }
 
