@@ -51,28 +51,77 @@ const CustomerDetails = () => {
 const handlePayDue = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
 
-  const payload = {
-    customerId: id,
-    amount: Number(formData.amount),
-    method: formData.method,
-    note: formData.note,
-  };
+  try {
+    // 🔴 basic validation
+    if (!formData.amount || Number(formData.amount) <= 0) {
+      alert("Enter valid amount");
+      return;
+    }
 
-  console.log(payload);
+    if (!id) {
+      alert("Customer not found");
+      return;
+    }
 
-  // 👉 API call
-  // await addPayment(payload)
+    const payload = {
+      customerId: id,
+      amount: Number(formData.amount),
+      method: formData.method,
+      note: formData.note,
 
-  // reset
-  setFormData({
-    amount: 0,
-    method: "CASH",
-    note: "",
-    transactionId: "",
-    paymentDate: "",
-  });
+      // ✅ only if not CASH
+      transactionId:
+        formData.method !== "CASH"
+          ? formData.transactionId
+          : undefined,
 
-  setOpenPayment(false);
+      // ✅ payment date (fallback today)
+      paymentDate: formData.paymentDate
+        ? new Date(formData.paymentDate)
+        : new Date(),
+    };
+
+    console.log("PAYLOAD:", payload);
+
+    // 🔥 API CALL
+    const res = await fetch("/api/payments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Payment failed");
+    }
+
+    // ✅ success
+    alert("✅ Payment added successfully");
+
+    // 🔄 reset form (correct way)
+    setFormData({
+      amount: 0,
+      method: "CASH",
+      note: "",
+      transactionId: "",
+      paymentDate: new Date().toISOString().split("T")[0],
+    });
+
+    // ❌ close modal AFTER success
+    setOpenPayment(false);
+
+    // 🔄 optional refetch
+    // refetchCustomer();
+    // refetchSummary();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    console.error(error);
+    alert(error.message || "Something went wrong");
+  }
 };
 
   return (
