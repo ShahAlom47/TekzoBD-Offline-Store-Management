@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     // 2️⃣ Create Sale
     const saleData: Sale = {
-      customerId: customerId ? new ObjectId(customerId) : undefined, // optional walk-in
+      customerId: customerId ? customerId : undefined, // optional walk-in
       products: saleProducts,
       discount,
       totalAmount,
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
     // 3️⃣ Insert Payment (always, even walk-in)
     if (payment && payment.amount > 0) {
       await paymentsCollection.insertOne({
-        customerId: customerId ? new ObjectId(customerId) : '', // walk-in handled
+        customerId: customerId ? customerId : '', // walk-in handled
         saleId: saleResult.insertedId,
         amount: payment.amount,
         method: payment.method || "CASH",

@@ -37,6 +37,8 @@ const CustomerDetails = () => {
   const sales = data?.sales || [];
   const summary = data?.summary;
 
+  console.log(data)
+
   const handleChange = (
   e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
 ) => {
