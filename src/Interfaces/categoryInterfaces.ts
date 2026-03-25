@@ -11,8 +11,8 @@ export interface Category {
 
   status: "active" | "inactive";
 
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type GetAllCategoryParams = {

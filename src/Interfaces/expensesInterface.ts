@@ -7,7 +7,7 @@ export interface Expense {
   amount: number;           // টাকা
   category: ExpenseCategory; // category enum
   note?: string;            // optional
-  createdAt: Date;          // date
+  createdAt: string;          // date
 }
 
 // 🔹 Allowed categories

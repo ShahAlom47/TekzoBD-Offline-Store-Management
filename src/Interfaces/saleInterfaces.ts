@@ -39,7 +39,7 @@ export interface Sale {
   saleNumber?: string;
 
   createdBy?: ID;
-  createdAt: Date;
+  createdAt: string;
 }
 
 

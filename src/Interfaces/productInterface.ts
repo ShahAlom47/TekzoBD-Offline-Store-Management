@@ -26,8 +26,8 @@ export interface Product {
 
   isDeleted?: boolean;
 
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 

@@ -25,8 +25,8 @@ export interface Customer {
   isDeleted?:boolean;
 
   // Metadata
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 

@@ -12,6 +12,6 @@ export type UserRole = "OWNER" | "MANAGER" | "SALESMAN";
 
   isActive: boolean;
 
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
