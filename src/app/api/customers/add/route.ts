@@ -39,6 +39,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ✅ 🔥 DATE FIX START
+    const nowISO = new Date().toISOString();
+    // ✅ 🔥 DATE FIX END
+
     const newCustomer = {
       name,
       phone,
@@ -48,8 +52,10 @@ export async function POST(req: NextRequest) {
       openingBalance: openingBalance || 0,
       creditLimit: creditLimit || 0,
       isActive: isActive ?? true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+
+      // ✅ ISO string
+      createdAt: nowISO,
+      updatedAt: nowISO,
     };
 
     const result = await collection.insertOne(newCustomer);
@@ -67,10 +73,10 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     );
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
 
-    // MongoDB Duplicate Error
     if (error.code === 11000) {
       return NextResponse.json(
         {
