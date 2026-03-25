@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
 
     const {
       customerId,
-      saleId, // optional
+      saleId,
       amount,
       method = "CASH",
       note,
@@ -17,6 +17,9 @@ export async function POST(req: NextRequest) {
       transactionId,
       createdBy,
     } = body;
+
+    // 🔥 helper → সব ID string
+    const toStr = (val: any) => (val ? val.toString() : "");
 
     // 🔴 Validation
     if (!customerId) {
@@ -36,36 +39,45 @@ export async function POST(req: NextRequest) {
     const paymentsCollection = await getPaymentsCollection();
 
     // ✅ Detect payment type
-const paymentType = (saleId
-  ? "SALE_PAYMENT"
-  : "DUE_PAYMENT") as PaymentType;
+    const paymentType = (saleId
+      ? "SALE_PAYMENT"
+      : "DUE_PAYMENT") as PaymentType;
+
+    // ✅ DATE FIX
+    const nowISO = new Date().toISOString();
+
+    // ✅ safe paymentDate
+    const paymentDateISO = paymentDate
+      ? new Date(paymentDate).toISOString()
+      : nowISO;
+
     // ✅ Create Payment
     const paymentData = {
-      customerId: customerId,
-      saleId: saleId ? saleId : undefined,
+      customerId: toStr(customerId), // ✅ string
+      saleId: saleId ? toStr(saleId) : undefined, // ✅ string
       amount,
       method,
       type: paymentType,
-      note:note ,
+      note: note || "",
       transactionId: transactionId || null,
-      paymentDate:new Date(paymentDate).toISOString(),
-      createdBy,
-      createdAt: new Date().toISOString(),
+      paymentDate: paymentDateISO,
+      createdBy: createdBy ? toStr(createdBy) : undefined, // ✅ string
+      createdAt: nowISO,
     };
 
     const result = await paymentsCollection.insertOne(paymentData);
-    if(!result?.insertedId){
-            return NextResponse.json({
-      success: false,
-      message: "Failed",
-    });
 
+    if (!result?.insertedId) {
+      return NextResponse.json({
+        success: false,
+        message: "Failed",
+      });
     }
 
     return NextResponse.json({
       success: true,
       message: "Payment added successfully",
-      paymentId: result.insertedId,
+      paymentId: result.insertedId.toString(), // ✅ string return
     });
 
   } catch (error: any) {
