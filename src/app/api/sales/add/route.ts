@@ -12,10 +12,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const {
-      sale,
-      payment,
-    } = body;
+    const { sale, payment } = body;
 
     const {
       customerId,
@@ -39,10 +36,13 @@ export async function POST(req: NextRequest) {
     let totalAmount = 0;
     let totalCost = 0;
 
+    // 🔥 ensure string helper
+    const toStr = (val: any) => (val ? val.toString() : "");
+
     // 1️⃣ Validate stock & calculate totals
     for (const item of products) {
       const product = await productCollection.findOne({
-        _id: new ObjectId(item.productId),
+        _id: new ObjectId(item.productId), // ✅ only here ObjectId needed
       });
 
       if (!product) {
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       totalCost += itemTotalCost;
 
       saleProducts.push({
-        productId: item.productId,
+        productId: toStr(item.productId), // ✅ নিশ্চিত string
         productName: product.name,
         quantity: item.quantity,
         sellingPrice,
@@ -84,39 +84,43 @@ export async function POST(req: NextRequest) {
     totalAmount = totalAmount - discount;
     const totalProfit = totalAmount - totalCost;
 
-    // ✅ 🔥 DATE FIX START
+    // ✅ DATE FIX
     const nowISO = new Date().toISOString();
-    // ✅ 🔥 DATE FIX END
 
     // 2️⃣ Create Sale
     const saleData: Sale = {
-      customerId: customerId ? customerId : undefined,
+      customerId: customerId ? toStr(customerId) : undefined, // ✅ string
       products: saleProducts,
       discount,
       totalAmount,
       totalCost,
       totalProfit,
-      createdBy,
-      createdAt: nowISO, // ✅ unified ISO
+      createdBy: createdBy ? toStr(createdBy) : undefined, // ✅ string
+      createdAt: nowISO,
       saleNumber: `SALE-${Date.now()}`,
     };
 
     const saleResult = await salesCollection.insertOne(saleData);
 
+    // 🔥 convert insertedId → string
+    const saleIdStr = saleResult.insertedId.toString();
+
     // 3️⃣ Insert Payment
     if (payment && payment.amount > 0) {
       await paymentsCollection.insertOne({
-        customerId: customerId ? customerId : "",
-        saleId: saleResult.insertedId,
+        customerId: customerId ? toStr(customerId) : "", // ✅ string
+        saleId: saleIdStr, // ✅ FIXED (string নিশ্চিত)
+
         amount: payment.amount,
         method: payment.method || "CASH",
         type: "SALE_PAYMENT",
 
-        // ✅ 🔥 DATE FIX
         paymentDate: nowISO,
         createdAt: nowISO,
 
-        note: payment.note || (customerId ? "Sale payment" : "Walk-in payment"),
+        note:
+          payment.note ||
+          (customerId ? "Sale payment" : "Walk-in payment"),
       });
     }
 
@@ -136,13 +140,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Sale created successfully",
-      saleId: saleResult.insertedId,
+      saleId: saleIdStr, // ✅ এখন string return
     });
 
   } catch (error: any) {
     console.error("SALE ERROR:", error);
     return NextResponse.json(
-      { success: false, message: "Server error", error: error.message || error },
+      {
+        success: false,
+        message: "Server error",
+        error: error.message || error,
+      },
       { status: 500 }
     );
   }
