@@ -108,7 +108,6 @@ const AddSalePage = () => {
     }),
   };
 
-  console.log(saleData);
 
   const res = await addSale(saleData);
 

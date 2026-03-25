@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import {
   getSalesCollection,
-  getProductCollection, 
-  getPaymentsCollection
+  getProductCollection,
+  getPaymentsCollection,
 } from "@/lib/database/db_collections";
 import { Sale, SaleProduct } from "@/Interfaces/saleInterfaces";
 
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
     const {
       sale,
-      payment, // { amount: number, method?: "CASH" | "BKASH" | "BANK" | "CARD", note?: string }
+      payment,
     } = body;
 
     const {
@@ -84,32 +84,39 @@ export async function POST(req: NextRequest) {
     totalAmount = totalAmount - discount;
     const totalProfit = totalAmount - totalCost;
 
+    // ✅ 🔥 DATE FIX START
+    const nowISO = new Date().toISOString();
+    // ✅ 🔥 DATE FIX END
+
     // 2️⃣ Create Sale
     const saleData: Sale = {
-      customerId: customerId ? customerId : undefined, // optional walk-in
+      customerId: customerId ? customerId : undefined,
       products: saleProducts,
       discount,
       totalAmount,
       totalCost,
       totalProfit,
       createdBy,
-      createdAt: new Date(),
+      createdAt: nowISO, // ✅ unified ISO
       saleNumber: `SALE-${Date.now()}`,
     };
 
     const saleResult = await salesCollection.insertOne(saleData);
 
-    // 3️⃣ Insert Payment (always, even walk-in)
+    // 3️⃣ Insert Payment
     if (payment && payment.amount > 0) {
       await paymentsCollection.insertOne({
-        customerId: customerId ? customerId : '', // walk-in handled
+        customerId: customerId ? customerId : "",
         saleId: saleResult.insertedId,
         amount: payment.amount,
         method: payment.method || "CASH",
         type: "SALE_PAYMENT",
-        paymentDate:new Date().toISOString(),
+
+        // ✅ 🔥 DATE FIX
+        paymentDate: nowISO,
+        createdAt: nowISO,
+
         note: payment.note || (customerId ? "Sale payment" : "Walk-in payment"),
-        createdAt: new Date().toISOString(),
       });
     }
 
