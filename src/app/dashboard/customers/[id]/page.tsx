@@ -11,6 +11,7 @@ import SalesSection from "@/Components/CustomerComponet/SalesSection";
 import PaymentModal from "@/Components/CustomerComponet/PaymentModal";
 import { PaymentMethod } from "@/Interfaces/paymentInterface";
 import { PaymentFormData } from "@/Interfaces/saleInterfaces";
+import PaymentHistoryTable from "@/Components/CustomerComponet/PaymentHistoryTable";
 
 export default function CustomerDetails() {
   const { id } = useParams();
@@ -30,6 +31,9 @@ export default function CustomerDetails() {
   const customer = data?.customer;
   const summary = data?.summary;
   const sales = data?.sales || [];
+  const paymentHistory= Array.isArray(data?.paymentHistory) ? data?.paymentHistory : []
+
+  console.log(data)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -71,6 +75,8 @@ export default function CustomerDetails() {
       />
 
       <SummaryCards summary={summary} />
+
+      <PaymentHistoryTable payments={paymentHistory} ></PaymentHistoryTable>
 
       <SalesSection sales={sales} />
 

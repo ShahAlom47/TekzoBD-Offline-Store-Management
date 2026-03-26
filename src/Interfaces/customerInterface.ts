@@ -2,6 +2,7 @@
 
 import { ObjectId } from "mongodb";
 import { Sale } from "./saleInterfaces";
+import { PaymentMethod, PaymentType } from "./paymentInterface";
 
 export interface Customer {
   _id: ObjectId|string;
@@ -66,10 +67,34 @@ export interface CustomerDetailsData {
   customer: Customer;
   sales: Sale[];
   summary: CustomerSummary;
+  paymentHistory:CustomerPaymentHistory;
 }
 
 export interface CustomerDetailsResponse {
   success: boolean;
   data: CustomerDetailsData;
   message?: string;
+}
+
+export interface CustomerPaymentHistory {
+  _id: ObjectId| string;
+
+  // Relation
+  customerId: string;
+  saleId?: string | null;
+
+  // Payment Info
+  amount: number;
+  method: PaymentMethod;
+  type: PaymentType;
+
+  transactionId?: string | null;
+  note?: string | null;
+
+  paymentDate: string;
+
+  // Meta
+  createdAt: string;
+  updatedAt?: string;
+  createdBy?: string | null;
 }
