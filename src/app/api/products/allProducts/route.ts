@@ -91,7 +91,7 @@ export async function GET(req: NextRequest) {
       productCollection.find(filter).sort(sortQuery).skip(skip).limit(pageSize).toArray() as Promise<Product[]>,
       productCollection.countDocuments(filter),
     ]);
-console.log(products)
+
     return NextResponse.json({
       success: true,
       message: "Products retrieved successfully",

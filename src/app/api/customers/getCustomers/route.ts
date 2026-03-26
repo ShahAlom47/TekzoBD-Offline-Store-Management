@@ -4,8 +4,6 @@ import {
   getSalesCollection,
   getPaymentsCollection,
 } from "@/lib/database/db_collections";
-import { address } from "framer-motion/client";
-import { ObjectId } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -19,8 +17,8 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const search = searchParams.get("search")?.trim() || "";
 
-    // 🔹 Filter customers
     const filter: any = { isDeleted: { $ne: true } };
+
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -47,65 +45,61 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // 🔹 Convert customerIds to string
     const customerIds = customers.map((c) => c._id.toString());
 
-    // 🔹 Fetch only sales where customerId exists and in our list
+    // ✅ SALES
+    const sales = await saleCollection
+      .find({
+        customerId: { $in: customerIds },
+      })
+      .toArray();
 
-    const customerObjectIds = customerIds
-  .filter(Boolean) // remove empty string
-  .map((id) => new ObjectId(id)); // convert string to ObjectId
+    // ✅ SALE IDS
+    const saleIds = sales.map((s) => s._id.toString());
 
-const sales = await saleCollection
-  .find({
-    customerId: { $in: customerObjectIds },
-  })
-  .toArray();
+    // ✅ PAYMENTS (both types)
+    const payments = await paymentsCollection
+      .find({
+        $or: [
+          { saleId: { $in: saleIds } },       // sale payment
+          { customerId: { $in: customerIds } } // due payment
+        ],
+      })
+      .toArray();
 
-
-    // 🔹 Fetch payments for sales which exist
- // saleIds as ObjectId
-const saleObjectIds = sales
-  .map((s) => s._id)
-  .filter(Boolean); // already ObjectId in DB
-
-const payments = await paymentsCollection
-  .find({
-    saleId: { $in: saleObjectIds }, // match ObjectId type
-  })
-  .toArray();
-
-    // 🔹 Map each customer with currentDue
+    // 🔥 MAIN LOGIC
     const customersWithDue = customers.map((customer) => {
       const customerSales = sales.filter(
         (s) =>
-          s.customerId && // ensure customerId exists
+          s.customerId &&
           s.customerId.toString() === customer._id.toString()
       );
 
-      let totalDue = 0;
+      // ✅ total sales
+      const totalSales = customerSales.reduce(
+        (sum, s) => sum + (s.totalAmount || 0),
+        0
+      );
 
-      customerSales.forEach((sale) => {
-        const relatedPayments = payments.filter(
+      // ✅ total paid (sale + due)
+      const totalPaid = payments
+        .filter(
           (p) =>
-            p.saleId && // ensure saleId exists
-            p.saleId.toString() === sale._id.toString()
-        );
+            p.customerId &&
+            p.customerId.toString() === customer._id.toString()
+        )
+        .reduce((sum, p) => sum + (p.amount || 0), 0);
 
-        const paid = relatedPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
-        const due = Math.max((sale.totalAmount || 0) - paid, 0);
-        totalDue += due;
-      });
-
-      const currentDue = (customer.openingBalance || 0) + totalDue;
+      const currentDue =
+        (customer.openingBalance || 0) + totalSales - totalPaid;
 
       return {
         _id: customer._id,
         name: customer.name,
-        address:customer?.address,
+        address: customer?.address,
         phone: customer.phone,
-        isActive:customer?.isActive,
-        currentDue,
+        isActive: customer?.isActive,
+        currentDue: currentDue < 0 ? 0 : currentDue, // safety
       };
     });
 

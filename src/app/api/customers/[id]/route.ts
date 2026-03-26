@@ -37,6 +37,7 @@ export async function GET(
 
     // 🔹 Sales
     const sales = await saleCollection.find({ customerId }).sort({ createdAt: -1 }).toArray();
+    console.log(sales)
     
 
     // 🔹 All payments
