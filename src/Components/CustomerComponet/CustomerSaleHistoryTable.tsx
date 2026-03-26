@@ -1,8 +1,8 @@
-import { Sale } from '@/Interfaces/saleInterfaces';
+import { CustomerSaleHistory } from '@/Interfaces/saleInterfaces';
 import React from 'react';
 import { CustomTable } from '../CommonComponents/CustomTable';
 interface PropsType{
-    saleData:Sale[]
+    saleData:CustomerSaleHistory[]
 }
 const CustomerSaleHistoryTable = ({saleData}:PropsType) => {
 

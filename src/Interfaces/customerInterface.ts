@@ -59,6 +59,7 @@ export interface CustomerSummary {
   totalDue: number;
   openingBalance: number;
   currentDue: number;
+  totalSalesAmount:number;
 }
 
 export interface CustomerDetailsData {

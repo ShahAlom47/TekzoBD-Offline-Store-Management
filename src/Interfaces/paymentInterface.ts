@@ -28,8 +28,9 @@ paymentDate:string;
 }
 
 export interface AddPaymentFormType{
+  customerId:string;
   amount:number;
-  method:"CASH"|"CASH"|"BANK"|"CARD";
+  method:"CASH"|"BKASH"|"BANK"|"CARD";
   note?:string;
   transactionId:string;
   paymentDate:string;
