@@ -54,11 +54,15 @@ export async function GET(req: NextRequest) {
       .limit(pageSize)
       .toArray();
 
+
+
     // 🔹 Fetch all related payments for these sales
-    const saleIds = sales.map((s) => s._id);
+    const saleIds = sales.map((s) => s._id.toString());
     const payments = await paymentsCollection
       .find({ saleId: { $in: saleIds } })
       .toArray();
+      
+// console.log(payments)
 
     // 🔹 Map payments to sales
     const salesWithPayment = sales.map((sale) => {
@@ -67,6 +71,8 @@ export async function GET(req: NextRequest) {
       );
       const totalPaid = relatedPayments.reduce((acc, p) => acc + p.amount, 0);
       const dueAmount = Math.max(sale.totalAmount - totalPaid, 0);
+
+      // console.log(saleIds,'iddd')
 
       return {
         ...sale,

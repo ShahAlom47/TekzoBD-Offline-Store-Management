@@ -34,7 +34,7 @@ export async function GET(
 
     // 🔹 Get Payments for this sale
     const payments = await paymentsCollection
-      .find({ saleId: new ObjectId(id) })
+      .find({ saleId: id })
       .toArray();
 
     // 🔹 Calculate paid & due
