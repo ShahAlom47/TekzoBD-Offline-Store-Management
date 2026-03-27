@@ -18,7 +18,7 @@ const Expenses = () => {
     },
   });
 
-  const expenses = data?.data  as Expense[]
+  const expenses = data?.data  as Expense[] || []
 
   return (
     <div className="p-5">
