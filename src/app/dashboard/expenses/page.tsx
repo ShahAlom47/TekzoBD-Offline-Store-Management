@@ -2,6 +2,7 @@
 
 import CustomModal from "@/Components/CommonComponents/CustomModal";
 import AddExpenseForm from "@/Components/Expenses/AddExpenses";
+import { Expense } from "@/Interfaces/expensesInterface";
 import { getExpenses } from "@/lib/allApiRequest/expensesRequest/expensesRequest";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
@@ -17,7 +18,7 @@ const Expenses = () => {
     },
   });
 
-  const expenses = data?.data || [];
+  const expenses = data?.data  as Expense[]
 
   return (
     <div className="p-5">
@@ -56,8 +57,8 @@ const Expenses = () => {
             </thead>
 
             <tbody>
-              {expenses.map((exp: any) => (
-                <tr key={exp._id} className="text-center">
+              {expenses.map((exp: Expense) => (
+                <tr key={exp._id?.toString()} className="text-center">
                   <td className="p-2 border">{exp.title}</td>
                   <td className="p-2 border capitalize">
                     {exp.category.replaceAll("_", " ")}
