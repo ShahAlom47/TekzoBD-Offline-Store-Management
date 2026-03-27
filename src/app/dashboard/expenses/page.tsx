@@ -2,6 +2,7 @@
 
 import CustomModal from "@/Components/CommonComponents/CustomModal";
 import AddExpenseForm from "@/Components/Expenses/AddExpenses";
+import ExpensesTable from "@/Components/Expenses/ExpensesTable";
 import { Expense } from "@/Interfaces/expensesInterface";
 import { getExpenses } from "@/lib/allApiRequest/expensesRequest/expensesRequest";
 import { useQuery } from "@tanstack/react-query";
@@ -34,50 +35,19 @@ const Expenses = () => {
         </button>
       </div>
 
-      {/* 🔹 Table */}
-      <div className="bg-white shadow rounded p-3 overflow-x-auto">
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : isError ? (
-          <p className="text-red-500">Something went wrong!</p>
-        ) : expenses.length === 0 ? (
-          <p className="text-gray-500 text-center py-5">
-            No expenses found 😐
-          </p>
-        ) : (
-          <table className="w-full text-sm border">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-2 border">Title</th>
-                <th className="p-2 border">Category</th>
-                <th className="p-2 border">Amount</th>
-                <th className="p-2 border">Date</th>
-                <th className="p-2 border">Note</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {expenses.map((exp: Expense) => (
-                <tr key={exp._id?.toString()} className="text-center">
-                  <td className="p-2 border">{exp.title}</td>
-                  <td className="p-2 border capitalize">
-                    {exp.category.replaceAll("_", " ")}
-                  </td>
-                  <td className="p-2 border text-red-500 font-semibold">
-                    ৳ {exp.amount}
-                  </td>
-                  <td className="p-2 border">
-                    {new Date(exp.expenseDate).toLocaleDateString()}
-                  </td>
-                  <td className="p-2 border">
-                    {exp.note || "-"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+   <div className="bg-white shadow rounded p-3">
+  {isLoading ? (
+    <p>Loading...</p>
+  ) : isError ? (
+    <p className="text-red-500">Something went wrong!</p>
+  ) : expenses.length === 0 ? (
+    <p className="text-gray-500 text-center py-5">
+      No expenses found 😐
+    </p>
+  ) : (
+    <ExpensesTable expenses={expenses} />
+  )}
+</div>
 
       {/* 🔹 Modal */}
       <CustomModal
