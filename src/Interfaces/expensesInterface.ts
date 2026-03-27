@@ -1,37 +1,6 @@
-
 import { ObjectId } from "mongodb";
 
-export interface Expense {
-  _id?: ObjectId;           // MongoDB ID
-  title: string;            // Example: "Nasta", "Electricity"
-  amount: number;           // টাকা
-  category: ExpenseCategory; // category enum
-  note?: string;            // optional
-  createdAt: string;          // date
-}
-
-// 🔹 Allowed categories
-export type ExpenseCategory = 
-  |"daily_pocket_mony"
-  |"rent"
-  |"wifi_bill"
-  |"electric_bill"
-  | "rent" 
-  | "bill" 
-  | "salary" 
-  | "transport" 
-  | "others"
-  ;
-
-
-  export interface ExpenseFormType {
-  title: string;            // Example: "Nasta", "Electricity"
-  amount: number;           // টাকা
-  category: ExpenseCategory; // category enum
-  note?: string;            // optional
-}
-
-  // 🔹 Category constant (Single source of truth)
+// 🔹 Category constant (Single source of truth)
 export const EXPENSE_CATEGORY = {
   DAILY_POCKET_MONEY: "daily_pocket_money",
   RENT: "rent",
@@ -43,6 +12,30 @@ export const EXPENSE_CATEGORY = {
   OTHERS: "others",
 } as const;
 
+// 🔥 Type derive from constant (No duplicate / no typo)
+export type ExpenseCategory =
+  (typeof EXPENSE_CATEGORY)[keyof typeof EXPENSE_CATEGORY];
+
+// 🔹 Main Expense Model
+export interface Expense {
+  _id?: ObjectId;            // MongoDB ID
+  title: string;             // Example: "Nasta", "Electricity"
+  expenseDate: string;       // ISO string (when expense happened)
+  amount: number;            // টাকা
+  category: ExpenseCategory; // category
+  note?: string;             // optional
+  createdAt: string;         // record created time
+}
+
+// 🔹 Form Type (Frontend use)
+export interface ExpenseFormType {
+  title: string;
+  amount: number;
+  category: ExpenseCategory;
+  note?: string;
+}
+
+// 🔹 Dropdown Options
 export const expenseCategoryOptions = [
   { label: "Daily Pocket Money", value: EXPENSE_CATEGORY.DAILY_POCKET_MONEY },
   { label: "Rent", value: EXPENSE_CATEGORY.RENT },
