@@ -32,7 +32,12 @@ export async function GET(req: NextRequest) {
     // 🔹 Build Query
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const query: any = {};
-    if (searchTrim) query.title = { $regex: searchTrim, $options: "i" };
+  if (searchTrim) {
+  query.$or = [
+    { title: { $regex: searchTrim, $options: "i" } },
+    { category: { $regex: searchTrim, $options: "i" } },
+  ];
+}
     if (category) query.category = category;
 
     if (month) {
