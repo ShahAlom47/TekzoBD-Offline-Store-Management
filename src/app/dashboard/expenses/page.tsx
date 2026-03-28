@@ -9,6 +9,16 @@ import { Expense } from "@/Interfaces/expensesInterface";
 import { getExpenses } from "@/lib/allApiRequest/expensesRequest/expensesRequest";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
+interface ExpensesResponse {
+  success: boolean;
+  message: string;
+  data: {
+    expenses: Expense[];
+    totalAmount: number;
+  };
+  totalPages: number;
+  totalCount: number;
+}
 
 const Expenses = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
@@ -19,20 +29,24 @@ const Expenses = () => {
 
   const queryClient = useQueryClient();
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<ExpensesResponse>({
     queryKey: ["expenses", page, filters], // 🔥 IMPORTANT
     queryFn: async () => {
       const res = await getExpenses({
         currentPage: page,
         limit: limit,
+        sort: "newest",
         ...filters,
       });
-      return res;
+      return res as ExpensesResponse;
     },
   });
 
-  const expenses = (data?.data as Expense[]) || [];
+  const expenses = (data?.data?.expenses as Expense[]) || [];
   const totalPages = data?.totalPages || 1;
+  const totalExpenses=data?.data?.totalAmount
+
+  console.log(data)
 
   return (
     <div className="p-5">
@@ -52,6 +66,7 @@ const Expenses = () => {
 
         {/* 🔥 Filter always visible */}
         <ExpenseFilter
+        totalAmount={totalExpenses}
           onFilterChange={(newFilters) => {
             setPage(1);
             setFilters(newFilters);

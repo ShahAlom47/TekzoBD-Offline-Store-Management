@@ -18,13 +18,13 @@ export type ExpenseCategory =
 
 // 🔹 Main Expense Model
 export interface Expense {
-  _id?: ObjectId;            // MongoDB ID
-  title: string;             // Example: "Nasta", "Electricity"
-  expenseDate: string;       // ISO string (when expense happened)
-  amount: number;            // টাকা
+  _id?: ObjectId; // MongoDB ID
+  title: string; // Example: "Nasta", "Electricity"
+  expenseDate: string; // ISO string (when expense happened)
+  amount: number; // টাকা
   category: ExpenseCategory; // category
-  note?: string;             // optional
-  createdAt: string;         // record created time
+  note?: string; // optional
+  createdAt: string; // record created time
 }
 
 // 🔹 Form Type (Frontend use)
@@ -47,7 +47,7 @@ export const expenseCategoryOptions = [
   { label: "Others", value: EXPENSE_CATEGORY.OTHERS },
 ];
 
-
+type SortOption = "newest" | "oldest" | "high" | "low";
 
 export interface GetExpensesParams {
   currentPage: number;
@@ -55,5 +55,5 @@ export interface GetExpensesParams {
   searchTrim?: string;
   category?: string;
   month?: string; // 🔥 YYYY-MM
-  sort?: string;
+  sort: SortOption;
 }

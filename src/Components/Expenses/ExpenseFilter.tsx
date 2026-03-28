@@ -95,8 +95,8 @@ export default function ExpenseFilter({
         <div className="flex justify-between items-center">
 
           {/* 🔥 Total Expense */}
-          <p className="text-sm font-medium">
-            Total: <span className="text-blue-600">
+          <p className="text-lg font-medium">
+            Total: <span className="text-blue-600 font-bold">
               ৳ {totalAmount || 0}
             </span>
           </p>
