@@ -1,38 +1,37 @@
 "use client";
 
-import { ExpenseCategory, expenseCategoryOptions } from "@/Interfaces/expensesInterface";
+import {
+  ExpenseCategory,
+  expenseCategoryOptions,
+} from "@/Interfaces/expensesInterface";
 import { useState } from "react";
 
 interface GetExpensesParams {
   searchTrim?: string;
   category?: ExpenseCategory;
-  minAmount?: number;
-  maxAmount?: number;
-  startDate?: string;
-  endDate?: string;
-  sort?: string;
+  month?: string; // format: YYYY-MM
 }
 
 interface Props {
   onFilterChange: (filters: Partial<GetExpensesParams>) => void;
+  totalAmount?: number; // 🔥 show total
 }
 
-export default function ExpenseFilter({ onFilterChange }: Props) {
+export default function ExpenseFilter({
+  onFilterChange,
+  totalAmount,
+}: Props) {
   const [filters, setFilters] = useState<Partial<GetExpensesParams>>({
     searchTrim: "",
     category: undefined,
-    minAmount: undefined,
-    maxAmount: undefined,
-    startDate: "",
-    endDate: "",
-    sort: undefined,
+    month: "",
   });
 
   const handleChange = (
     field: keyof GetExpensesParams,
     value: string
   ) => {
-    const updated: Partial<GetExpensesParams> = {
+    const updated = {
       ...filters,
       [field]: value || undefined,
     };
@@ -48,13 +47,11 @@ export default function ExpenseFilter({ onFilterChange }: Props) {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-md border border-gray-200 
-    rounded-2xl p-5 shadow-sm mb-6">
-
+    <div className="bg-white border rounded-2xl p-5 shadow-sm mb-6">
       <div className="flex flex-col gap-4">
 
-        {/* Top Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
           {/* Search */}
           <input
@@ -64,9 +61,7 @@ export default function ExpenseFilter({ onFilterChange }: Props) {
             onChange={(e) =>
               handleChange("searchTrim", e.target.value)
             }
-            className="w-full border border-gray-200 
-            focus:border-black focus:ring-1 focus:ring-black
-            px-4 py-2.5 rounded-xl text-sm outline-none"
+            className="border px-4 py-2 rounded-xl text-sm"
           />
 
           {/* Category */}
@@ -75,9 +70,7 @@ export default function ExpenseFilter({ onFilterChange }: Props) {
             onChange={(e) =>
               handleChange("category", e.target.value)
             }
-            className="w-full border border-gray-200
-            focus:border-black focus:ring-1 focus:ring-black
-            px-4 py-2.5 rounded-xl text-sm outline-none"
+            className="border px-4 py-2 rounded-xl text-sm"
           >
             <option value="">All Categories</option>
             {expenseCategoryOptions.map((cat) => (
@@ -87,90 +80,32 @@ export default function ExpenseFilter({ onFilterChange }: Props) {
             ))}
           </select>
 
-          {/* Min Amount */}
+          {/* Month */}
           <input
-            type="number"
-            placeholder="Min Amount"
-            value={filters.minAmount || ""}
+            type="month"
+            value={filters.month || ""}
             onChange={(e) =>
-              handleChange("minAmount", e.target.value)
+              handleChange("month", e.target.value)
             }
-            className="w-full border border-gray-200 
-            focus:border-black focus:ring-1 focus:ring-black
-            px-4 py-2.5 rounded-xl text-sm outline-none"
+            className="border px-4 py-2 rounded-xl text-sm"
           />
-
-          {/* Max Amount */}
-          <input
-            type="number"
-            placeholder="Max Amount"
-            value={filters.maxAmount || ""}
-            onChange={(e) =>
-              handleChange("maxAmount", e.target.value)
-            }
-            className="w-full border border-gray-200 
-            focus:border-black focus:ring-1 focus:ring-black
-            px-4 py-2.5 rounded-xl text-sm outline-none"
-          />
-
-          {/* Start Date */}
-          <input
-            type="date"
-            value={filters.startDate || ""}
-            onChange={(e) =>
-              handleChange("startDate", e.target.value)
-            }
-            className="w-full border border-gray-200 
-            focus:border-black focus:ring-1 focus:ring-black
-            px-4 py-2.5 rounded-xl text-sm outline-none"
-          />
-
-          {/* End Date */}
-          <input
-            type="date"
-            value={filters.endDate || ""}
-            onChange={(e) =>
-              handleChange("endDate", e.target.value)
-            }
-            className="w-full border border-gray-200 
-            focus:border-black focus:ring-1 focus:ring-black
-            px-4 py-2.5 rounded-xl text-sm outline-none"
-          />
-
-          {/* Sort */}
-          <select
-            value={filters.sort || ""}
-            onChange={(e) =>
-              handleChange("sort", e.target.value)
-            }
-            className="w-full border border-gray-200
-            focus:border-black focus:ring-1 focus:ring-black
-            px-4 py-2.5 rounded-xl text-sm outline-none"
-          >
-            <option value="">Sort</option>
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="high">Amount High → Low</option>
-            <option value="low">Amount Low → High</option>
-          </select>
-
         </div>
 
-        {/* Bottom Row */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 pt-2">
+        {/* Bottom */}
+        <div className="flex justify-between items-center">
 
-          <p className="text-xs text-gray-500">
-            Filter and manage your expenses efficiently
+          {/* 🔥 Total Expense */}
+          <p className="text-sm font-medium">
+            Total: <span className="text-blue-600">
+              ৳ {totalAmount || 0}
+            </span>
           </p>
 
           <button
             onClick={handleReset}
-            className="px-4 py-2 text-sm font-medium
-            border border-gray-300 rounded-xl
-            hover:bg-black hover:text-white
-            transition-all duration-200"
+            className="px-4 py-2 text-sm border rounded-xl hover:bg-black hover:text-white"
           >
-            Reset Filters
+            Reset
           </button>
         </div>
 

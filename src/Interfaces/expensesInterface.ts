@@ -48,14 +48,12 @@ export const expenseCategoryOptions = [
 ];
 
 
+
 export interface GetExpensesParams {
   currentPage: number;
   limit: number;
   searchTrim?: string;
-  sort?: string;
-  minAmount?: number;
-  maxAmount?: number;
   category?: string;
-  startDate?: string;
-  endDate?: string;
+  month?: string; // 🔥 YYYY-MM
+  sort?: string;
 }

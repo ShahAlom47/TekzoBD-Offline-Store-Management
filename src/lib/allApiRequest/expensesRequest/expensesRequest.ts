@@ -14,17 +14,15 @@ export const addExpenses = async (data:ExpenseFormType) => {
 
 
 
+
 export const getExpenses = async (params: GetExpensesParams) => {
   const {
     currentPage,
     limit,
     searchTrim,
-    sort,
-    minAmount,
-    maxAmount,
     category,
-    startDate,
-    endDate,
+    month,
+    sort,
   } = params;
 
   const queryParams = new URLSearchParams();
@@ -33,17 +31,13 @@ export const getExpenses = async (params: GetExpensesParams) => {
   queryParams.set("pageSize", String(limit));
 
   if (searchTrim) queryParams.set("searchTrim", searchTrim);
-  if (sort) queryParams.set("sort", sort);
-  if (minAmount) queryParams.set("minAmount", String(minAmount));
-  if (maxAmount) queryParams.set("maxAmount", String(maxAmount));
   if (category) queryParams.set("category", category);
-  if (startDate) queryParams.set("startDate", startDate);
-  if (endDate) queryParams.set("endDate", endDate);
+  if (month) queryParams.set("month", month); // 🔥 important
+  if (sort) queryParams.set("sort", sort);
 
   const url = `/expenses?${queryParams.toString()}`;
 
   return request("GET", url);
 };
-
 
 
