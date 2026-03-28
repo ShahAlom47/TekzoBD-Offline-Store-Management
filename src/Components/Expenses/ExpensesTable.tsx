@@ -1,5 +1,6 @@
 import { CustomTable } from "../CommonComponents/CustomTable";
 import { Expense } from "@/Interfaces/expensesInterface";
+import { DashPaginationButton } from "../CommonComponents/DashPaginationButton";
 
 interface PropsType {
   expenses: Expense[];
@@ -12,6 +13,7 @@ const ExpensesTable = ({ expenses }: PropsType) => {
     { header: "Amount (৳)", accessor: "amount" },
     { header: "Date", accessor: "date" },
     { header: "Note", accessor: "note" },
+    { header: "Action", accessor: "action" },
   ];
 
   // 🔹 format data
@@ -26,6 +28,23 @@ const ExpensesTable = ({ expenses }: PropsType) => {
         ? new Date(item.expenseDate).toLocaleDateString()
         : "-",
       note: item.note || "-",
+      action:(
+          <div className="flex gap-2 justify-center">
+          <button
+            className="bg-yellow-400 text-white px-2 py-1 rounded"
+            // onClick={() => handleEdit(row.original)}
+          >
+            Edit
+          </button>
+          <button
+            className="bg-red-500 text-white px-2 py-1 rounded"
+            // onClick={() => handleDelete(row.original._id)}xs
+          >
+            Delete
+          </button>
+        </div>
+      )
+      
     };
   });
 

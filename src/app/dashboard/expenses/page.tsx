@@ -1,25 +1,38 @@
 "use client";
 
 import CustomModal from "@/Components/CommonComponents/CustomModal";
+import { DashPaginationButton } from "@/Components/CommonComponents/DashPaginationButton";
 import AddExpenseForm from "@/Components/Expenses/AddExpenses";
+import ExpenseFilter from "@/Components/Expenses/ExpenseFilter";
 import ExpensesTable from "@/Components/Expenses/ExpensesTable";
 import { Expense } from "@/Interfaces/expensesInterface";
 import { getExpenses } from "@/lib/allApiRequest/expensesRequest/expensesRequest";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
 
 const Expenses = () => {
   const [openModal, setOpenModal] = useState<boolean>(false);
 
+  const [filters, setFilters] = useState({});
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const queryClient = useQueryClient();
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["expenses"],
+    queryKey: ["expenses", page, filters], // 🔥 IMPORTANT
     queryFn: async () => {
-      const res = await getExpenses();
+      const res = await getExpenses({
+        currentPage: page,
+        limit: limit,
+        ...filters,
+      });
       return res;
     },
   });
 
-  const expenses = data?.data  as Expense[] || []
+  const expenses = (data?.data as Expense[]) || [];
+  const totalPages = data?.totalPages || 1;
 
   return (
     <div className="p-5">
@@ -35,19 +48,37 @@ const Expenses = () => {
         </button>
       </div>
 
-   <div className="bg-white shadow rounded p-3">
-  {isLoading ? (
-    <p>Loading...</p>
-  ) : isError ? (
-    <p className="text-red-500">Something went wrong!</p>
-  ) : expenses.length === 0 ? (
-    <p className="text-gray-500 text-center py-5">
-      No expenses found 😐
-    </p>
-  ) : (
-    <ExpensesTable expenses={expenses} />
-  )}
-</div>
+      <div className="bg-white shadow rounded p-3">
+
+        {/* 🔥 Filter always visible */}
+        <ExpenseFilter
+          onFilterChange={(newFilters) => {
+            setPage(1);
+            setFilters(newFilters);
+          }}
+        />
+
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : isError ? (
+          <p className="text-red-500">Something went wrong!</p>
+        ) : expenses.length === 0 ? (
+          <p className="text-gray-500 text-center py-5">
+            No expenses found 😐
+          </p>
+        ) : (
+          <>
+            <ExpensesTable expenses={expenses} />
+
+            <DashPaginationButton
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={(newPage) => setPage(newPage)}
+              className="mt-4"
+            />
+          </>
+        )}
+      </div>
 
       {/* 🔹 Modal */}
       <CustomModal
@@ -58,6 +89,11 @@ const Expenses = () => {
         <AddExpenseForm
           onSuccess={() => {
             setOpenModal(false);
+
+            // 🔥 refetch after add
+            queryClient.invalidateQueries({
+              queryKey: ["expenses"],
+            });
           }}
         />
       </CustomModal>

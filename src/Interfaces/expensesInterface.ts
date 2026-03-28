@@ -46,3 +46,16 @@ export const expenseCategoryOptions = [
   { label: "Transport", value: EXPENSE_CATEGORY.TRANSPORT },
   { label: "Others", value: EXPENSE_CATEGORY.OTHERS },
 ];
+
+
+export interface GetExpensesParams {
+  currentPage: number;
+  limit: number;
+  searchTrim?: string;
+  sort?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  category?: string;
+  startDate?: string;
+  endDate?: string;
+}

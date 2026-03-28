@@ -32,7 +32,7 @@ const Products = () => {
 
   const products = data?.data as Product[] || [];
   const totalPages = data?.totalPages || 1;
-  console.log(data?.totalPages)
+ 
 
   return (
     <div className="p-4">
