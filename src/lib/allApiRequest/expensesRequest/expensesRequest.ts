@@ -2,18 +2,10 @@
 import {  ExpenseFormType, GetExpensesParams } from "@/Interfaces/expensesInterface";
 import { request } from "../apiRequests";
 
-export const loginUser = async (phone: string, password: string) => {
-  return request("POST", "/user/login", { phone, password });
-}
-
 
 export const addExpenses = async (data:ExpenseFormType) => {
   return request("POST", `/expenses/add`,{...data});
 }
-
-
-
-
 
 export const getExpenses = async (params: GetExpensesParams) => {
   const {
@@ -39,5 +31,10 @@ export const getExpenses = async (params: GetExpensesParams) => {
 
   return request("GET", url);
 };
+
+export const editExpenses = async ( id:string,data:ExpenseFormType) => {
+  return request("PATCH", `/expenses/edit/${id}`,{...data});
+}
+
 
 
