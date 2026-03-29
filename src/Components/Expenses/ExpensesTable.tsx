@@ -76,14 +76,8 @@ const ExpensesTable = ({ expenses }: PropsType) => {
       >
         <EditExpenseForm
         initialData={selectedExpense}
-          onSuccess={() => {
-            setOpenModal(false);
-
-            // 🔥 refetch after add
-            queryClient.invalidateQueries({
-              queryKey: ["expenses"],
-            });
-          }}
+      
+        
         />
       </CustomModal>
 
