@@ -15,9 +15,10 @@ import { useQueryClient } from "@tanstack/react-query";
 
 interface Props {
   initialData?: Expense | null;
+  setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const EditExpenseForm = ({ initialData }: Props) => {
+const EditExpenseForm = ({ initialData ,setOpenModal}: Props) => {
   const queryClient = useQueryClient();
 
   const getDefaultForm = () => ({
@@ -110,6 +111,7 @@ const EditExpenseForm = ({ initialData }: Props) => {
       queryClient.invalidateQueries({
         queryKey: ["expenses"],
       });
+      setOpenModal(false);
 
       // 🔥 reset only for add
       if (!isEdit) {

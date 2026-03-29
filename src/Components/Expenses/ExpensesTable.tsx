@@ -2,7 +2,6 @@ import { CustomTable } from "../CommonComponents/CustomTable";
 import { Expense } from "@/Interfaces/expensesInterface";
 import { useState } from "react";
 import CustomModal from "../CommonComponents/CustomModal";
-import { useQueryClient } from "@tanstack/react-query";
 import EditExpenseForm from "./EditExpenseForm";
 
 interface PropsType {
@@ -12,7 +11,7 @@ interface PropsType {
 const ExpensesTable = ({ expenses }: PropsType) => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
-    const queryClient = useQueryClient();
+   
 
     const handleEdit = (expense: Expense) => {
         setSelectedExpense(expense);
@@ -76,6 +75,7 @@ const ExpensesTable = ({ expenses }: PropsType) => {
       >
         <EditExpenseForm
         initialData={selectedExpense}
+        setOpenModal={setOpenModal}
       
         
         />

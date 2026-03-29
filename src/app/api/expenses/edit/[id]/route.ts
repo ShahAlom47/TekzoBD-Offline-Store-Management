@@ -2,11 +2,32 @@ import { getExpensesCollection } from "@/lib/database/db_collections";
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 
-export async function PATCH(req: NextRequest) {
+export async function PATCH(
+  req: NextRequest,
+ { params }: { params: Promise< { id: string }> }
+) {
   try {
+    const { id } = await params;
+
+    if (!ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { message: "Invalid product ID", success: false },
+        { status: 400 }
+      );
+    }
+
     const body = await req.json();
 
-    const { id, title, amount, category, note, expenseDate } = body;
+    console.log(id)
+
+    if (!body || typeof body !== "object") {
+      return NextResponse.json(
+        { message: "Invalid request body", success: false },
+        { status: 400 }
+      );
+    }
+
+    const {  title, amount, category, note, expenseDate } = body;
 
     // 🔹 validation
     if (!id) {
