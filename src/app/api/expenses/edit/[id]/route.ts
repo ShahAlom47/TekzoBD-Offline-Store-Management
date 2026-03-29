@@ -2,7 +2,7 @@ import { getExpensesCollection } from "@/lib/database/db_collections";
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 
-export async function PUT(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
 

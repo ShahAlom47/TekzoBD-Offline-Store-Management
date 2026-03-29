@@ -1,12 +1,24 @@
 import { CustomTable } from "../CommonComponents/CustomTable";
 import { Expense } from "@/Interfaces/expensesInterface";
-import { DashPaginationButton } from "../CommonComponents/DashPaginationButton";
+import { useState } from "react";
+import CustomModal from "../CommonComponents/CustomModal";
+import { useQueryClient } from "@tanstack/react-query";
+import EditExpenseForm from "./EditExpenseForm";
 
 interface PropsType {
   expenses: Expense[];
 }
 
 const ExpensesTable = ({ expenses }: PropsType) => {
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+    const queryClient = useQueryClient();
+
+    const handleEdit = (expense: Expense) => {
+        setSelectedExpense(expense);
+        setOpenModal(true);
+    }   
+
   const columns = [
     { header: "Title", accessor: "title" },
     { header: "Category", accessor: "category" },
@@ -32,13 +44,13 @@ const ExpensesTable = ({ expenses }: PropsType) => {
           <div className="flex gap-2 justify-center">
           <button
             className="bg-yellow-400 text-white px-2 py-1 rounded"
-            // onClick={() => handleEdit(row.original)}
+            onClick={() => handleEdit(item)}
           >
             Edit
           </button>
           <button
             className="bg-red-500 text-white px-2 py-1 rounded"
-            // onClick={() => handleDelete(row.original._id)}xs
+            // onClick={() => handleDelete(row.original._id)}
           >
             Delete
           </button>
@@ -55,6 +67,26 @@ const ExpensesTable = ({ expenses }: PropsType) => {
       </h2>
 
       <CustomTable columns={columns} data={data} />
+
+         {/* 🔹 Modal */}
+      <CustomModal
+        title="Add Expense"
+        open={openModal}
+        onOpenChange={setOpenModal}
+      >
+        <EditExpenseForm
+        initialData={selectedExpense}
+          onSuccess={() => {
+            setOpenModal(false);
+
+            // 🔥 refetch after add
+            queryClient.invalidateQueries({
+              queryKey: ["expenses"],
+            });
+          }}
+        />
+      </CustomModal>
+
     </div>
   );
 };

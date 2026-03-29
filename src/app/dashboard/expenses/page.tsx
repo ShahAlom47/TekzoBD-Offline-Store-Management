@@ -83,7 +83,7 @@ const Expenses = () => {
           </p>
         ) : (
           <>
-            <ExpensesTable expenses={expenses} />
+            <ExpensesTable expenses={expenses}  />
 
             <DashPaginationButton
               currentPage={page}
