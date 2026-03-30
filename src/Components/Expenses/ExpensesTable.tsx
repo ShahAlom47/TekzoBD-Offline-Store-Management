@@ -8,6 +8,7 @@ import { deleteCategory } from "@/lib/allApiRequest/categoryRequest/categoryRequ
 import { deleteExpenses } from "@/lib/allApiRequest/expensesRequest/expensesRequest";
 import toast from "react-hot-toast/headless";
 import { i } from "framer-motion/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface PropsType {
   expenses: Expense[];
@@ -17,6 +18,7 @@ const ExpensesTable = ({ expenses }: PropsType) => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const {confirm,ConfirmModal}=useConfirm();
+   const queryClient = useQueryClient();
 
    
 
@@ -38,6 +40,10 @@ const ExpensesTable = ({ expenses }: PropsType) => {
     const res = await deleteExpenses(id);
     if (res.success) {
     toast.success("Expense deleted!");
+      // 🔥 refetch after add
+            queryClient.invalidateQueries({
+              queryKey: ["expenses"],
+            });
     } else {
       toast.error("Failed to delete expense.");
     }
