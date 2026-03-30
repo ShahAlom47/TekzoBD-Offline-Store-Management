@@ -16,7 +16,12 @@ const ExpensesTable = ({ expenses }: PropsType) => {
     const handleEdit = (expense: Expense) => {
         setSelectedExpense(expense);
         setOpenModal(true);
-    }   
+    } 
+    
+    const handleDelete =(id:string)=>{
+      
+
+    }
 
   const columns = [
     { header: "Title", accessor: "title" },
@@ -49,7 +54,7 @@ const ExpensesTable = ({ expenses }: PropsType) => {
           </button>
           <button
             className="bg-red-500 text-white px-2 py-1 rounded"
-            // onClick={() => handleDelete(row.original._id)}
+         onClick={() => item._id && handleDelete(item._id.toString())}
           >
             Delete
           </button>

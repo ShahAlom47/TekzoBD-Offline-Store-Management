@@ -35,6 +35,9 @@ export const getExpenses = async (params: GetExpensesParams) => {
 export const editExpenses = async ( id:string,data:ExpenseFormType) => {
   return request("PATCH", `/expenses/edit/${id}`,{...data});
 }
+export const deleteExpenses = async ( id:string) => {
+  return request("DELETE", `/expenses/delete/${id}`);
+}
 
 
 
