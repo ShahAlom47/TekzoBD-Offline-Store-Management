@@ -3,6 +3,11 @@ import { Expense } from "@/Interfaces/expensesInterface";
 import { useState } from "react";
 import CustomModal from "../CommonComponents/CustomModal";
 import EditExpenseForm from "./EditExpenseForm";
+import { useConfirm } from "@/hook/useConfirm";
+import { deleteCategory } from "@/lib/allApiRequest/categoryRequest/categoryRequest";
+import { deleteExpenses } from "@/lib/allApiRequest/expensesRequest/expensesRequest";
+import toast from "react-hot-toast/headless";
+import { i } from "framer-motion/client";
 
 interface PropsType {
   expenses: Expense[];
@@ -11,6 +16,8 @@ interface PropsType {
 const ExpensesTable = ({ expenses }: PropsType) => {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const {confirm,ConfirmModal}=useConfirm();
+
    
 
     const handleEdit = (expense: Expense) => {
@@ -18,10 +25,28 @@ const ExpensesTable = ({ expenses }: PropsType) => {
         setOpenModal(true);
     } 
     
-    const handleDelete =(id:string)=>{
-      
+ const handleDelete = async (id: string) => {
+  const ok = await confirm({
+    title: "Delete Expense",
+    message: "Are you sure you want to delete this expense?",
+    confirmText: "Yes, Delete",
+    cancelText: "Cancel",
+  });
 
+  if (ok) {
+  
+    const res = await deleteExpenses(id);
+    if (res.success) {
+    toast.success("Expense deleted!");
+    } else {
+      toast.error("Failed to delete expense.");
     }
+  } else {
+
+    console.log("User cancelled delete");
+  }
+};
+
 
   const columns = [
     { header: "Title", accessor: "title" },
@@ -85,6 +110,8 @@ const ExpensesTable = ({ expenses }: PropsType) => {
         
         />
       </CustomModal>
+
+      {ConfirmModal}
 
     </div>
   );
