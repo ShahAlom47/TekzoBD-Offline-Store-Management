@@ -1,0 +1,25 @@
+export interface PurchaseMemo {
+  shopName?: string;      // shop name (optional)
+  memoNumber: string;     // memo no
+  amount: number;         // ওই দোকানের total
+}
+
+export interface Purchase {
+  _id?: string;
+
+  date: Date;
+
+  memos: PurchaseMemo[];  // multiple shop memo
+
+  productTotal: number;   // সব memo এর total
+
+  transportCost?: number; // transport / extra cost
+
+  otherCost?: number;     // extra expense (optional)
+
+  grandTotal: number;     // final total (product + cost)
+
+  note?: string;
+
+  createdAt?: Date;
+}
