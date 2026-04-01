@@ -1,131 +1,76 @@
 "use client";
 
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
-interface Memo {
-  memoNumber: string;
-  amount: number;
+interface Purchase {
+  _id: string;
+  date: string;
+  memos: { memoNumber: string; amount: number }[];
+  productTotal: number;
+  transportCost: number;
+  otherCost: number;
+  grandTotal: number;
 }
 
-const Purchase = () => {
-  const [memos, setMemos] = useState<Memo[]>([
-    { memoNumber: "", amount: 0 },
-  ]);
+const fetchPurchases = async (): Promise<Purchase[]> => {
+  const res = await fetch("/api/purchase");
+  const data = await res.json();
+  return data;
+};
 
-  const [transportCost, setTransportCost] = useState(0);
-  const [otherCost, setOtherCost] = useState(0);
+const PurchasePage = () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ["purchases"],
+    queryFn: fetchPurchases,
+  });
 
-  // ➕ Add new memo
-  const addMemo = () => {
-    setMemos([...memos, { memoNumber: "", amount: 0 }]);
-  };
-
-  // ✏️ Update memo
-  const handleMemoChange = (
-    index: number,
-    field: keyof Memo,
-    value: string | number
-  ) => {
-    const updated = [...memos];
-    updated[index][field] =
-      field === "amount" ? Number(value) : value;
-    setMemos(updated);
-  };
-
-  // 🧮 Calculate total
-  const productTotal = memos.reduce(
-    (sum, m) => sum + (m.amount || 0),
-    0
-  );
-
-  const grandTotal = productTotal + transportCost + otherCost;
-
-  // 🚀 Submit
-  const handleSubmit = () => {
-    const data = {
-      date: new Date(),
-      memos,
-      productTotal,
-      transportCost,
-      otherCost,
-      grandTotal,
-    };
-
-    console.log("Purchase Data:", data);
-  };
+  if (isLoading) return <p>Loading...</p>;
 
   return (
-    <div className="p-4 max-w-2xl mx-auto">
+    <div className="p-4">
       <h2 className="text-xl font-semibold mb-4">
-        Purchase Entry
+        Purchase History
       </h2>
 
-      {/* Memo List */}
-      {memos.map((memo, index) => (
-        <div key={index} className="flex gap-2 mb-2">
-          <input
-            type="text"
-            placeholder="Memo Number"
-            value={memo.memoNumber}
-            onChange={(e) =>
-              handleMemoChange(index, "memoNumber", e.target.value)
-            }
-            className="border p-2 w-1/2"
-          />
+      <table className="w-full border">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="p-2 border">Date</th>
+            <th className="p-2 border">Memo Count</th>
+            <th className="p-2 border">Product Total</th>
+            <th className="p-2 border">Transport</th>
+            <th className="p-2 border">Grand Total</th>
+          </tr>
+        </thead>
 
-          <input
-            type="number"
-            placeholder="Amount"
-            value={memo.amount}
-            onChange={(e) =>
-              handleMemoChange(index, "amount", e.target.value)
-            }
-            className="border p-2 w-1/2"
-          />
-        </div>
-      ))}
+        <tbody>
+          {data?.map((item) => (
+            <tr key={item._id}>
+              <td className="p-2 border">
+                {new Date(item.date).toLocaleDateString()}
+              </td>
 
-      <button
-        onClick={addMemo}
-        className="bg-blue-500 text-white px-3 py-1 mt-2"
-      >
-        + Add Memo
-      </button>
+              <td className="p-2 border">
+                {item.memos.length}
+              </td>
 
-      {/* Costs */}
-      <div className="mt-4 space-y-2">
-        <input
-          type="number"
-          placeholder="Transport Cost"
-          value={transportCost}
-          onChange={(e) => setTransportCost(Number(e.target.value))}
-          className="border p-2 w-full"
-        />
+              <td className="p-2 border">
+                ৳ {item.productTotal}
+              </td>
 
-        <input
-          type="number"
-          placeholder="Other Cost"
-          value={otherCost}
-          onChange={(e) => setOtherCost(Number(e.target.value))}
-          className="border p-2 w-full"
-        />
-      </div>
+              <td className="p-2 border">
+                ৳ {item.transportCost || 0}
+              </td>
 
-      {/* Totals */}
-      <div className="mt-4">
-        <p>Product Total: ৳ {productTotal}</p>
-        <p>Grand Total: ৳ {grandTotal}</p>
-      </div>
-
-      {/* Submit */}
-      <button
-        onClick={handleSubmit}
-        className="bg-green-600 text-white px-4 py-2 mt-4"
-      >
-        Save Purchase
-      </button>
+              <td className="p-2 border font-semibold">
+                ৳ {item.grandTotal}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-export default Purchase;
+export default PurchasePage;
