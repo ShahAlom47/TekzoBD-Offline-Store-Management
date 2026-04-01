@@ -4,7 +4,6 @@ import { useState } from "react";
 import CustomModal from "../CommonComponents/CustomModal";
 import EditExpenseForm from "./EditExpenseForm";
 import { useConfirm } from "@/hook/useConfirm";
-import { deleteCategory } from "@/lib/allApiRequest/categoryRequest/categoryRequest";
 import { deleteExpenses } from "@/lib/allApiRequest/expensesRequest/expensesRequest";
 import toast from "react-hot-toast/headless";
 import { i } from "framer-motion/client";
