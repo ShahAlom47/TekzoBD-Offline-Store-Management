@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export interface PurchaseMemo {
   shopName?: string;      // shop name (optional)
   memoNumber: string;     // memo no
@@ -5,7 +7,7 @@ export interface PurchaseMemo {
 }
 
 export interface Purchase {
-  _id?: string;
+  _id?: string | ObjectId;
 
   date: string;
 

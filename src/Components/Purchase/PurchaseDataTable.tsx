@@ -1,11 +1,42 @@
+import { useConfirm } from "@/hook/useConfirm";
 import { CustomTable } from "../CommonComponents/CustomTable";
 import { Purchase } from "@/Interfaces/purchaseInterface";
+import toast from "react-hot-toast";
+import { deletePurchase } from "@/lib/allApiRequest/purchaseRequest/purchaseRequest";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface PropsType {
   purchases: Purchase[];
+  onEdit?: (purchase: Purchase) => void;
+  onDelete?: (purchaseId: string) => void;
 }
 
-const PurchaseDataTable = ({ purchases }: PropsType) => {
+const PurchaseDataTable = ({ purchases, onEdit, onDelete }: PropsType) => {
+  const {confirm,ConfirmModal } = useConfirm();
+    const queryClient = useQueryClient();
+
+
+  const handleDelete = async (id: string) => {
+  const ok = await confirm({
+    title: "Delete Purchase",
+    message: "Are you sure you want to delete this purchase?",
+    confirmText: "Yes, Delete",
+    cancelText: "Cancel",
+  });
+
+  if (ok) {
+    // ✅ ইউজার Confirm করেছে, এখন delete কাজ করো
+    await deletePurchase(id);
+    toast.success("Purchase deleted!");
+        queryClient.invalidateQueries({
+           queryKey: ["purchases"],
+        });
+  } else {
+    console.log("User cancelled delete");
+  }
+};
+
+
   const columns = [
     { header: "Date", accessor: "date" },
     { header: "Total (৳)", accessor: "grandTotal" },
@@ -14,9 +45,9 @@ const PurchaseDataTable = ({ purchases }: PropsType) => {
     { header: "Other (৳)", accessor: "otherCost" },
     { header: "Memos", accessor: "memos" },
     { header: "Note", accessor: "note" },
+    { header: "Action", accessor: "action" },
   ];
 
-  // ✅ format data
   const data = purchases.map((item: Purchase) => {
     return {
       date: item.date
@@ -28,12 +59,30 @@ const PurchaseDataTable = ({ purchases }: PropsType) => {
       transportCost: item.transportCost?.toLocaleString() || "0",
       otherCost: item.otherCost?.toLocaleString() || "0",
 
-      // 👉 memo count or short info
       memos: item.memos?.length
         ? `${item.memos.length} memo`
         : "0",
 
       note: item.note || "-",
+
+      // 👉 Action buttons
+      action: (
+        <div className="flex gap-2">
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded"
+            onClick={() => onEdit && onEdit(item)}
+          >
+            Edit
+          </button>
+
+          <button
+            className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
+            onClick={() => handleDelete(item._id?.toString() || "")}
+          >
+            Delete
+          </button>
+        </div>
+      ),
     };
   });
 
@@ -44,6 +93,7 @@ const PurchaseDataTable = ({ purchases }: PropsType) => {
       </h2>
 
       <CustomTable columns={columns} data={data} />
+      {ConfirmModal}
     </div>
   );
 };

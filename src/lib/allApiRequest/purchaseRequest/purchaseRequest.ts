@@ -4,6 +4,11 @@ import { request } from "../apiRequests";
 export const addPurchase = async (data: Purchase) => {
   return request("POST", "/purchase/add", {...data});
 }
+export const deletePurchase = async (id: string) => {
+  return request("DELETE", `/purchase/delete/${id}`, undefined);
+}
+
+
 interface ParamsType {
   currentPage: number;
   limit: number;
