@@ -1,26 +1,27 @@
 "use client";
 
 import { Purchase } from "@/Interfaces/purchaseInterface";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
-
-
 
 interface Props {
   initialData?: Purchase | null;
-  onSubmit: (data: Purchase) => void;
+  onSubmit: (data: Purchase) => Promise<void> | void;
 }
 
 const PurchaseForm = ({ initialData, onSubmit }: Props) => {
+  const [loading, setLoading] = useState(false);
+
   const {
     register,
     control,
     handleSubmit,
     watch,
     setValue,
+    reset,
   } = useForm<Purchase>({
     defaultValues: {
-      date: new Date().toISOString().split("T")[0], // current date in YYYY-MM-DD format
+      date: new Date().toISOString().split("T")[0],
       memos: [{ shopName: "", memoNumber: "", amount: 0 }],
       productTotal: 0,
       transportCost: 0,
@@ -56,13 +57,38 @@ const PurchaseForm = ({ initialData, onSubmit }: Props) => {
     }
   }, [initialData, setValue]);
 
+  const handleFormSubmit = async (data: Purchase) => {
+    if (loading) return;
+
+    try {
+      setLoading(true);
+      await onSubmit(data);
+
+      // ✅ reset form after success (only for add)
+      if (!initialData) {
+        reset({
+          date: new Date().toISOString().split("T")[0],
+          memos: [{ shopName: "", memoNumber: "", amount: 0 }],
+          productTotal: 0,
+          transportCost: 0,
+          otherCost: 0,
+          grandTotal: 0,
+          note: "",
+        });
+      }
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-6 space-y-6">
       <h1 className="text-2xl font-bold text-gray-800">
         {initialData ? "✏️ Edit Purchase" : "➕ Add Purchase"}
       </h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
         {/* Date */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
@@ -188,9 +214,16 @@ const PurchaseForm = ({ initialData, onSubmit }: Props) => {
         {/* Submit */}
         <button
           type="submit"
-          className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl font-semibold"
+          disabled={loading}
+          className={`w-full py-2 rounded-xl font-semibold text-white ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"}`}
         >
-          {initialData ? "Update Purchase" : "Save Purchase"}
+          {loading
+            ? initialData
+              ? "Updating..."
+              : "Saving..."
+            : initialData
+            ? "Update Purchase"
+            : "Save Purchase"}
         </button>
       </form>
     </div>
