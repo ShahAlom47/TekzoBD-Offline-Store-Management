@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
 interface Purchase {
   _id: string;
@@ -28,9 +29,11 @@ const PurchasePage = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">
+  <div>  <h2 className="text-xl font-semibold mb-4">
         Purchase History
       </h2>
+      <Link href="/dashboard/purchase/add">Add Purchase</Link>
+      </div>
 
       <table className="w-full border">
         <thead>
