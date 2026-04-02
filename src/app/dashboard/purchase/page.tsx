@@ -7,9 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
 
-// 👉 create this like PaymentDataTable later
-import PurchaseDataTable from "@/Components/Purchase/PurchaseDataTable";
 import { Purchase } from "@/Interfaces/purchaseInterface";
+import PurchaseDataTable from "@/Components/Purchase/PurchaseDataTable";
 
 const PurchasePage = () => {
   const [page, setPage] = useState(1);
