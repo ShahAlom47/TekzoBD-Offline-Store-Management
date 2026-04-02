@@ -1,7 +1,9 @@
+'use client'
+
 import PurchaseForm from "@/Components/Purchase/PurchaseForm";
 import { Purchase } from "@/Interfaces/purchaseInterface";
 
-export const AddPurchase = () => {
+ const AddPurchase = () => {
   const handleAdd = (data: Purchase) => {
     console.log("ADD:", data);
   };
@@ -9,11 +11,5 @@ export const AddPurchase = () => {
   return <PurchaseForm onSubmit={handleAdd} />;
 };
 
-// 🔹 Example Edit Page
-export const EditPurchase = ({ data }: { data: Purchase }) => {
-  const handleEdit = (updated: Purchase) => {
-    console.log("UPDATE:", updated);
-  };
+export default AddPurchase;
 
-  return <PurchaseForm initialData={data} onSubmit={handleEdit} />;
-};
