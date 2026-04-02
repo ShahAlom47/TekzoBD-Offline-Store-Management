@@ -20,7 +20,7 @@ const PurchaseForm = ({ initialData, onSubmit }: Props) => {
     setValue,
   } = useForm<Purchase>({
     defaultValues: {
-      date: new Date(),
+      date: new Date().toISOString().split("T")[0], // current date in YYYY-MM-DD format
       memos: [{ shopName: "", memoNumber: "", amount: 0 }],
       productTotal: 0,
       transportCost: 0,

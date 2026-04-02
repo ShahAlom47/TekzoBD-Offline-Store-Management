@@ -7,7 +7,7 @@ export interface PurchaseMemo {
 export interface Purchase {
   _id?: string;
 
-  date: Date;
+  date: string;
 
   memos: PurchaseMemo[];  // multiple shop memo
 
@@ -21,5 +21,5 @@ export interface Purchase {
 
   note?: string;
 
-  createdAt?: Date;
+  createdAt?: string;
 }
