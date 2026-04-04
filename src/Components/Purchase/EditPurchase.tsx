@@ -35,23 +35,17 @@ const EditPurchaseModal = ({ initialData, isOpen, onClose, onUpdated }: Props) =
   if (!isOpen) return null; // don't render if modal is closed
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 bb" >
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl p-6 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl font-bold"
-        >
-          ✖
-        </button>
 
-        <h2 className="text-2xl font-bold mb-4">✏️ Edit Purchase</h2>
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl p-2 relative">
+    
+
 
         <PurchaseForm
           initialData={initialData}
           onSubmit={handleEdit}
         />
       </div>
-    </div>
+  
   );
 };
 
