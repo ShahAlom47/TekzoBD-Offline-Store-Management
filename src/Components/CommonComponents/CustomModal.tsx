@@ -41,7 +41,7 @@ const CustomModal = ({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center  ">
       {/* Overlay */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -50,10 +50,10 @@ const CustomModal = ({
 
       {/* Modal Content */}
       <div
-        className={`relative bg-white rounded-xl shadow-lg w-11/12 md:w-8/12 lg:w-6/12 xl:w-5/12 2xl:w-4/12 max-h-[95vh] overflow-y-auto p-4 ${className}`}
+        className={`relative bg-white rounded-xl shadow-lg w-11/12 md:w-8/12 lg:w-6/12 xl:w-5/12  2xl:w-4/12 max-h-[95vh] overflow-y-scroll p-4 ${className}`}
       >
         {(title || description) && (
-          <div className="mb-4">
+          <div className="mb-4 ">
             {title && (
               <h2 className="text-lg font-semibold">{title}</h2>
             )}
