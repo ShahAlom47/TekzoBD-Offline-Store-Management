@@ -83,7 +83,7 @@ const PurchaseForm = ({ initialData, onSubmit }: Props) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-6 space-y-6">
+    <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-3 space-y-6">
       <h1 className="text-2xl font-bold text-gray-800">
         {initialData ? "✏️ Edit Purchase" : "➕ Add Purchase"}
       </h1>
@@ -97,6 +97,7 @@ const PurchaseForm = ({ initialData, onSubmit }: Props) => {
             {...register("date", { required: true })}
             className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-blue-400"
           />
+          <p className="text-red-500 font-bold my-2">({initialData?.date ? new Date(initialData.date).toLocaleDateString() : "-"})</p>
         </div>
 
         {/* Memo Section */}
