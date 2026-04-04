@@ -1,3 +1,4 @@
+
 import { Purchase } from "@/Interfaces/purchaseInterface";
 import { request } from "../apiRequests";
 
@@ -6,6 +7,9 @@ export const addPurchase = async (data: Purchase) => {
 }
 export const deletePurchase = async (id: string) => {
   return request("DELETE", `/purchase/delete/${id}`, undefined);
+}
+export const editPurchase = async (id: string, data: Partial<Purchase>) => {
+  return request("PATCH", `/purchase/editPurchase/${id}`, {...data});
 }
 
 
