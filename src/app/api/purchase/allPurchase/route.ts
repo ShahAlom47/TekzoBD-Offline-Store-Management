@@ -26,6 +26,8 @@ export async function GET(req: NextRequest) {
     const startDate = url.searchParams.get("startDate");
     const endDate = url.searchParams.get("endDate");
 
+    console.log(startDate,endDate)
+
     // 🔹 Build filter
     const filter: any = {};
 
