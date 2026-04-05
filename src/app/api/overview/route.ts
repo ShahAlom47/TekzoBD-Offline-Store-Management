@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { Overview } from "@/Interfaces/overviewInterface";
 import {
@@ -7,7 +8,6 @@ import {
   getProductCollection,
   getPaymentsCollection,
 } from "@/lib/database/db_collections";
-import { PaymentMethod } from "@/Interfaces/paymentInterface";
 import { PaymentMethod } from "@/Interfaces/paymentInterface";
 
 type DateRange = { startDate?: string; endDate?: string };
@@ -117,7 +117,7 @@ export async function GET(req: NextRequest) {
       { $sort: { totalAmount: -1 } },
       { $limit: 1 },
     ]).toArray();
-    const topPaymentMethod: PaymentMethod | null = topPaymentMethodResult[0]?._id || null;
+    const topPaymentMethod: PaymentMethod | undefined = topPaymentMethodResult[0]?._id || undefined;
 
     // ------------------------
     // 5️⃣ Build Overview
@@ -127,7 +127,7 @@ export async function GET(req: NextRequest) {
     const overview: Overview = {
       overall: { totalPurchase, totalExpense, totalSales, totalPayment, profit },
       filtered: { purchase: totalPurchase, expense: totalExpense, sales: totalSales, payment: totalPayment, profit },
-      counts: { totalPurchases, totalExpenses: totalExpensesCount, totalSales: totalSalesCount, totalPayments: totalPayment },
+      counts: { totalPurchases: totalPurchasesCount, totalExpenses: totalExpensesCount, totalSales: totalSalesCount, totalPayments: totalPayment },
       today: { purchase: totalPurchase, expense: totalExpense, sales: totalSales, payment: totalPayment },
       thisWeek: { purchase: totalPurchase, expense: totalExpense, sales: totalSales, payment: totalPayment },
       thisMonth: { purchase: totalPurchase, expense: totalExpense, sales: totalSales, payment: totalPayment },
