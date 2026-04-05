@@ -26,39 +26,59 @@ export async function GET(req: NextRequest) {
     const startDate = url.searchParams.get("startDate");
     const endDate = url.searchParams.get("endDate");
 
-    console.log(startDate,endDate)
-
     // 🔹 Build filter
     const filter: any = {};
 
-    // --- Search (shopName or memoNumber)
+    // =========================
+    // 🔍 SEARCH (FIXED)
+    // =========================
     if (searchTrim) {
       const regex = { $regex: searchTrim, $options: "i" };
-      filter.$or = [
+
+      const orConditions: any[] = [
         { "memos.shopName": regex },
         { "memos.memoNumber": regex },
       ];
 
-      // Try ObjectId search
-      try {
-        const id = new ObjectId(searchTrim);
-        filter._id = id;
-      } catch {}
+      // ObjectId search (safe way)
+      if (ObjectId.isValid(searchTrim)) {
+        orConditions.push({ _id: new ObjectId(searchTrim) });
+      }
+
+      filter.$or = orConditions;
     }
 
-    // --- Date filter
+    // =========================
+    // 📅 DATE FILTER (IMPORTANT FIX)
+    // =========================
     if (startDate || endDate) {
       filter.date = {};
-      if (startDate) filter.date.$gte = new Date(startDate);
-      if (endDate) filter.date.$lte = new Date(endDate);
+
+      if (startDate) {
+        filter.date.$gte = startDate; // ISO string compare
+      }
+
+      if (endDate) {
+        filter.date.$lt = endDate; // ⚠️ use $lt (NOT $lte)
+      }
     }
 
-    // 🔹 Sorting (newest first)
+    // =========================
+    // 🔽 SORT
+    // =========================
     const sortQuery: any = { date: -1 };
 
-    // 🔹 Fetch purchases + total count in parallel
+    // =========================
+    // 🚀 QUERY EXECUTION
+    // =========================
     const [purchases, total] = await Promise.all([
-      purchaseCollection.find(filter).sort(sortQuery).skip(skip).limit(pageSize).toArray() as Promise<Purchase[]>,
+      purchaseCollection
+        .find(filter)
+        .sort(sortQuery)
+        .skip(skip)
+        .limit(pageSize)
+        .toArray() as Promise<Purchase[]>,
+
       purchaseCollection.countDocuments(filter),
     ]);
 
@@ -74,6 +94,7 @@ export async function GET(req: NextRequest) {
 
   } catch (error: any) {
     console.error("GET /api/purchase/allPurchase error:", error);
+
     return NextResponse.json(
       {
         success: false,
