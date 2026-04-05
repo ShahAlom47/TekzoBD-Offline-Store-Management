@@ -1,119 +1,146 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPurchaseCollection, getSalesCollection, getExpensesCollection, getProductCollection } from "@/lib/database/db_collections";
 import { Overview } from "@/Interfaces/overviewInterface";
+import {
+  getPurchaseCollection,
+  getSalesCollection,
+  getExpensesCollection,
+  getProductCollection,
+  getPaymentsCollection,
+} from "@/lib/database/db_collections";
+import { PaymentMethod } from "@/Interfaces/paymentInterface";
+import { PaymentMethod } from "@/Interfaces/paymentInterface";
 
+type DateRange = { startDate?: string; endDate?: string };
+
+// Helper to build date filter for MongoDB
+const buildDateFilter = (field: string, range: DateRange) => {
+  if (!range.startDate && !range.endDate) return {};
+  const filter: any = {};
+  if (range.startDate) filter.$gte = new Date(range.startDate);
+  if (range.endDate) filter.$lte = new Date(range.endDate);
+  return { [field]: filter };
+};
 
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
-    const startDate = url.searchParams.get("startDate");
-    const endDate = url.searchParams.get("endDate");
-
-    const purchaseCollection = await getPurchaseCollection();
-    const saleCollection = await getSalesCollection();
-    const expenseCollection = await getExpensesCollection();
-    const productCollection = await getProductCollection();
-
-    // 🔹 Build date filter
-    const dateFilter: any = {};
-    if (startDate) dateFilter.$gte = new Date(startDate);
-    if (endDate) dateFilter.$lte = new Date(endDate);
+    const startDate = url.searchParams.get("startDate") || undefined;
+    const endDate = url.searchParams.get("endDate") || undefined;
+    const dateRange: DateRange = { startDate, endDate };
 
     // ------------------------
-    // 1️⃣ Summary Calculations
+    // 1️⃣ Collections
+    // ------------------------
+    const [purchaseCollection, saleCollection, expenseCollection, productCollection, paymentCollection] =
+      await Promise.all([
+        getPurchaseCollection(),
+        getSalesCollection(),
+        getExpensesCollection(),
+        getProductCollection(),
+        getPaymentsCollection(),
+      ]);
+
+    // ------------------------
+    // 2️⃣ Aggregations
     // ------------------------
 
     // Purchases
-    const purchaseMatch: any = {};
-    if (startDate || endDate) purchaseMatch.date = dateFilter;
-
+    const purchaseFilter = buildDateFilter("date", dateRange);
     const totalPurchaseResult = await purchaseCollection.aggregate([
-      { $match: purchaseMatch },
-      { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } }
+      { $match: purchaseFilter },
+      { $group: { _id: null, totalAmount: { $sum: "$grandTotal" } } },
     ]).toArray();
     const totalPurchase = totalPurchaseResult[0]?.totalAmount || 0;
+    const totalPurchasesCount = await purchaseCollection.countDocuments(purchaseFilter);
 
     // Expenses
-    const expenseMatch: any = {};
-    if (startDate || endDate) expenseMatch.date = dateFilter;
-
+    const expenseFilter = buildDateFilter("expenseDate", dateRange);
     const totalExpenseResult = await expenseCollection.aggregate([
-      { $match: expenseMatch },
-      { $group: { _id: null, totalAmount: { $sum: "$amount" } } }
+      { $match: expenseFilter },
+      { $group: { _id: null, totalAmount: { $sum: "$amount" } } },
     ]).toArray();
     const totalExpense = totalExpenseResult[0]?.totalAmount || 0;
+    const totalExpensesCount = await expenseCollection.countDocuments(expenseFilter);
 
     // Sales
-    const saleMatch: any = {};
-    if (startDate || endDate) saleMatch.date = dateFilter;
-
+    const saleFilter = buildDateFilter("createdAt", dateRange);
     const totalSalesResult = await saleCollection.aggregate([
-      { $match: saleMatch },
-      { $group: { _id: null, totalAmount: { $sum: "$total" } } }
+      { $match: saleFilter },
+      { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
     ]).toArray();
     const totalSales = totalSalesResult[0]?.totalAmount || 0;
+    const totalSalesCount = await saleCollection.countDocuments(saleFilter);
 
-    const profit = totalSales - totalPurchase - totalExpense;
-
-    // ------------------------
-    // 2️⃣ Counts
-    // ------------------------
-    const [totalPurchases, totalExpenses, totalSalesCount] = await Promise.all([
-      purchaseCollection.countDocuments(purchaseMatch),
-      expenseCollection.countDocuments(expenseMatch),
-      saleCollection.countDocuments(saleMatch),
-    ]);
+    // Payments
+    const paymentFilter = buildDateFilter("paymentDate", dateRange);
+    const totalPaymentResult = await paymentCollection.aggregate([
+      { $match: paymentFilter },
+      { $group: { _id: null, totalAmount: { $sum: "$amount" } } },
+    ]).toArray();
+    const totalPayment = totalPaymentResult[0]?.totalAmount || 0;
 
     // ------------------------
-    // 3️⃣ Stock
+    // 3️⃣ Stock Info
     // ------------------------
     const products = await productCollection.find().toArray();
     const totalProducts = products.length;
-    const inStock = products.filter(p => p.stock > 0).length;
-    const outOfStock = products.filter(p => p.stock === 0).length;
-    const lowStock = products.filter(p => p.stock > 0 && p.stock < 5).length;
-    const totalStockValue = products.reduce((acc, p) => acc + (p.stock * p.price), 0);
+    const inStock = products.filter(p => p.currentStock > 0).length;
+    const outOfStock = products.filter(p => p.currentStock === 0).length;
+    const lowStock = products.filter(p => p.currentStock > 0 && p.currentStock < 5).length;
+    const totalStockValue = products.reduce((acc, p) => acc + p.currentStock * p.costPrice, 0);
 
     // ------------------------
     // 4️⃣ Insights
     // ------------------------
-    // Top Selling Product
+
+    // Top selling product
     const topProductResult = await saleCollection.aggregate([
       { $unwind: "$products" },
-      { $group: { _id: "$products.productId", totalQty: { $sum: "$products.qty" } } },
+      { $group: { _id: "$products.productId", totalQty: { $sum: "$products.quantity" } } },
       { $sort: { totalQty: -1 } },
-      { $limit: 1 }
+      { $limit: 1 },
     ]).toArray();
     const topSellingProduct = topProductResult[0]?._id || null;
 
-    // Top Expense Category
+    // Top expense category
     const topExpenseCategoryResult = await expenseCollection.aggregate([
       { $group: { _id: "$category", totalAmount: { $sum: "$amount" } } },
       { $sort: { totalAmount: -1 } },
-      { $limit: 1 }
+      { $limit: 1 },
     ]).toArray();
     const topExpenseCategory = topExpenseCategoryResult[0]?._id || null;
 
+    // Top payment method
+    const topPaymentMethodResult = await paymentCollection.aggregate([
+      { $match: paymentFilter },
+      { $group: { _id: "$method", totalAmount: { $sum: "$amount" } } },
+      { $sort: { totalAmount: -1 } },
+      { $limit: 1 },
+    ]).toArray();
+    const topPaymentMethod: PaymentMethod | null = topPaymentMethodResult[0]?._id || null;
+
     // ------------------------
-    // 5️⃣ Build Overview object
+    // 5️⃣ Build Overview
     // ------------------------
+    const profit = totalSales - totalPurchase - totalExpense;
+
     const overview: Overview = {
-      summary: { totalPurchase, totalExpense, totalSales, profit },
-      counts: { totalPurchases, totalExpenses, totalSales: totalSalesCount },
-      today: { purchase: totalPurchase, expense: totalExpense, sales: totalSales }, // simple, can split by date later
-      thisMonth: { purchase: totalPurchase, expense: totalExpense, sales: totalSales }, // same
+      overall: { totalPurchase, totalExpense, totalSales, totalPayment, profit },
+      filtered: { purchase: totalPurchase, expense: totalExpense, sales: totalSales, payment: totalPayment, profit },
+      counts: { totalPurchases, totalExpenses: totalExpensesCount, totalSales: totalSalesCount, totalPayments: totalPayment },
+      today: { purchase: totalPurchase, expense: totalExpense, sales: totalSales, payment: totalPayment },
+      thisWeek: { purchase: totalPurchase, expense: totalExpense, sales: totalSales, payment: totalPayment },
+      thisMonth: { purchase: totalPurchase, expense: totalExpense, sales: totalSales, payment: totalPayment },
       stock: { totalProducts, inStock, outOfStock, lowStock, totalStockValue },
-      insights: { topSellingProduct, topExpenseCategory },
+      insights: { topSellingProduct, topExpenseCategory, topPaymentMethod },
     };
 
     return NextResponse.json({ success: true, data: overview });
-
   } catch (error: any) {
     console.error("GET /api/overview error:", error);
-    return NextResponse.json({
-      success: false,
-      message: "Failed to fetch overview",
-      error: error.message || String(error)
-    }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Failed to fetch overview", error: error.message || String(error) },
+      { status: 500 }
+    );
   }
 }
