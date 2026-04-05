@@ -2,18 +2,18 @@
 
 import { FilterType, OverviewFilter } from "@/Interfaces/overviewInterface";
 
-
-
 interface Props {
   filter: OverviewFilter;
   onChange: (filter: OverviewFilter) => void;
 }
 
 const OverviewFilterComponent = ({ filter, onChange }: Props) => {
+  const quickTypes: FilterType[] = ["today", "week", "month", "all", "custom"];
+
   return (
     <div className="flex gap-2 flex-wrap mb-4">
       {/* Quick Buttons */}
-      {(["today", "week", "month"] as FilterType[]).map((type) => (
+      {quickTypes.map((type) => (
         <button
           key={type}
           onClick={() => onChange({ type })}
@@ -25,26 +25,32 @@ const OverviewFilterComponent = ({ filter, onChange }: Props) => {
             ? "Today"
             : type === "week"
             ? "This Week"
-            : "This Month"}
+            : type === "month"
+            ? "This Month"
+            : type === "all"
+            ? "All"
+            : "Custom"}
         </button>
       ))}
 
       {/* Month Picker */}
-      <input
-        type="month"
-        value={filter.month || ""}
-        onChange={(e) => onChange({ type: "month", month: e.target.value })}
-        className="border p-1 rounded"
-      />
+      {filter.type === "month" && (
+        <input
+          type="month"
+          value={filter.month || ""}
+          onChange={(e) => onChange({ type: "month", month: e.target.value })}
+          className="border p-1 rounded"
+        />
+      )}
 
-      {/* Custom Date (optional, show only if type === custom) */}
+      {/* Custom Date */}
       {filter.type === "custom" && (
         <>
           <input
             type="date"
             value={filter.startDate || ""}
             onChange={(e) =>
-              onChange({ ...filter, type: "custom", startDate: e.target.value })
+              onChange({ ...filter, startDate: e.target.value })
             }
             className="border p-1 rounded"
           />
@@ -52,7 +58,7 @@ const OverviewFilterComponent = ({ filter, onChange }: Props) => {
             type="date"
             value={filter.endDate || ""}
             onChange={(e) =>
-              onChange({ ...filter, type: "custom", endDate: e.target.value })
+              onChange({ ...filter, endDate: e.target.value })
             }
             className="border p-1 rounded"
           />
