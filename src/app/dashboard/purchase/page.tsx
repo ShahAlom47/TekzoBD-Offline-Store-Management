@@ -9,28 +9,41 @@ import { useState } from "react";
 
 import { Purchase } from "@/Interfaces/purchaseInterface";
 import PurchaseDataTable from "@/Components/Purchase/PurchaseDataTable";
+import PurchaseFilter from "@/Components/Purchase/PurchaseFilter";
 
 const PurchasePage = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const [search, setSearch] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [filters, setFilters] = useState({
+    search: "",
+    month: "",
+  });
 
-  const clearFilters = () => {
-    setSearch("");
-    setStartDate("");
-    setEndDate("");
+const getMonthRange = (month: string) => {
+  if (!month) return { startDate: "", endDate: "" };
+
+  const start = new Date(month + "-01T00:00:00.000Z");
+  const end = new Date(start);
+
+  // next month
+  end.setMonth(end.getMonth() + 1);
+
+  return {
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
   };
+};
+
+  const { startDate, endDate } = getMonthRange(filters.month);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["purchases", page, search, startDate, endDate],
+    queryKey: ["purchases", page, filters.search, filters.month],
     queryFn: async () => {
       const res = await getPurchases({
         currentPage: page,
         limit,
-        searchTrim: search,
+        searchTrim: filters.search,
         startDate,
         endDate,
       });
@@ -47,7 +60,7 @@ const PurchasePage = () => {
   return (
     <div className="p-6 space-y-4">
       
-      {/* 🔹 Header */}
+      {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Purchase History</h2>
         <Link
@@ -58,39 +71,10 @@ const PurchasePage = () => {
         </Link>
       </div>
 
-      {/* 🔹 Filters */}
-      <div className="bg-white p-4 rounded-xl shadow flex flex-wrap gap-3">
-        <input
-          type="text"
-          placeholder="Search..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border p-2 rounded-lg"
-        />
+      {/* Filters */}
+      <PurchaseFilter onChange={setFilters} />
 
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="border p-2 rounded-lg"
-        />
-
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          className="border p-2 rounded-lg"
-        />
-
-        <button
-          onClick={clearFilters}
-          className="bg-gray-500 text-white px-3 rounded-lg"
-        >
-          Clear
-        </button>
-      </div>
-
-      {/* 🔹 Table */}
+      {/* Table */}
       <div className="bg-white rounded-xl shadow overflow-hidden">
         <PurchaseDataTable purchases={purchaseData} />
 
