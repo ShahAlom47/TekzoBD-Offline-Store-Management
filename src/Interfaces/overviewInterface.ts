@@ -1,3 +1,4 @@
+import { PaymentMethod } from "./paymentInterface";
 
 
 
@@ -7,6 +8,7 @@ export interface Overview {
     totalPurchase: number;
     totalExpense: number;
     totalSales: number;
+    totalPayment: number; // 💰 added
     profit: number;
   };
 
@@ -14,6 +16,7 @@ export interface Overview {
     purchase: number;
     expense: number;
     sales: number;
+    payment: number; // 💰 added
     profit: number;
   };
 
@@ -21,24 +24,28 @@ export interface Overview {
     totalPurchases: number;
     totalExpenses: number;
     totalSales: number;
+    totalPayments: number; // 💰 added
   };
 
   today: {
     purchase: number;
     expense: number;
     sales: number;
+    payment: number; // 💰 added
   };
 
   thisWeek: {
     purchase: number;
     expense: number;
     sales: number;
+    payment: number; // 💰 added
   };
 
   thisMonth: {
     purchase: number;
     expense: number;
     sales: number;
+    payment: number; // 💰 added
   };
 
   stock: {
@@ -52,12 +59,13 @@ export interface Overview {
   insights?: {
     topSellingProduct?: string;
     topExpenseCategory?: string;
+    topPaymentMethod?: PaymentMethod; // optional insight
   };
 }
 
 
 
-type FilterType = "today" | "week" | "month" | "custom" | "all";
+export type FilterType = "today" | "week" | "month" | "custom" | "all";
 
 export interface OverviewFilter {
   type: FilterType;

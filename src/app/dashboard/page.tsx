@@ -1,18 +1,40 @@
-"use client"
-import { useCategories } from '@/hook/useCategory';
+"use client";
+
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import Loading from "@/app/loading";
+import { getOverview } from "@/lib/allApiRequest/overviewRequest/overviewRequest";
+import {  Overview, OverviewFilter } from "@/Interfaces/overviewInterface";
+import OverviewFilterComponent from "@/Components/Overview/OverviewFilter";
+
+const OverviewPage = () => {
+  const [filter, setFilter] = useState<OverviewFilter>({ type: "today" });
 
 
-const DashHome = () => {
-  const { categories, isLoading, isError } = useCategories();
+   const { data, isLoading } = useQuery({
+     queryKey: ["overview", filter],
+      queryFn: async () => {
+     const response = await getOverview({ filter });
+     return response;
+      },
+      placeholderData: (prev) => prev, // keep old data while fetching new
+    });
+const overviewData = data?.data as Overview;
 
-  console.log(categories, isLoading, isError);
+  if (isLoading) return <Loading />;
+console.log(overviewData)
   return (
-    <div>
+    <div className="p-6 space-y-4">
+      <h2 className="text-xl font-semibold">Overview Dashboard</h2>
 
-      Overview
-      
+      {/* 🔹 Filter */}
+      <OverviewFilterComponent filter={filter} onChange={setFilter} />
+
+      <div className="bg-gray-50 p-4 rounded">
+        <p>Check console for overview data output after filter change.</p>
+      </div>
     </div>
   );
 };
 
-export default DashHome
+export default OverviewPage;
