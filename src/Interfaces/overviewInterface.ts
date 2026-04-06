@@ -1,14 +1,18 @@
-import { PaymentMethod } from "./paymentInterface";
-
-
+import { PaymentMethod } from "@/Interfaces/paymentInterface";
 
 
 export interface Overview {
   overall: {
     totalPurchase: number;
     totalExpense: number;
+
     totalSales: number;
-    totalPayment: number; // 💰 added
+    totalPayment: number;
+
+    totalCost: number;   // ✅ add
+    totalDue: number;    // ✅ add
+    netBalance: number;  // ✅ add
+
     profit: number;
   };
 
@@ -16,7 +20,11 @@ export interface Overview {
     purchase: number;
     expense: number;
     sales: number;
-    payment: number; // 💰 added
+    payment: number;
+
+    cost: number;   // ✅ add
+    due: number;    // ✅ add
+
     profit: number;
   };
 
@@ -24,28 +32,34 @@ export interface Overview {
     totalPurchases: number;
     totalExpenses: number;
     totalSales: number;
-    totalPayments: number; // 💰 added
+    totalPayments: number;
   };
 
   today: {
     purchase: number;
     expense: number;
     sales: number;
-    payment: number; // 💰 added
+    payment: number;
+
+    due: number; // ✅ add
   };
 
   thisWeek: {
     purchase: number;
     expense: number;
     sales: number;
-    payment: number; // 💰 added
+    payment: number;
+
+    due: number; // ✅ add
   };
 
   thisMonth: {
     purchase: number;
     expense: number;
     sales: number;
-    payment: number; // 💰 added
+    payment: number;
+
+    due: number; // ✅ add
   };
 
   stock: {
@@ -59,17 +73,6 @@ export interface Overview {
   insights?: {
     topSellingProduct?: string;
     topExpenseCategory?: string;
-    topPaymentMethod?: PaymentMethod; // optional insight
+    topPaymentMethod?: PaymentMethod;
   };
 }
-
-
-
-export type FilterType = "today" | "week" | "month" | "custom" | "all";
-
-export interface OverviewFilter {
-  type: FilterType;
-  month?: string; // "2026-04"
-  startDate?: string;
-  endDate?: string;
-}    

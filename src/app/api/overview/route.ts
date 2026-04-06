@@ -31,14 +31,19 @@ export async function GET(req: NextRequest) {
     // ------------------------
     // 1️⃣ Collections
     // ------------------------
-    const [purchaseCollection, saleCollection, expenseCollection, productCollection, paymentCollection] =
-      await Promise.all([
-        getPurchaseCollection(),
-        getSalesCollection(),
-        getExpensesCollection(),
-        getProductCollection(),
-        getPaymentsCollection(),
-      ]);
+    const [
+      purchaseCollection,
+      saleCollection,
+      expenseCollection,
+      productCollection,
+      paymentCollection,
+    ] = await Promise.all([
+      getPurchaseCollection(),
+      getSalesCollection(),
+      getExpensesCollection(),
+      getProductCollection(),
+      getPaymentsCollection(),
+    ]);
 
     // ------------------------
     // 2️⃣ Aggregations
@@ -46,100 +51,209 @@ export async function GET(req: NextRequest) {
 
     // Purchases
     const purchaseFilter = buildDateFilter("date", dateRange);
-    const totalPurchaseResult = await purchaseCollection.aggregate([
-      { $match: purchaseFilter },
-      { $group: { _id: null, totalAmount: { $sum: "$grandTotal" } } },
-    ]).toArray();
+    const totalPurchaseResult = await purchaseCollection
+      .aggregate([
+        { $match: purchaseFilter },
+        { $group: { _id: null, totalAmount: { $sum: "$grandTotal" } } },
+      ])
+      .toArray();
     const totalPurchase = totalPurchaseResult[0]?.totalAmount || 0;
-    const totalPurchasesCount = await purchaseCollection.countDocuments(purchaseFilter);
+    const totalPurchasesCount =
+      await purchaseCollection.countDocuments(purchaseFilter);
 
     // Expenses
     const expenseFilter = buildDateFilter("expenseDate", dateRange);
-    const totalExpenseResult = await expenseCollection.aggregate([
-      { $match: expenseFilter },
-      { $group: { _id: null, totalAmount: { $sum: "$amount" } } },
-    ]).toArray();
+    const totalExpenseResult = await expenseCollection
+      .aggregate([
+        { $match: expenseFilter },
+        { $group: { _id: null, totalAmount: { $sum: "$amount" } } },
+      ])
+      .toArray();
     const totalExpense = totalExpenseResult[0]?.totalAmount || 0;
-    const totalExpensesCount = await expenseCollection.countDocuments(expenseFilter);
+    const totalExpensesCount =
+      await expenseCollection.countDocuments(expenseFilter);
 
     // Sales
     const saleFilter = buildDateFilter("createdAt", dateRange);
-    const totalSalesResult = await saleCollection.aggregate([
-      { $match: saleFilter },
-      { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
-    ]).toArray();
+    const totalSalesResult = await saleCollection
+      .aggregate([
+        { $match: saleFilter },
+        { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
+      ])
+      .toArray();
     const totalSales = totalSalesResult[0]?.totalAmount || 0;
-    const totalSalesCount = await saleCollection.countDocuments(saleFilter);
+    const totalSalesCount =
+      await saleCollection.countDocuments(saleFilter);
 
     // Payments
     const paymentFilter = buildDateFilter("paymentDate", dateRange);
-    const totalPaymentResult = await paymentCollection.aggregate([
-      { $match: paymentFilter },
-      { $group: { _id: null, totalAmount: { $sum: "$amount" } } },
-    ]).toArray();
+    const totalPaymentResult = await paymentCollection
+      .aggregate([
+        { $match: paymentFilter },
+        { $group: { _id: null, totalAmount: { $sum: "$amount" } } },
+      ])
+      .toArray();
     const totalPayment = totalPaymentResult[0]?.totalAmount || 0;
+    const totalPaymentsCount =
+      await paymentCollection.countDocuments(paymentFilter);
 
     // ------------------------
-    // 3️⃣ Stock Info
+    // 3️⃣ Financial Calculations 🔥
+    // ------------------------
+
+    const totalCost = totalPurchase + totalExpense; // 💸
+    const profit = totalSales - totalCost;          // 🟢
+    const totalDue = totalSales - totalPayment;     // 🔴
+    const netBalance = totalPayment - totalCost;    // 🏦
+
+    // ------------------------
+    // 4️⃣ Stock Info
     // ------------------------
     const products = await productCollection.find().toArray();
     const totalProducts = products.length;
-    const inStock = products.filter(p => p.currentStock > 0).length;
-    const outOfStock = products.filter(p => p.currentStock === 0).length;
-    const lowStock = products.filter(p => p.currentStock > 0 && p.currentStock < 5).length;
-    const totalStockValue = products.reduce((acc, p) => acc + p.currentStock * p.costPrice, 0);
+    const inStock = products.filter((p) => p.currentStock > 0).length;
+    const outOfStock = products.filter((p) => p.currentStock === 0).length;
+    const lowStock = products.filter(
+      (p) => p.currentStock > 0 && p.currentStock < 5
+    ).length;
+    const totalStockValue = products.reduce(
+      (acc, p) => acc + p.currentStock * p.costPrice,
+      0
+    );
 
     // ------------------------
-    // 4️⃣ Insights
+    // 5️⃣ Insights
     // ------------------------
 
-    // Top selling product
-    const topProductResult = await saleCollection.aggregate([
-      { $unwind: "$products" },
-      { $group: { _id: "$products.productId", totalQty: { $sum: "$products.quantity" } } },
-      { $sort: { totalQty: -1 } },
-      { $limit: 1 },
-    ]).toArray();
+    const topProductResult = await saleCollection
+      .aggregate([
+        { $unwind: "$products" },
+        {
+          $group: {
+            _id: "$products.productId",
+            totalQty: { $sum: "$products.quantity" },
+          },
+        },
+        { $sort: { totalQty: -1 } },
+        { $limit: 1 },
+      ])
+      .toArray();
+
     const topSellingProduct = topProductResult[0]?._id || null;
 
-    // Top expense category
-    const topExpenseCategoryResult = await expenseCollection.aggregate([
-      { $group: { _id: "$category", totalAmount: { $sum: "$amount" } } },
-      { $sort: { totalAmount: -1 } },
-      { $limit: 1 },
-    ]).toArray();
+    const topExpenseCategoryResult = await expenseCollection
+      .aggregate([
+        {
+          $group: {
+            _id: "$category",
+            totalAmount: { $sum: "$amount" },
+          },
+        },
+        { $sort: { totalAmount: -1 } },
+        { $limit: 1 },
+      ])
+      .toArray();
+
     const topExpenseCategory = topExpenseCategoryResult[0]?._id || null;
 
-    // Top payment method
-    const topPaymentMethodResult = await paymentCollection.aggregate([
-      { $match: paymentFilter },
-      { $group: { _id: "$method", totalAmount: { $sum: "$amount" } } },
-      { $sort: { totalAmount: -1 } },
-      { $limit: 1 },
-    ]).toArray();
-    const topPaymentMethod: PaymentMethod | undefined = topPaymentMethodResult[0]?._id || undefined;
+    const topPaymentMethodResult = await paymentCollection
+      .aggregate([
+        { $match: paymentFilter },
+        {
+          $group: {
+            _id: "$method",
+            totalAmount: { $sum: "$amount" },
+          },
+        },
+        { $sort: { totalAmount: -1 } },
+        { $limit: 1 },
+      ])
+      .toArray();
+
+    const topPaymentMethod: PaymentMethod | undefined =
+      topPaymentMethodResult[0]?._id || undefined;
 
     // ------------------------
-    // 5️⃣ Build Overview
+    // 6️⃣ Final Overview
     // ------------------------
-    const profit = totalSales - totalPurchase - totalExpense;
 
     const overview: Overview = {
-      overall: { totalPurchase, totalExpense, totalSales, totalPayment, profit },
-      filtered: { purchase: totalPurchase, expense: totalExpense, sales: totalSales, payment: totalPayment, profit },
-      counts: { totalPurchases: totalPurchasesCount, totalExpenses: totalExpensesCount, totalSales: totalSalesCount, totalPayments: totalPayment },
-      today: { purchase: totalPurchase, expense: totalExpense, sales: totalSales, payment: totalPayment },
-      thisWeek: { purchase: totalPurchase, expense: totalExpense, sales: totalSales, payment: totalPayment },
-      thisMonth: { purchase: totalPurchase, expense: totalExpense, sales: totalSales, payment: totalPayment },
-      stock: { totalProducts, inStock, outOfStock, lowStock, totalStockValue },
-      insights: { topSellingProduct, topExpenseCategory, topPaymentMethod },
+      overall: {
+        totalPurchase,
+        totalExpense,
+        totalSales,
+        totalPayment,
+        totalCost,
+        totalDue,
+        netBalance,
+        profit,
+      },
+
+      filtered: {
+        purchase: totalPurchase,
+        expense: totalExpense,
+        sales: totalSales,
+        payment: totalPayment,
+        cost: totalCost,
+        due: totalDue,
+        profit,
+      },
+
+      counts: {
+        totalPurchases: totalPurchasesCount,
+        totalExpenses: totalExpensesCount,
+        totalSales: totalSalesCount,
+        totalPayments: totalPaymentsCount,
+      },
+
+      today: {
+        purchase: totalPurchase,
+        expense: totalExpense,
+        sales: totalSales,
+        payment: totalPayment,
+        due: totalDue,
+      },
+
+      thisWeek: {
+        purchase: totalPurchase,
+        expense: totalExpense,
+        sales: totalSales,
+        payment: totalPayment,
+        due: totalDue,
+      },
+
+      thisMonth: {
+        purchase: totalPurchase,
+        expense: totalExpense,
+        sales: totalSales,
+        payment: totalPayment,
+        due: totalDue,
+      },
+
+      stock: {
+        totalProducts,
+        inStock,
+        outOfStock,
+        lowStock,
+        totalStockValue,
+      },
+
+      insights: {
+        topSellingProduct,
+        topExpenseCategory,
+        topPaymentMethod,
+      },
     };
 
     return NextResponse.json({ success: true, data: overview });
   } catch (error: any) {
     console.error("GET /api/overview error:", error);
     return NextResponse.json(
-      { success: false, message: "Failed to fetch overview", error: error.message || String(error) },
+      {
+        success: false,
+        message: "Failed to fetch overview",
+        error: error.message || String(error),
+      },
       { status: 500 }
     );
   }
