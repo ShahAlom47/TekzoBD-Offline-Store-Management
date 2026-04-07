@@ -1,5 +1,7 @@
 "use client";
 
+import { FilterType, OverviewFilter } from "@/Interfaces/overviewInterface";
+
 
 
 interface Props {
