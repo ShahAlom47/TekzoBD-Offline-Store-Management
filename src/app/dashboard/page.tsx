@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "@/app/loading";
 import { getOverview } from "@/lib/allApiRequest/overviewRequest/overviewRequest";

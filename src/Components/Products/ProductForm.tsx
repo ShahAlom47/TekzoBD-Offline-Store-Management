@@ -6,6 +6,7 @@ import { Product, ProductFormData } from "@/Interfaces/productInterface";
 import { useCategories } from "@/hook/useCategory";
 import Input from "../CommonComponents/Input";
 import Select from "../CommonComponents/Select";
+import SlugInput from "../CommonComponents/SlugInput";
 
 interface ProductFormProps {
   product?: Product;
@@ -19,51 +20,29 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<ProductFormData>({
-    defaultValues: product
-      ? {
-          name: product.name,
-          slug: product.slug,
-          productCode: product.productCode,
-          brand: product.brand,
-          categoryId: product.categoryId,
-          costPrice: product.costPrice,
-          sellingPrice: product.sellingPrice,
-          currentStock: product.currentStock,
-          unit: product.unit,
-          supplierId: product.supplierId,
-          status: product.status,
-        }
-      : {
-          name: "",
-          slug: "",
-          productCode: "",
-          brand: "",
-          categoryId: "",
-          costPrice: 0,
-          sellingPrice: 0,
-          currentStock: 0,
-          unit: "PCS",
-          supplierId: "",
-          status: "ACTIVE",
-        },
+    defaultValues: {
+      name: "",
+      slug: "",
+      productCode: "",
+      brand: "",
+      categoryId: "",
+      costPrice: 0,
+      sellingPrice: 0,
+      currentStock: 0,
+      unit: "PCS",
+      supplierId: "",
+      status: "ACTIVE",
+    },
   });
 
+  // ✅ Edit mode data set
   useEffect(() => {
     if (product) {
-      reset({
-        name: product.name,
-        slug: product.slug,
-        productCode: product.productCode,
-        brand: product.brand,
-        categoryId: product.categoryId,
-        costPrice: product.costPrice,
-        sellingPrice: product.sellingPrice,
-        unit: product.unit,
-        supplierId: product.supplierId,
-        status: product.status,
-      });
+      reset(product);
     }
   }, [product, reset]);
 
@@ -93,6 +72,7 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
       className="bg-white p-6 rounded-2xl shadow-md space-y-6"
     >
       <div className="grid md:grid-cols-2 gap-4">
+        
         <Input
           label="Product Name *"
           required
@@ -100,10 +80,14 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
           error={errors.name?.message}
         />
 
-        <Input
+        {/* ✅ SlugInput (auto generate) */}
+        <SlugInput
           label="Slug *"
-          required
-          {...register("slug", { required: "Slug required" })}
+          nameField="name"
+          slugField="slug"
+          register={register}
+          watch={watch}
+          setValue={setValue}
           error={errors.slug?.message}
         />
 
@@ -134,13 +118,11 @@ export default function ProductForm({ product, onSubmit }: ProductFormProps) {
         />
 
         <Input
-          label="current Stock *"
+          label="Current Stock *"
           type="number"
           required
           {...register("currentStock", { required: true, min: 0 })}
         />
-
-       
 
         <Select
           label="Unit *"

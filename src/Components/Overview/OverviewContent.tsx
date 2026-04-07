@@ -36,6 +36,20 @@ const OverviewContent: React.FC<Props> = ({ data }) => {
       icon: <DollarSign className="w-6 h-6" />,
       color: "bg-green-50 text-green-700",
     },
+    
+    {
+      title: "Payment",
+      value: overall?.totalPayment,
+      icon: <Wallet className="w-6 h-6" />,
+      color: "bg-purple-50 text-purple-700",
+    },
+    
+    {
+      title: "Due",
+      value: overall?.totalDue,
+      icon: <AlertCircle className="w-6 h-6" />,
+      color: "bg-red-50 text-red-700",
+    },
     {
       title: "Purchase",
       value: overall?.totalPurchase,
@@ -43,14 +57,8 @@ const OverviewContent: React.FC<Props> = ({ data }) => {
       color: "bg-indigo-50 text-indigo-700",
     },
     {
-      title: "Payment",
-      value: overall?.totalPayment,
-      icon: <Wallet className="w-6 h-6" />,
-      color: "bg-purple-50 text-purple-700",
-    },
-    {
-      title: "Due",
-      value: overall?.totalDue,
+      title: "Expenses",
+      value: overall?.totalExpense,
       icon: <AlertCircle className="w-6 h-6" />,
       color: "bg-red-50 text-red-700",
     },
