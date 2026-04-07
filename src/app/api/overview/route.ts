@@ -28,6 +28,8 @@ export async function GET(req: NextRequest) {
     const endDate = url.searchParams.get("endDate") || undefined;
     const dateRange: DateRange = { startDate, endDate };
 
+    console.log(startDate,endDate,'start date end date ')
+
     // ------------------------
     // 1️⃣ Collections
     // ------------------------

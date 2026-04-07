@@ -2,8 +2,6 @@
 
 import { FilterType, OverviewFilter } from "@/Interfaces/overviewInterface";
 
-
-
 interface Props {
   filter: OverviewFilter;
   onChange: (filter: OverviewFilter) => void;
@@ -35,17 +33,7 @@ const OverviewFilterComponent = ({ filter, onChange }: Props) => {
         </button>
       ))}
 
-      {/* Month Picker */}
-      {filter.type === "month" && (
-        <input
-          type="month"
-          value={filter.month || ""}
-          onChange={(e) => onChange({ type: "month", month: e.target.value })}
-          className="border p-1 rounded"
-        />
-      )}
-
-      {/* Custom Date */}
+      {/* Custom Date Picker */}
       {filter.type === "custom" && (
         <>
           <input
