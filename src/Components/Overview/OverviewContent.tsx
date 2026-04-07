@@ -17,72 +17,85 @@ interface Props {
 }
 
 const OverviewContent: React.FC<Props> = ({ data }) => {
-  if (!data)
-    return <p className="text-center text-gray-500 mt-4">No data available</p>;
+  if (!data) {
+    return (
+      <p className="text-center text-gray-500 mt-4">No data available</p>
+    );
+  }
 
   const { overall, counts, stock, insights } = data;
 
-  // 🔥 MAIN FINANCIAL CARDS
+  // ✅ Safe number formatter (fix crash issue)
+  const format = (num: number | undefined) =>
+    (num || 0).toLocaleString();
+
   const summaryCards = [
     {
       title: "Sales",
-      value: overall.totalSales,
+      value: overall?.totalSales,
       icon: <DollarSign className="w-6 h-6" />,
       color: "bg-green-50 text-green-700",
     },
     {
+      title: "Purchase",
+      value: overall?.totalPurchase,
+      icon: <ShoppingCart className="w-6 h-6" />,
+      color: "bg-indigo-50 text-indigo-700",
+    },
+    {
       title: "Payment",
-      value: overall.totalPayment,
+      value: overall?.totalPayment,
       icon: <Wallet className="w-6 h-6" />,
       color: "bg-purple-50 text-purple-700",
     },
     {
       title: "Due",
-      value: overall.totalDue,
+      value: overall?.totalDue,
       icon: <AlertCircle className="w-6 h-6" />,
       color: "bg-red-50 text-red-700",
     },
     {
       title: "Cost",
-      value: overall.totalCost,
+      value: overall?.totalCost,
       icon: <CreditCard className="w-6 h-6" />,
       color: "bg-orange-50 text-orange-700",
     },
     {
       title: "Profit",
-      value: overall.profit,
+      value: overall?.profit,
       icon: <TrendingUp className="w-6 h-6" />,
       color: "bg-yellow-50 text-yellow-700",
     },
     {
       title: "Balance",
-      value: overall.netBalance,
+      value: overall?.netBalance,
       icon: <Wallet className="w-6 h-6" />,
-      color: "bg-blue-50 text-blue-700",
+      color:
+        (overall?.netBalance || 0) >= 0
+          ? "bg-blue-50 text-blue-700"
+          : "bg-red-50 text-red-700",
     },
   ];
 
-  // 🔹 Stock Cards
   const stockCards = [
-    { title: "Total Products", value: stock.totalProducts },
-    { title: "In Stock", value: stock.inStock },
-    { title: "Out of Stock", value: stock.outOfStock },
-    { title: "Low Stock", value: stock.lowStock },
-    { title: "Stock Value", value: stock.totalStockValue },
+    { title: "Total Products", value: stock?.totalProducts },
+    { title: "In Stock", value: stock?.inStock },
+    { title: "Out of Stock", value: stock?.outOfStock },
+    { title: "Low Stock", value: stock?.lowStock },
+    { title: "Stock Value", value: stock?.totalStockValue },
   ];
 
   return (
     <div className="space-y-8">
-
-      {/* 🔥 FINANCIAL OVERVIEW */}
+      {/* FINANCIAL */}
       <div>
         <h2 className="text-xl font-semibold mb-4">Financial Overview</h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7 gap-6">
           {summaryCards.map((card) => (
             <div
               key={card.title}
-              className={`p-5 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 flex items-center gap-4 ${card.color}`}
+              className={`p-5 rounded-2xl shadow-sm hover:shadow-xl transition flex items-center gap-4 ${card.color}`}
             >
               <div className="p-3 bg-white rounded-full shadow">
                 {card.icon}
@@ -91,7 +104,7 @@ const OverviewContent: React.FC<Props> = ({ data }) => {
               <div>
                 <p className="text-sm font-medium">{card.title}</p>
                 <p className="text-2xl font-bold mt-1">
-                  {card.value.toLocaleString()}
+                  ৳ {format(card.value)}
                 </p>
               </div>
             </div>
@@ -99,34 +112,42 @@ const OverviewContent: React.FC<Props> = ({ data }) => {
         </div>
       </div>
 
-      {/* 🔹 COUNTS */}
+      {/* COUNTS */}
       <div className="bg-white rounded-2xl shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Transaction Counts</h3>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-4 bg-gray-50 rounded-xl text-center">
             <p className="text-sm">Purchases</p>
-            <p className="text-xl font-bold">{counts.totalPurchases}</p>
+            <p className="text-xl font-bold">
+              {format(counts?.totalPurchases)}
+            </p>
           </div>
 
           <div className="p-4 bg-gray-50 rounded-xl text-center">
             <p className="text-sm">Sales</p>
-            <p className="text-xl font-bold">{counts.totalSales}</p>
+            <p className="text-xl font-bold">
+              {format(counts?.totalSales)}
+            </p>
           </div>
 
           <div className="p-4 bg-gray-50 rounded-xl text-center">
             <p className="text-sm">Expenses</p>
-            <p className="text-xl font-bold">{counts.totalExpenses}</p>
+            <p className="text-xl font-bold">
+              {format(counts?.totalExpenses)}
+            </p>
           </div>
 
           <div className="p-4 bg-gray-50 rounded-xl text-center">
             <p className="text-sm">Payments</p>
-            <p className="text-xl font-bold">{counts.totalPayments}</p>
+            <p className="text-xl font-bold">
+              {format(counts?.totalPayments)}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* 🔹 STOCK */}
+      {/* STOCK */}
       <div className="bg-white rounded-2xl shadow p-6">
         <h3 className="text-lg font-semibold mb-4">Stock Overview</h3>
 
@@ -138,15 +159,13 @@ const OverviewContent: React.FC<Props> = ({ data }) => {
             >
               <Box className="w-6 h-6 mx-auto mb-2 text-gray-500" />
               <p className="text-sm">{s.title}</p>
-              <p className="text-xl font-bold">
-                {s.value.toLocaleString()}
-              </p>
+              <p className="text-xl font-bold">{format(s.value)}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* 🔹 INSIGHTS */}
+      {/* INSIGHTS */}
       {insights && (
         <div className="bg-white rounded-2xl shadow p-6">
           <h3 className="text-lg font-semibold mb-4">Business Insights</h3>

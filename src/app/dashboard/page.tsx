@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "@/app/loading";
 import { getOverview } from "@/lib/allApiRequest/overviewRequest/overviewRequest";
-import {  Overview, OverviewFilter } from "@/Interfaces/overviewInterface";
+import {  Overview } from "@/Interfaces/overviewInterface";
 import OverviewFilterComponent from "@/Components/Overview/OverviewFilter";
 import OverviewContent from "@/Components/Overview/OverviewContent";
 
