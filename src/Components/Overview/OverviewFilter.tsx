@@ -1,6 +1,6 @@
 "use client";
 
-import { FilterType, OverviewFilter } from "@/Interfaces/overviewInterface";
+import { OverviewFilter } from "@/Interfaces/overviewInterface";
 
 interface Props {
   filter: OverviewFilter;
@@ -8,51 +8,46 @@ interface Props {
 }
 
 const OverviewFilterComponent = ({ filter, onChange }: Props) => {
-  const quickTypes: FilterType[] = ["today", "week", "month", "all", "custom"];
-
   return (
-    <div className="flex gap-2 flex-wrap mb-4">
-      {/* Quick Buttons */}
-      {quickTypes.map((type) => (
-        <button
-          key={type}
-          onClick={() => onChange({ type })}
-          className={`px-3 py-1 rounded ${
-            filter.type === type ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
-        >
-          {type === "today"
-            ? "Today"
-            : type === "week"
-            ? "This Week"
-            : type === "month"
-            ? "This Month"
-            : type === "all"
-            ? "All"
-            : "Custom"}
-        </button>
-      ))}
+    <div className="flex gap-2 flex-wrap mb-4 items-center">
 
-      {/* Custom Date Picker */}
+      {/* Today Button */}
+      <button
+        onClick={() => onChange({ type: "today" })}
+        className={`px-3 py-1 rounded transition ${
+          filter.type === "today"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 hover:bg-gray-300"
+        }`}
+      >
+        Today
+      </button>
+
+      {/* Custom Month */}
+      <button
+        onClick={() =>
+          onChange({
+            type: "custom",
+            month: filter.type === "custom" ? filter.month : "",
+          })
+        }
+        className={`px-3 py-1 rounded transition ${
+          filter.type === "custom"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 hover:bg-gray-300"
+        }`}
+      >
+        Custom
+      </button>
+
+      {/* Month Picker */}
       {filter.type === "custom" && (
-        <>
-          <input
-            type="date"
-            value={filter.startDate || ""}
-            onChange={(e) =>
-              onChange({ ...filter, startDate: e.target.value })
-            }
-            className="border p-1 rounded"
-          />
-          <input
-            type="date"
-            value={filter.endDate || ""}
-            onChange={(e) =>
-              onChange({ ...filter, endDate: e.target.value })
-            }
-            className="border p-1 rounded"
-          />
-        </>
+        <input
+          type="month"
+          value={filter.month}
+          onChange={(e) => onChange({ ...filter, month: e.target.value })}
+          className="border px-2 py-1 rounded"
+        />
       )}
     </div>
   );

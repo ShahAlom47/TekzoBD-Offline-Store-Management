@@ -2,6 +2,7 @@
 "use client";
 import { useUser } from "@/context/AuthContext";
 import { redirect } from "next/navigation";
+import Loading from "./loading";
 
 export default function Home() {
   // const cookieStore = await cookies();
@@ -11,7 +12,7 @@ export default function Home() {
  
 
   if(loading){  
-    return <div>Loading...</div>  
+    return <div><Loading></Loading></div>  
 
   }
 

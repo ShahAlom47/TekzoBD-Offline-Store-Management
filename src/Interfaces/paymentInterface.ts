@@ -17,7 +17,7 @@ export interface Payment {
   amount: number;
   method: PaymentMethod;
   type: PaymentType;
-paymentDate:string;
+  paymentDate: string;
   note?: string;
   transactionId?: string;
 
@@ -27,11 +27,11 @@ paymentDate:string;
   updatedAt?: string;
 }
 
-export interface AddPaymentFormType{
-  customerId:string;
-  amount:number;
-  method:"CASH"|"BKASH"|"BANK"|"CARD";
-  note?:string;
-  transactionId:string;
-  paymentDate:string;
+export interface AddPaymentFormType {
+  customerId: string;
+  amount: number;
+  method: "CASH" | "BKASH" | "BANK" | "CARD";
+  note?: string;
+  transactionId: string;
+  paymentDate: string;
 }

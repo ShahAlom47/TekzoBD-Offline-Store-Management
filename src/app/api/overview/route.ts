@@ -12,26 +12,57 @@ import { PaymentMethod } from "@/Interfaces/paymentInterface";
 
 type DateRange = { startDate?: string; endDate?: string };
 
-// Helper to build date filter for MongoDB
+// 🔥 Build MongoDB date filter
 const buildDateFilter = (field: string, range: DateRange) => {
   if (!range.startDate && !range.endDate) return {};
+
   const filter: any = {};
-  if (range.startDate) filter.$gte = new Date(range.startDate);
-  if (range.endDate) filter.$lte = new Date(range.endDate);
+
+  if (range.startDate) {
+    const start = new Date(range.startDate);
+    // set UTC 00:00:00
+    start.setUTCHours(0, 0, 0, 0);
+    filter.$gte = start;
+  }
+
+  if (range.endDate) {
+    const end = new Date(range.endDate);
+    // set UTC 23:59:59
+    end.setUTCHours(23, 59, 59, 999);
+    filter.$lte = end;
+  }
+
   return { [field]: filter };
+};
+
+// 🔹 Convert filter type to start/end date
+const getDateRangeFromQuery = (type: string, startDate?: string, endDate?: string) => {
+  if (type === "custom" && startDate && endDate) return { startDate, endDate };
+  if (type === "today") {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
+    return { startDate: start.toISOString(), endDate: end.toISOString() };
+  }
+  // all types (week/month) handled by frontend if needed
+  return {};
 };
 
 export async function GET(req: NextRequest) {
   try {
     const url = new URL(req.url);
+    const type = url.searchParams.get("type") || "today";
     const startDate = url.searchParams.get("startDate") || undefined;
     const endDate = url.searchParams.get("endDate") || undefined;
-    const dateRange: DateRange = { startDate, endDate };
 
-    console.log(startDate,endDate,'start date end date ')
+    const dateRange = getDateRangeFromQuery(type, startDate, endDate);
+
+console.log(startDate,endDate,'deko')
+console.log(dateRange,'deko date  range ' )
 
     // ------------------------
-    // 1️⃣ Collections
+    // Collections
     // ------------------------
     const [
       purchaseCollection,
@@ -48,68 +79,88 @@ export async function GET(req: NextRequest) {
     ]);
 
     // ------------------------
-    // 2️⃣ Aggregations
+    // Filters
     // ------------------------
-
-    // Purchases
     const purchaseFilter = buildDateFilter("date", dateRange);
+    const expenseFilter = buildDateFilter("expenseDate", dateRange);
+    const saleFilter = buildDateFilter("createdAt", dateRange);
+    const paymentFilter = buildDateFilter("paymentDate", dateRange);
+
+    // console.log(purchaseFilter)
+
+
+
+    // ------------------------
+    // Purchases
+    // ------------------------
     const totalPurchaseResult = await purchaseCollection
       .aggregate([
         { $match: purchaseFilter },
         { $group: { _id: null, totalAmount: { $sum: "$grandTotal" } } },
       ])
       .toArray();
+
+      
+
     const totalPurchase = totalPurchaseResult[0]?.totalAmount || 0;
     const totalPurchasesCount =
       await purchaseCollection.countDocuments(purchaseFilter);
 
+    // ------------------------
     // Expenses
-    const expenseFilter = buildDateFilter("expenseDate", dateRange);
+    // ------------------------
     const totalExpenseResult = await expenseCollection
       .aggregate([
         { $match: expenseFilter },
         { $group: { _id: null, totalAmount: { $sum: "$amount" } } },
       ])
       .toArray();
+
+ console.log(totalPurchaseResult,totalExpenseResult,totalPurchase,'rtttt')
+
+
     const totalExpense = totalExpenseResult[0]?.totalAmount || 0;
     const totalExpensesCount =
       await expenseCollection.countDocuments(expenseFilter);
 
+    // ------------------------
     // Sales
-    const saleFilter = buildDateFilter("createdAt", dateRange);
+    // ------------------------
     const totalSalesResult = await saleCollection
       .aggregate([
         { $match: saleFilter },
         { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
       ])
       .toArray();
+
     const totalSales = totalSalesResult[0]?.totalAmount || 0;
     const totalSalesCount =
       await saleCollection.countDocuments(saleFilter);
 
+    // ------------------------
     // Payments
-    const paymentFilter = buildDateFilter("paymentDate", dateRange);
+    // ------------------------
     const totalPaymentResult = await paymentCollection
       .aggregate([
         { $match: paymentFilter },
         { $group: { _id: null, totalAmount: { $sum: "$amount" } } },
       ])
       .toArray();
+
     const totalPayment = totalPaymentResult[0]?.totalAmount || 0;
     const totalPaymentsCount =
       await paymentCollection.countDocuments(paymentFilter);
 
     // ------------------------
-    // 3️⃣ Financial Calculations 🔥
+    // Calculations
     // ------------------------
-
-    const totalCost = totalPurchase + totalExpense; // 💸
-    const profit = totalSales - totalCost;          // 🟢
-    const totalDue = totalSales - totalPayment;     // 🔴
-    const netBalance = totalPayment - totalCost;    // 🏦
+    const totalCost = totalPurchase + totalExpense;
+    const profit = totalSales - totalCost;
+    const totalDue = totalSales - totalPayment;
+    const netBalance = totalPayment - totalCost;
 
     // ------------------------
-    // 4️⃣ Stock Info
+    // Stock
     // ------------------------
     const products = await productCollection.find().toArray();
     const totalProducts = products.length;
@@ -124,11 +175,11 @@ export async function GET(req: NextRequest) {
     );
 
     // ------------------------
-    // 5️⃣ Insights
+    // Insights
     // ------------------------
-
     const topProductResult = await saleCollection
       .aggregate([
+        { $match: saleFilter },
         { $unwind: "$products" },
         {
           $group: {
@@ -145,6 +196,7 @@ export async function GET(req: NextRequest) {
 
     const topExpenseCategoryResult = await expenseCollection
       .aggregate([
+        { $match: expenseFilter },
         {
           $group: {
             _id: "$category",
@@ -176,9 +228,8 @@ export async function GET(req: NextRequest) {
       topPaymentMethodResult[0]?._id || undefined;
 
     // ------------------------
-    // 6️⃣ Final Overview
+    // Final Response
     // ------------------------
-
     const overview: Overview = {
       overall: {
         totalPurchase,

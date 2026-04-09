@@ -76,12 +76,6 @@ export interface Overview {
     topPaymentMethod?: PaymentMethod;
   };
 }
-
- export type FilterType = "today" | "week" | "month" | "custom" | "all";
-
-export interface OverviewFilter {
-  type: FilterType;
-  month?: string; // "2026-04"
-  startDate?: string;
-  endDate?: string;
-}    
+export type OverviewFilter =
+  | { type: "today" }
+  | { type: "custom"; month: string }; // month in "YYYY-MM" format
