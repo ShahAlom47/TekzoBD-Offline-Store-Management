@@ -1,15 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { FundRecord as FundRecordType } from "@/Interfaces/fundInterface";
+import React, { useState } from "react";
+import { FundRecord } from "@/Interfaces/fundRecordInterface";
 
-interface FundFormProps {
-  initialData?: FundRecordType;           // Edit er jonno
-  onSubmit: (data: FundRecordType) => void;
+
+
+// ✅ FundForm Component
+const FundForm: React.FC<{
+  initialData?: FundRecord;
+  onSubmit: (data: FundRecord) => void;
   onClose: () => void;
-}
-
-const FundForm: React.FC<FundFormProps> = ({ initialData, onSubmit, onClose }) => {
+}> = ({ initialData, onSubmit, onClose }) => {
   const [source, setSource] = useState(initialData?.source || "");
   const [type, setType] = useState<"IN" | "OUT">(initialData?.type || "IN");
   const [amount, setAmount] = useState(initialData?.amount || 0);
@@ -60,7 +61,7 @@ const FundForm: React.FC<FundFormProps> = ({ initialData, onSubmit, onClose }) =
         required
         className="border p-2 rounded"
       />
-      <select value={category} onChange={(e) => setCategory(e.target.value)} className="border p-2 rounded">
+      <select value={category} onChange={(e) => setCategory(e.target.value as "Investment" | "Loan" | "Expense" | "Profit" | "Others")} className="border p-2 rounded">
         <option value="Investment">Investment</option>
         <option value="Loan">Loan</option>
         <option value="Expense">Expense</option>
@@ -85,4 +86,6 @@ const FundForm: React.FC<FundFormProps> = ({ initialData, onSubmit, onClose }) =
   );
 };
 
+
 export default FundForm;
+
