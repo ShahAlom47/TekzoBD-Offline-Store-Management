@@ -40,12 +40,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data,
-      meta: {
-        total,
         currentPage,
-        pageSize,
         totalPages: Math.ceil(total / pageSize),
-      },
+      
     });
   } catch (error) {
     console.error("Get Fund Records Error:", error);

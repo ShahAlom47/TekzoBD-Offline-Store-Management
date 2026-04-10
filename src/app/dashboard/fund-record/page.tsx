@@ -6,12 +6,18 @@ import { FundRecord } from "@/Interfaces/fundRecordInterface";
 import FundForm from "@/Components/FundRecordComponet/FundForm";
 import { addFundRecord, getAllFundRecords } from "@/lib/allApiRequest/fundRecordRequest/fundRecordRequest";
 import toast from "react-hot-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import FundTable from "@/Components/FundRecordComponet/FundTable";
+import { DashPaginationButton } from "@/Components/CommonComponents/DashPaginationButton";
 
 // ✅ Main FundRecord Page
 const FundRecordPage = () => {
   const [openModal, setModal] = useState(false);
   const [editingRecord, setEditingRecord] = useState<FundRecord | null>(null);
+    const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const queryClient = useQueryClient();
 
 const {data}= useQuery({
   queryKey:[],
@@ -21,16 +27,16 @@ const {data}= useQuery({
   }
 })
 const fundRecords = data ?.data as FundRecord[] || [];
+const totalPages = data?.totalPages || 1;
 
+
+console.log(data)
   const handleAdd = () => {
     setEditingRecord(null);
     setModal(true);
   };
 
-  const handleEdit = (record: FundRecord) => {
-    setEditingRecord(record);
-    setModal(true);
-  };
+  
 
   // ✅ FIXED SUBMIT FUNCTION
   const handleSubmit = async (data: FundRecord) => {
@@ -41,7 +47,10 @@ const fundRecords = data ?.data as FundRecord[] || [];
       if (res?.success) {
         toast.success("Fund record saved successfully! 🎉");
              setModal(false);
-      }
+   queryClient.invalidateQueries({
+        queryKey: ["expenses"],
+      });
+            }
       
        
     } catch (error) {
@@ -62,39 +71,8 @@ const fundRecords = data ?.data as FundRecord[] || [];
         </button>
       </div>
 
-      <table className="w-full border rounded overflow-hidden">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="p-2">Source</th>
-            <th className="p-2">Type</th>
-            <th className="p-2">Amount</th>
-            <th className="p-2">Category</th>
-            <th className="p-2">Date</th>
-            <th className="p-2">Note</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {fundRecords.map((record) => (
-            <tr key={record.id?.toString()} className="border-b">
-              <td className="p-2">{record.source}</td>
-              <td className="p-2">{record.type}</td>
-              <td className="p-2">{record.amount} ৳</td>
-              <td className="p-2">{record.category}</td>
-              <td className="p-2">{new Date(record.date).toLocaleDateString()}</td>
-              <td className="p-2">{record.note}</td>
-              <td className="p-2 flex gap-2">
-                <button
-                  onClick={() => handleEdit(record)}
-                  className="bg-yellow-500 px-2 py-1 rounded text-white hover:bg-yellow-600"
-                >
-                  Edit
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+     <FundTable fundRecords={fundRecords}></FundTable>
+     <DashPaginationButton currentPage={page} totalPages={totalPages} onPageChange={setPage}></DashPaginationButton>
 
       <CustomModal open={openModal} onOpenChange={setModal}>
         <FundForm
