@@ -9,6 +9,7 @@ import { CustomerWithOutId } from "@/Interfaces/customerInterface";
 import { Payment } from "@/Interfaces/paymentInterface";
 import { Expense } from "@/Interfaces/expensesInterface";
 import { Purchase } from "@/Interfaces/purchaseInterface";
+import { FundRecord } from "@/Interfaces/fundRecordInterface";
 
 
 // Define the User type (you can extend it as needed)
@@ -54,4 +55,9 @@ export const getPurchaseCollection = async (): Promise<Collection<Purchase>> => 
   const client = await clientPromise;
   const db: Db = client.db("TekzoBD-Offline-Store-DB"); // Replace with your database name
   return db.collection<Purchase>("purchase");
+};
+export const getFundCollection = async (): Promise<Collection<FundRecord>> => {
+  const client = await clientPromise;
+  const db: Db = client.db("TekzoBD-Offline-Store-DB"); // Replace with your database name
+  return db.collection<FundRecord>("fund-record");
 };

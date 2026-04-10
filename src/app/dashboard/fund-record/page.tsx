@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import CustomModal from "@/Components/CommonComponents/CustomModal";
 import { FundRecord } from "@/Interfaces/fundRecordInterface";
 import FundForm from "@/Components/FundRecordComponet/FundForm";
+import { addFundRecord } from "@/lib/allApiRequest/fundRecordRequest/fundRecordRequest";
 
 
 
@@ -18,6 +19,8 @@ const FundRecordPage = () => {
   const handleAdd = () => {
     setEditingRecord(null);
     setModal(true);
+
+   
   };
 
   const handleEdit = (record: FundRecord) => {
@@ -25,14 +28,19 @@ const FundRecordPage = () => {
     setModal(true);
   };
 
-  const handleSubmit = (data: FundRecord) => {
+  const handleSubmit = (data: FundRecord) async =>  {
     setFundRecords((prev) => {
       const exists = prev.find((r) => r.id === data.id);
       if (exists) {
         return prev.map((r) => (r.id === data.id ? data : r));
       } else {
         return [...prev, data];
+       
       }
+        const res=await addFundRecord(data) 
+        if(res?.success){
+          
+        }
     });
   };
 
@@ -59,7 +67,7 @@ const FundRecordPage = () => {
         </thead>
         <tbody>
           {fundRecords.map((record) => (
-            <tr key={record.id} className="border-b">
+            <tr key={record.id?.toString()} className="border-b">
               <td className="p-2">{record.source}</td>
               <td className="p-2">{record.type}</td>
               <td className="p-2">{record.amount} ৳</td>
