@@ -6,7 +6,10 @@ import { useState } from "react";
 import CustomModal from "../CommonComponents/CustomModal";
 import FundForm from "./FundForm";
 import { useConfirm } from "@/hook/useConfirm";
-import { deleteFundRecord, updateFundRecord } from "@/lib/allApiRequest/fundRecordRequest/fundRecordRequest";
+import {
+  deleteFundRecord,
+  updateFundRecord,
+} from "@/lib/allApiRequest/fundRecordRequest/fundRecordRequest";
 import toast from "react-hot-toast/headless";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -15,8 +18,10 @@ interface PropsType {
 }
 
 const FundTable = ({ fundRecords }: PropsType) => {
-  const [openModal, setOpenModal] = useState<boolean>(false);
-  const [selectedRecord, setSelectedRecord] = useState<FundRecord | null>(null);
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedRecord, setSelectedRecord] =
+    useState<FundRecord | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const { confirm, ConfirmModal } = useConfirm();
   const queryClient = useQueryClient();
@@ -27,30 +32,46 @@ const FundTable = ({ fundRecords }: PropsType) => {
     setOpenModal(true);
   };
 
-  // ✅ Submit
+  // ✅ Update
   const handleSubmit = async (data: FundRecord) => {
-    const id = selectedRecord?.id;
-    if (!id) {
-      toast.error("ID is missing!");
-      return;
+    try {
+      const id = selectedRecord?.id;
+
+      if (!id) {
+        toast.error("ID is missing!");
+        return;
+      }
+
+      setLoading(true);
+
+      const res = await updateFundRecord(id.toString(), data);
+
+      if (res?.success) {
+        toast.success("Updated successfully 🎉");
+
+        await queryClient.invalidateQueries({
+          queryKey: ["fundRecords"],
+        });
+
+        setOpenModal(false);
+        setSelectedRecord(null);
+      } else {
+        toast.error("Update failed ❌");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong ❌");
+    } finally {
+      setLoading(false);
     }
-    const res= await updateFundRecord(id.toString(),data);
-    if(res.success){
-      toast.success("Record updated!");
-    }
-    queryClient.invalidateQueries({
-      queryKey: ["fundRecords"],
-    });
-    setOpenModal(false);
-    setSelectedRecord(null);
   };
 
   // ✅ Delete
   const handleDelete = async (id: string) => {
     const ok = await confirm({
-      title: "Delete Fund Record",
-      message: "Are you sure you want to delete this record?",
-      confirmText: "Yes, Delete",
+      title: "Delete",
+      message: "Are you sure?",
+      confirmText: "Yes",
       cancelText: "Cancel",
     });
 
@@ -58,12 +79,12 @@ const FundTable = ({ fundRecords }: PropsType) => {
       const res = await deleteFundRecord(id);
 
       if (res.success) {
-        toast.success("Record deleted!");
+        toast.success("Deleted ✅");
         queryClient.invalidateQueries({
           queryKey: ["fundRecords"],
         });
       } else {
-        toast.error("Failed to delete.");
+        toast.error("Delete failed ❌");
       }
     }
   };
@@ -72,71 +93,60 @@ const FundTable = ({ fundRecords }: PropsType) => {
   const columns = [
     { header: "Source", accessor: "source" },
     { header: "Type", accessor: "type" },
-    { header: "Amount (৳)", accessor: "amount" },
+    { header: "Amount", accessor: "amount" },
     { header: "Category", accessor: "category" },
     { header: "Date", accessor: "date" },
     { header: "Note", accessor: "note" },
     { header: "Action", accessor: "action" },
   ];
 
-  // ✅ Format Data
-  const data = fundRecords.map((item: FundRecord) => {
-    return {
-      source: item.source || "-",
-      type: (
-        <span
-          className={`px-2 py-1 rounded text-white ${
-            item.type === "IN" ? "bg-green-500" : "bg-red-500"
-          }`}
+  // ✅ Data
+  const data = fundRecords.map((item) => ({
+    source: item.source,
+    type: (
+      <span
+        className={`px-2 py-1 text-white rounded ${
+          item.type === "IN" ? "bg-green-500" : "bg-red-500"
+        }`}
+      >
+        {item.type}
+      </span>
+    ),
+    amount: `৳ ${item.amount}`,
+    category: item.category,
+    date: new Date(item.date).toLocaleDateString(),
+    note: item.note || "-",
+    action: (
+      <div className="flex gap-2 justify-center">
+        <button
+          onClick={() => handleEdit(item)}
+          className="bg-yellow-400 px-2 py-1 text-white rounded"
         >
-          {item.type}
-        </span>
-      ),
-      amount: item.amount?.toLocaleString() || "0",
-      category: item.category || "-",
-      date: item.date
-        ? new Date(item.date).toLocaleDateString()
-        : "-",
-      note: item.note || "-",
-      action: (
-        <div className="flex gap-2 justify-center">
-          <button
-            className="bg-yellow-400 text-white px-2 py-1 rounded"
-            onClick={() => handleEdit(item)}
-          >
-            Edit
-          </button>
-          <button
-            className="bg-red-500 text-white px-2 py-1 rounded"
-            onClick={() =>
-              item.id && handleDelete(item.id.toString())
-            }
-          >
-            Delete
-          </button>
-        </div>
-      ),
-    };
-  });
+          Edit
+        </button>
+        <button
+          onClick={() => item.id && handleDelete(item.id.toString())}
+          className="bg-red-500 px-2 py-1 text-white rounded"
+        >
+          Delete
+        </button>
+      </div>
+    ),
+  }));
 
   return (
-    <div className="p-4 bg-white rounded-2xl shadow overflow-x-auto">
-      <h2 className="text-xl font-semibold mb-4 text-gray-700">
-        💰 Fund Records
-      </h2>
+    <div className="p-4 bg-white rounded-xl shadow">
+      <h2 className="text-xl font-semibold mb-4">💰 Fund Records</h2>
 
       <CustomTable columns={columns} data={data} />
 
-      {/* ✅ Modal */}
-      <CustomModal
-        title="Edit Fund"
-        open={openModal}
-        onOpenChange={setOpenModal}
-      >
+      {/* Modal */}
+      <CustomModal open={openModal} onOpenChange={setOpenModal}>
         <FundForm
           initialData={selectedRecord || undefined}
           onSubmit={handleSubmit}
           onClose={() => setOpenModal(false)}
+          loading={loading}
         />
       </CustomModal>
 

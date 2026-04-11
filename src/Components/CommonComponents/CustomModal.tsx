@@ -1,5 +1,6 @@
 "use client";
 import { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 
 interface CustomModalProps {
   open: boolean;
@@ -75,6 +76,7 @@ const CustomModal = ({
           ✕
         </button>
       </div>
+        <Toaster position="top-right" />
     </div>
   );
 };

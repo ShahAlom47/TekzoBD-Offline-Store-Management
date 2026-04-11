@@ -29,7 +29,7 @@ const FundForm: React.FC<{
       category,
       note,
     });
-    onClose();
+    // onClose();
   };
 
   return (
