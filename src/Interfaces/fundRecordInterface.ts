@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 // ✅ FundRecord Interface
 export interface FundRecord {
-  id?: string|ObjectId; // Unique ID
+  _id?: string|ObjectId; // Unique ID
   source: string; // “Personal”, “Loan from Bank”, “Investor A”, “Shop Revenue”, ইত্যাদি
   type: "IN" | "OUT"; // টাকা এসেছে কিনা বা গেছে
   amount: number; // Amount in ৳

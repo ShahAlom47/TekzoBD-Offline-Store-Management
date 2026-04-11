@@ -32,7 +32,7 @@ const FundForm: React.FC<Props> = ({
     e.preventDefault();
 
     onSubmit({
-      id: initialData?.id,
+    
       source,
       type,
       amount,
@@ -82,6 +82,9 @@ const FundForm: React.FC<Props> = ({
         required
         className="border p-2 rounded"
       />
+      <p className="text-sm text-gray-500">
+        {initialData?.date && `Current: ${new Date(initialData.date).toLocaleDateString()}`}
+      </p>
 
       {/* Category */}
       <select

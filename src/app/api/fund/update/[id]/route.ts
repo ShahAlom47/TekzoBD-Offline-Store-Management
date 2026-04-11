@@ -2,12 +2,31 @@ import { getFundCollection } from "@/lib/database/db_collections";
 import { NextRequest, NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 
-export async function PATCH(req: NextRequest) {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
+    const { id } = await params;
+
+    // ✅ ObjectId validation
+    if (!ObjectId.isValid(id)) {
+      return NextResponse.json(
+        { success: false, message: "Invalid Fund ID" },
+        { status: 400 }
+      );
+    }
+
     const body = await req.json();
 
+    if (!body || typeof body !== "object") {
+      return NextResponse.json(
+        { success: false, message: "Invalid request body" },
+        { status: 400 }
+      );
+    }
+
     const {
-      id,
       source,
       type,
       amount,
@@ -19,40 +38,52 @@ export async function PATCH(req: NextRequest) {
       tags,
     } = body;
 
-    // ✅ validation
-    if (!id) {
+    // ✅ validation (minimum required)
+    if (!source || !type || !amount || !date || !category) {
       return NextResponse.json(
-        { success: false, message: "ID is required" },
+        { success: false, message: "Required fields missing" },
+        { status: 400 }
+      );
+    }
+
+    if (!["IN", "OUT"].includes(type)) {
+      return NextResponse.json(
+        { success: false, message: "Invalid type" },
+        { status: 400 }
+      );
+    }
+
+    if (Number(amount) <= 0) {
+      return NextResponse.json(
+        { success: false, message: "Amount must be greater than 0" },
         { status: 400 }
       );
     }
 
     const fundCollection = await getFundCollection();
 
-    // ✅ ISO safe update object
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updatedData: Record<string, any> = {
+    // ✅ update object (ISO format)
+    const updatedFund = {
+      source,
+      type,
+      amount: Number(amount),
+      date: new Date(date).toISOString(),
+      category,
+      note: note || "",
+      paymentMethod: paymentMethod || null,
+      relatedParty: relatedParty || null,
+      tags: tags || [],
       updatedAt: new Date().toISOString(),
     };
 
-    if (source !== undefined) updatedData.source = source;
-    if (type !== undefined) updatedData.type = type;
-    if (amount !== undefined) updatedData.amount = Number(amount);
-    if (date !== undefined) updatedData.date = new Date(date).toISOString();
-    if (category !== undefined) updatedData.category = category;
-    if (note !== undefined) updatedData.note = note;
-    if (paymentMethod !== undefined) updatedData.paymentMethod = paymentMethod;
-    if (relatedParty !== undefined) updatedData.relatedParty = relatedParty;
-    if (tags !== undefined) updatedData.tags = tags;
-
     const result = await fundCollection.updateOne(
       { _id: new ObjectId(id) },
-      { $set: updatedData }
+      { $set: updatedFund }
     );
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
-        { success: false, message: "Record not found" },
+        { success: false, message: "Fund record not found" },
         { status: 404 }
       );
     }
@@ -60,7 +91,6 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Fund record updated successfully",
-      data: result,
     });
   } catch (error) {
     console.error("Update Fund Error:", error);

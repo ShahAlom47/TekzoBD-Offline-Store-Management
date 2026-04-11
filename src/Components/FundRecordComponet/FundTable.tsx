@@ -28,23 +28,25 @@ const FundTable = ({ fundRecords }: PropsType) => {
 
   // ✅ Edit
   const handleEdit = (record: FundRecord) => {
+    console.log(record)
     setSelectedRecord(record);
     setOpenModal(true);
   };
 
   // ✅ Update
   const handleSubmit = async (data: FundRecord) => {
-    try {
-      const id = selectedRecord?.id;
-
-      if (!id) {
+   
+      const id = selectedRecord?._id;
+ console.log(id,selectedRecord)
+      if (!selectedRecord?._id) {
         toast.error("ID is missing!");
         return;
       }
 
       setLoading(true);
 
-      const res = await updateFundRecord(id.toString(), data);
+      const res = await updateFundRecord(selectedRecord?._id.toString(), data);
+      console.log(res)
 
       if (res?.success) {
         toast.success("Updated successfully 🎉");
@@ -55,15 +57,11 @@ const FundTable = ({ fundRecords }: PropsType) => {
 
         setOpenModal(false);
         setSelectedRecord(null);
+        return;
       } else {
         toast.error("Update failed ❌");
       }
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong ❌");
-    } finally {
-      setLoading(false);
-    }
+ 
   };
 
   // ✅ Delete
@@ -80,11 +78,13 @@ const FundTable = ({ fundRecords }: PropsType) => {
 
       if (res.success) {
         toast.success("Deleted ✅");
+        setLoading(false)
         queryClient.invalidateQueries({
           queryKey: ["fundRecords"],
         });
       } else {
         toast.error("Delete failed ❌");
+        setLoading(false)
       }
     }
   };
@@ -125,7 +125,7 @@ const FundTable = ({ fundRecords }: PropsType) => {
           Edit
         </button>
         <button
-          onClick={() => item.id && handleDelete(item.id.toString())}
+          onClick={() => item._id && handleDelete(item._id.toString())}
           className="bg-red-500 px-2 py-1 text-white rounded"
         >
           Delete
