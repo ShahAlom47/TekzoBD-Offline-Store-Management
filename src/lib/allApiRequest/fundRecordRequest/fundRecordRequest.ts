@@ -22,7 +22,7 @@ export const getAllFundRecords = async ({ currentPage, limit, searchTrim }: GetA
 
 
 
-export const updateFundRecord = async (id:string|ObjectId,data:Category)=>{
+export const updateFundRecord = async (id:string|ObjectId,data:FundRecord)=>{
   return request("PATCH",`/fund/update/${id}`,{...data})
 }
 

@@ -77,7 +77,7 @@ const FundRecordPage = () => {
         </button>
       </div>
 
-      <FundTable fundRecords={fundRecords} />
+      <FundTable fundRecords={fundRecords || []} />
 
       <DashPaginationButton
         currentPage={page}

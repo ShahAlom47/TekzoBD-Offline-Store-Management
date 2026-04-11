@@ -6,7 +6,7 @@ import { useState } from "react";
 import CustomModal from "../CommonComponents/CustomModal";
 import FundForm from "./FundForm";
 import { useConfirm } from "@/hook/useConfirm";
-import { deleteFundRecord } from "@/lib/allApiRequest/fundRecordRequest/fundRecordRequest";
+import { deleteFundRecord, updateFundRecord } from "@/lib/allApiRequest/fundRecordRequest/fundRecordRequest";
 import toast from "react-hot-toast/headless";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -28,7 +28,16 @@ const FundTable = ({ fundRecords }: PropsType) => {
   };
 
   // ✅ Submit
-  const handleSubmit = (data: FundRecord) => {
+  const handleSubmit = async (data: FundRecord) => {
+    const id = selectedRecord?.id;
+    if (!id) {
+      toast.error("ID is missing!");
+      return;
+    }
+    const res= await updateFundRecord(id.toString(),data);
+    if(res.success){
+      toast.success("Record updated!");
+    }
     queryClient.invalidateQueries({
       queryKey: ["fundRecords"],
     });

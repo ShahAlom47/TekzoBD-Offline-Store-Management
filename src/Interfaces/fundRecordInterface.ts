@@ -12,4 +12,6 @@ export interface FundRecord {
   paymentMethod?: "Cash" | "Bank Transfer" | "Mobile Payment" | "Other"; // Optional
   relatedParty?: string; // Optional, Investor name, Supplier, Customer etc.
   tags?: string[]; // Optional, for filtering or grouping
+  createAt?: string; // ISO date string
+  updateAt?: string; // ISO date string
 }
