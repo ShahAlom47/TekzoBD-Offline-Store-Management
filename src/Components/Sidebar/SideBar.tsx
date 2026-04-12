@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Logo from "./Logo";
 import Logout from "../CommonComponents/Logout";
 import StoreNavbar from "../CommonComponents/Navbar";
+import { Menu } from "lucide-react";
 // import { Menu, X } from "lucide-react";
 
 const SideBar = () => {
@@ -15,7 +16,7 @@ const SideBar = () => {
       <div className="md:hidden flex items-center justify-between p-4 bg-white border-b shadow-sm">
         <button onClick={() => setOpen(true)}>
           {/* <Menu size={24} /> */}
-          =
+          <Menu size={22} />
         
         </button>
         <Logo />
