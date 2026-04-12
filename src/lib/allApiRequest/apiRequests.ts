@@ -11,9 +11,10 @@ export interface IApiResponse<T = unknown> {
   currentPage?: number;
   totalPages?: number;
 }
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ;
 
 const api = axios.create({
-  baseURL: `http://localhost:3000/api`,
+  baseURL: `${API_BASE_URL}/api`,
   // baseURL: `https://tekzobd.vercel.app/api`,
   // baseURL: `https://www.tekzobd.com/api`,
   withCredentials: true,

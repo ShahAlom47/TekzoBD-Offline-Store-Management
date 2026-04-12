@@ -3,39 +3,48 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useUser } from "@/context/AuthContext";
 import { getUserInfo } from "@/lib/allApiRequest/userRequest/userRequest";
+import { User } from "@/Interfaces/userInterfaces";
 
-
+interface SettingDataType {
+    success: boolean;
+    message: string;
+data: {
+    currentUser: User;
+    users: User[];  
+}
+}
 
 export default function Settings() {
   const { user } = useUser();
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ name: "", password: "" });
+  const [form, setForm] = useState({ fullName: "", password: "" });
 
   const { data, isLoading } = useQuery({
     queryKey: ["users", user?.phone || ""],
     queryFn:async () =>{
         const res = await  getUserInfo(user?.phone || "")
-        console.log(res)
-        return res;
+      
+        return res?.data as SettingDataType; ;
     },
   });
-console.log(data)
+
   if (isLoading) return <div className="p-6">Loading...</div>;
 
-  const currentUser = data?.data;
+  const currentUser = data?.data?.currentUser;
   const users = data?.data?.users || [];
+  console.log(data,currentUser,users);
 
   const handleEdit = () => {
     setEditing(true);
-    setForm({ name: currentUser.name, password: "" });
+    setForm({ fullName: currentUser?.fullName || "", password: "" });
   };
 
   const handleSave = async () => {
-    await fetch(`/api/users/${currentUser._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    // await fetch(`/api/users/${currentUser._id}`, {
+    //   method: "PUT",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(form),
+    // });
     setEditing(false);
   };
 
@@ -59,15 +68,15 @@ console.log(data)
 
         {!editing ? (
           <div className="space-y-2">
-            <p><strong>Name:</strong> {currentUser?.name}</p>
+            <p><strong>Name:</strong> {currentUser?.fullName}</p>
             <p><strong>Role:</strong> {currentUser?.role}</p>
           </div>
         ) : (
           <div className="space-y-3">
             <input
               type="text"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              value={form?.fullName}
+              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
               className="border p-2 rounded w-full"
               placeholder="Name"
             />
@@ -99,7 +108,7 @@ console.log(data)
       </div>
 
       {/* Admin Only User List */}
-      {currentUser?.role === "admin" && (
+      {currentUser?.role === "OWNER" && (
         <div className="bg-white shadow rounded-2xl p-6">
           <h2 className="text-lg font-semibold mb-4">All Users</h2>
 
