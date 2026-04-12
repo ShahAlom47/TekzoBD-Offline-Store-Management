@@ -6,10 +6,10 @@ import { UserRole } from "@/Interfaces/userInterfaces";
 
 export async function POST(req: NextRequest) {
   try {
-    const { fullName, phone, email, password } = await req.json();
+    const { fullName, phone, password } = await req.json();
 
     // 🔥 validation
-    if (!fullName || !phone || !email || !password) {
+    if (!fullName || !phone || !password) {
       return NextResponse.json(
         { success: false, message: "All fields are required" },
         { status: 400 }
@@ -41,10 +41,10 @@ export async function POST(req: NextRequest) {
       fullName,
       phone: cleanPhone,
       passwordHash: hashedPassword, // ✅ IMPORTANT (login same field)
-      role: "SALESMAN" as UserRole,
+      role: "USER" as UserRole,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      isActive: true,
+      isActive: false,
     };
 
     const result = await userCollection.insertOne(newUser);

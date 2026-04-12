@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginUser } from "@/lib/allApiRequest/userRequest/userRequest";
 import { useUser } from "@/context/AuthContext";
+import Link from "next/link";
 
 type LoginFormInputs = {
   phone: string;
@@ -116,7 +117,11 @@ try {
             Login
           </PrimaryButton>
         </form>
-
+<div className="flex justify-center">
+  <Link className="text-sm text-blue-700 hover:text-gray-700 transition cursor-pointer" href="/register">
+    Don`t have an account? Register
+  </Link>
+</div>
         {/* Footer */}
         <div className="text-center text-xs text-gray-400 pt-4 border-t">
           © {new Date().getFullYear()} TekzoBd
