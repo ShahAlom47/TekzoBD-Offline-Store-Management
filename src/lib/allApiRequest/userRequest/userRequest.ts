@@ -10,7 +10,7 @@ export const loginUser = async (phone: string, password: string) => {
   return request("POST", "/user/login", { phone, password });
 }
 export const updateUser = async (userId: string, data: { role?: UserRole, isActive?: boolean }) => {
-  return request("PUT", `/user/update/${userId}`, {...data});
+  return request("PATCH", `/user/updateRoleStatus/${userId}`, {...data});
 }
 
 export const getUserInfo = async (userEmail: string) => {
