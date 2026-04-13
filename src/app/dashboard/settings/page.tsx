@@ -5,6 +5,7 @@ import { useUser } from "@/context/AuthContext";
 import { getUserInfo } from "@/lib/allApiRequest/userRequest/userRequest";
 import { User } from "@/Interfaces/userInterfaces";
 import { ProfileCard } from "@/Components/Settings/UserProfileCard";
+import UserTable from "@/Components/Settings/UserTable";
 
 interface SettingDataType {
 
@@ -41,9 +42,9 @@ export default function Settings() {
 
       {currentUser && <ProfileCard currentUser={currentUser} />}
 
-      {/* {currentUser?.role === "OWNER" && (
-        <UsersTable users={users} />
-      )} */}
+      {currentUser?.role === "OWNER" && (
+        <UserTable users={users} />
+      )}
     </div>
   );
 }
