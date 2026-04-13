@@ -43,7 +43,7 @@ export default function Settings() {
       {currentUser && <ProfileCard currentUser={currentUser} />}
 
       {currentUser?.role === "OWNER" && (
-        <UserTable users={users} />
+        <UserTable users={users} currentUser={currentUser}/>
       )}
     </div>
   );
