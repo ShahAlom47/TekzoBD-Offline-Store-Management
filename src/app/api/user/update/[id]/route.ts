@@ -18,7 +18,7 @@ export async function PATCH(
       isActive?: boolean;
     };
 
-    // ❌ Nothing to update validation
+    // ❌ Nothing to update
     if (!fullName && !role && typeof isActive !== "boolean") {
       return NextResponse.json(
         { success: false, message: "Nothing to update" },
@@ -28,41 +28,85 @@ export async function PATCH(
 
     const userCollection = await getUserCollection();
 
-    const user = await userCollection.findOne({
+    // 🎯 Target user (DB user)
+    const targetUser = await userCollection.findOne({
       _id: new ObjectId(id),
     });
 
-    if (!user) {
+    if (!targetUser) {
       return NextResponse.json(
         { success: false, message: "User not found" },
         { status: 404 }
       );
     }
 
-    // 🔥 SECURITY
-    if (user.role === "OWNER") {
+    // 🎯 Logged-in user (IMPORTANT)
+    // 👉 এখানে তুমি JWT / middleware থেকে user আনবা
+    const currentUserHeader = req.headers.get("user"); // example only
+    const currentUser = currentUserHeader
+      ? JSON.parse(currentUserHeader)
+      : null;
+
+    if (!currentUser) {
       return NextResponse.json(
-        { success: false, message: "Cannot modify OWNER" },
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    // ❗ Normal user শুধু নিজের data update করতে পারবে
+    if (
+      currentUser._id !== id &&
+      !["OWNER", "MANAGER"].includes(currentUser.role)
+    ) {
+      return NextResponse.json(
+        { success: false, message: "You can only update your own profile" },
         { status: 403 }
       );
     }
 
     const updateData: any = {};
 
-    // ✅ Name update
+    // ✅ 1. Name → সবাই change করতে পারবে (OWNER সহ)
     if (fullName) {
       updateData.fullName = fullName;
     }
 
-    // ✅ Role update
+    // ✅ 2. Role update
     if (role) {
+      // ❌ OWNER-এর role change করা যাবে না
+      if (targetUser.role === "OWNER") {
+        return NextResponse.json(
+          { success: false, message: "Cannot change OWNER role" },
+          { status: 403 }
+        );
+      }
+
+      // ❌ শুধু OWNER / MANAGER role change করতে পারবে
+      if (!["OWNER", "MANAGER"].includes(currentUser.role)) {
+        return NextResponse.json(
+          { success: false, message: "Not authorized to change role" },
+          { status: 403 }
+        );
+      }
+
       updateData.role = role;
     }
 
-    // ✅ Active status update
+    // ✅ 3. isActive update
     if (typeof isActive === "boolean") {
+      // ❌ শুধু OWNER / MANAGER change করতে পারবে
+      if (!["OWNER", "MANAGER"].includes(currentUser.role)) {
+        return NextResponse.json(
+          { success: false, message: "Not authorized" },
+          { status: 403 }
+        );
+      }
+
       updateData.isActive = isActive;
     }
+
+    // ❌ যদি শুধু name ছাড়া কিছু না থাকে, তাও ok (name already added)
 
     updateData.updatedAt = new Date().toISOString();
 
@@ -73,7 +117,7 @@ export async function PATCH(
 
     if (result.modifiedCount === 0) {
       return NextResponse.json(
-        { success: false, message: "Update failed" },
+        { success: false, message: "No changes applied" },
         { status: 400 }
       );
     }
