@@ -12,14 +12,14 @@ export async function PATCH(
     const { id } = await params;
     const body = await req.json();
 
-    const {fullName, role, isActive } = body as {
-      fullName:string,
+    const { fullName, role, isActive } = body as {
+      fullName?: string;
       role?: UserRole;
       isActive?: boolean;
     };
 
-    // ❌ Validation
-    if (!role && typeof isActive !== "boolean") {
+    // ❌ Nothing to update validation
+    if (!fullName && !role && typeof isActive !== "boolean") {
       return NextResponse.json(
         { success: false, message: "Nothing to update" },
         { status: 400 }
@@ -39,9 +39,7 @@ export async function PATCH(
       );
     }
 
-    // 🔥 SECURITY (VERY IMPORTANT)
-
-    // ❌ OWNER change block
+    // 🔥 SECURITY
     if (user.role === "OWNER") {
       return NextResponse.json(
         { success: false, message: "Cannot modify OWNER" },
@@ -51,10 +49,17 @@ export async function PATCH(
 
     const updateData: any = {};
 
+    // ✅ Name update
+    if (fullName) {
+      updateData.fullName = fullName;
+    }
+
+    // ✅ Role update
     if (role) {
       updateData.role = role;
     }
 
+    // ✅ Active status update
     if (typeof isActive === "boolean") {
       updateData.isActive = isActive;
     }

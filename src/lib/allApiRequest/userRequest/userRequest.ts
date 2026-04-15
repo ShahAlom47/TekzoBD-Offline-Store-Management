@@ -19,6 +19,17 @@ export const updateUserInfo = async (
 ) => {
   return request("PATCH", `/user/update/${userId}`, { ...data });
 };
+export const updateUserPassword = async (
+  userId: string,
+  data: {
+    oldPassword?: string;
+    newPassword?: string; 
+    role?: string;
+    isActive?: boolean;
+  }
+) => {
+  return request("PATCH", `/user/update/${userId}`, { ...data });
+};
 
 
 export const getUserInfo = async (userEmail: string) => {
