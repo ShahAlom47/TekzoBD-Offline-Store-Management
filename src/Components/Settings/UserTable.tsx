@@ -3,9 +3,9 @@
 import { CustomTable } from "../CommonComponents/CustomTable";
 import { User, UserRole } from "@/Interfaces/userInterfaces";
 import { useConfirm } from "@/hook/useConfirm";
+import { updateUserInfo } from "@/lib/allApiRequest/userRequest/userRequest";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast/headless";
-import { updateUser } from "@/lib/allApiRequest/userRequest/userRequest";
 
 interface Props {
   users: User[];
@@ -20,7 +20,7 @@ const UserTable = ({ users, currentUser }: Props) => {
     userId: string,
     payload: { role?: UserRole; isActive?: boolean }
   ) => {
-    const res = await updateUser(userId, payload);
+    const res = await updateUserInfo(userId, payload);
 
     if (res?.success) {
       toast.success("Updated ✅");

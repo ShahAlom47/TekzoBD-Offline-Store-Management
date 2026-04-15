@@ -1,5 +1,7 @@
 import { User } from "@/Interfaces/userInterfaces";
+import { updateUserInfo } from "@/lib/allApiRequest/userRequest/userRequest";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export function ProfileCard({ currentUser }: { currentUser: User }) {
   const [editing, setEditing] = useState<"none" | "name" | "password">("none");
@@ -12,8 +14,12 @@ export function ProfileCard({ currentUser }: { currentUser: User }) {
 
   // 👉 Name Save
   const handleNameSave = async () => {
-    // TODO: API call
-    // await updateName({ userId: currentUser._id, fullName: name });
+
+const id = currentUser?._id?.toString()||''
+if(!id){
+  toast?.success("Id Requerd")
+}
+    const res = await updateUserInfo(id,{fullName:name})
 
     setEditing("none");
   };
