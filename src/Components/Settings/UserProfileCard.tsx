@@ -3,6 +3,7 @@ import {
   updateUserInfo,
   updateUserPassword,
 } from "@/lib/allApiRequest/userRequest/userRequest";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -11,6 +12,7 @@ export function ProfileCard({ currentUser }: { currentUser: User }) {
 
   const [name, setName] = useState(currentUser?.fullName || "");
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const [passwordForm, setPasswordForm] = useState({
     oldPassword: "",
@@ -39,6 +41,7 @@ export function ProfileCard({ currentUser }: { currentUser: User }) {
       if (res?.success) {
         toast.success("Name updated successfully");
         setEditing("none");
+        queryClient.invalidateQueries({ queryKey: ["users"] });
       } else {
         toast.error(res?.message || "Update failed");
       }

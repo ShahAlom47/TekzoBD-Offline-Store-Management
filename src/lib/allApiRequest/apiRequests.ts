@@ -1,32 +1,33 @@
 import axios from "axios";
 import type { AxiosError } from "axios";
 
-export interface IApiResponse<T = unknown> {
+// ✅ দুইটা generic: T = data, S = summary
+export interface IApiResponse<T = unknown, S = unknown> {
   success: boolean;
   message: string;
-  insId?:string;
-  unreadCount?:number;
+  insId?: string;
+  unreadCount?: number;
   data?: T;
+  summary?: S;
   totalData?: number;
   currentPage?: number;
   totalPages?: number;
 }
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ;
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const api = axios.create({
   baseURL: `${API_BASE_URL}/api`,
-  // baseURL: `https://tekzobd.vercel.app/api`,
-  // baseURL: `https://www.tekzobd.com/api`,
   withCredentials: true,
 });
 
-export const request = async <T>(
+export const request = async <T = unknown, S = unknown>(
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
   url: string,
   data?: Record<string, unknown> | FormData,
   isForm?: "formData",
   customHeaders?: Record<string, string>
-): Promise<IApiResponse<T>> => {
+): Promise<IApiResponse<T, S>> => {
   try {
     const headers = {
       "Content-Type":
@@ -34,7 +35,7 @@ export const request = async <T>(
       ...customHeaders,
     };
 
-    // Auto add timestamps
+    // ✅ Auto timestamps
     if (data && !(data instanceof FormData)) {
       const now = new Date().toISOString();
       if (method === "POST") {
@@ -50,13 +51,15 @@ export const request = async <T>(
       data,
       headers,
     });
-    return response.data as IApiResponse<T>;
-  
+
+    return response.data as IApiResponse<T, S>;
   } catch (error: unknown) {
     let message = "Unknown error occurred";
+
     if (axios.isAxiosError(error)) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const axiosError = error as AxiosError<any>;
+
       if (axiosError.response?.data?.message) {
         message = axiosError.response.data.message;
       } else if (axiosError.message) {
@@ -65,7 +68,6 @@ export const request = async <T>(
     } else if (error instanceof Error) {
       message = error.message;
     }
-   
 
     return {
       success: false,

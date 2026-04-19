@@ -28,7 +28,7 @@ export const updateUserPassword = async (
     isActive?: boolean;
   }
 ) => {
-  return request("PATCH", `/user/update/${userId}`, { ...data });
+  return request("PATCH", `/user/changePass/${userId}`, { ...data });
 };
 
 

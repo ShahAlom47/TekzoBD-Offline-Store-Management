@@ -1,5 +1,4 @@
 "use client";
-import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useUser } from "@/context/AuthContext";
 import { getUserInfo } from "@/lib/allApiRequest/userRequest/userRequest";
@@ -16,8 +15,6 @@ interface SettingDataType {
 
 export default function Settings() {
   const { user } = useUser();
-  const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ fullName: "", password: "" });
 
   const { data, isLoading } = useQuery({
     queryKey: ["users", user?.phone || ""],
