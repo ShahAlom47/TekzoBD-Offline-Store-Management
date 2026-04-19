@@ -94,3 +94,11 @@ export interface CustomerSaleHistory{
 
 
 }
+
+export interface SalesSummary {
+  totalSales: number;
+  totalRevenue: number;
+  totalPaid: number;
+  totalDue: number;
+  totalProfit: number;
+}

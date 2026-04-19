@@ -3,7 +3,8 @@ import Loading from "@/app/loading";
 import { DashPaginationButton } from "@/Components/CommonComponents/DashPaginationButton";
 import SaleFilter from "@/Components/Sales/SaleFilter";
 import SalesDataTable, { SaleWithPayment } from "@/Components/Sales/SalesDataTable";
-import { Sale } from "@/Interfaces/saleInterfaces";
+import SaleSummary from "@/Components/Sales/SaleSummary";
+import { SalesSummary } from "@/Interfaces/saleInterfaces";
 import { getAllSales } from "@/lib/allApiRequest/salesRequest/salesRequest";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -38,6 +39,8 @@ const Sales = () => {
     placeholderData: (prev) => prev, // keep old data while fetching new
   });
 
+  console.log(data)
+
   if (isLoading) return <Loading></Loading>;
   const totalPages = data?.totalPages || 0;
   const salesData = (data?.data as SaleWithPayment[]) || [];
@@ -58,6 +61,7 @@ const Sales = () => {
         setStatus={setStatus}
         clearFilters={clearFilters}
       />
+      <SaleSummary summary={data?.summary as SalesSummary | undefined} />
       <SalesDataTable sales={salesData}></SalesDataTable>
       <DashPaginationButton
         totalPages={totalPages}
