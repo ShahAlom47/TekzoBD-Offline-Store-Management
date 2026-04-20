@@ -25,13 +25,12 @@ export async function GET(req: NextRequest) {
     const searchTrim = url.searchParams.get("searchTrim")?.trim() || "";
     const startDate = url.searchParams.get("startDate");
     const endDate = url.searchParams.get("endDate");
+    const month = url.searchParams.get("month"); // 🔥 NEW
 
-    // 🔹 Build filter
+    // 🔹 Filter
     const filter: any = {};
 
-    // =========================
-    // 🔍 SEARCH (FIXED)
-    // =========================
+    // 🔍 SEARCH
     if (searchTrim) {
       const regex = { $regex: searchTrim, $options: "i" };
 
@@ -40,7 +39,6 @@ export async function GET(req: NextRequest) {
         { "memos.memoNumber": regex },
       ];
 
-      // ObjectId search (safe way)
       if (ObjectId.isValid(searchTrim)) {
         orConditions.push({ _id: new ObjectId(searchTrim) });
       }
@@ -48,29 +46,36 @@ export async function GET(req: NextRequest) {
       filter.$or = orConditions;
     }
 
-    // =========================
-    // 📅 DATE FILTER (IMPORTANT FIX)
-    // =========================
-    if (startDate || endDate) {
+    // 📅 MONTH FILTER (priority)
+    if (month) {
+      const start = `${month}-01T00:00:00.000Z`;
+
+      const [year, m] = month.split("-").map(Number);
+      const nextMonth = new Date(year, m, 1);
+      const end = nextMonth.toISOString();
+
+      filter.date = {
+        $gte: start,
+        $lt: end,
+      };
+    }
+    // 📅 DATE FILTER (fallback)
+    else if (startDate || endDate) {
       filter.date = {};
 
       if (startDate) {
-        filter.date.$gte = startDate; // ISO string compare
+        filter.date.$gte = startDate;
       }
 
       if (endDate) {
-        filter.date.$lt = endDate; // ⚠️ use $lt (NOT $lte)
+        filter.date.$lt = endDate;
       }
     }
 
-    // =========================
     // 🔽 SORT
-    // =========================
     const sortQuery: any = { date: -1 };
 
-    // =========================
-    // 🚀 QUERY EXECUTION
-    // =========================
+    // 🚀 DATA QUERY
     const [purchases, total] = await Promise.all([
       purchaseCollection
         .find(filter)
@@ -82,6 +87,29 @@ export async function GET(req: NextRequest) {
       purchaseCollection.countDocuments(filter),
     ]);
 
+    // 🔥 🔥 SUMMARY (IMPORTANT)
+    const summaryAgg = await purchaseCollection
+      .aggregate([
+        { $match: filter },
+        {
+          $group: {
+            _id: null,
+            totalProduct: { $sum: "$productTotal" },
+            totalTransport: { $sum: "$transportCost" },
+            totalOther: { $sum: "$otherCost" },
+            grandTotal: { $sum: "$grandTotal" },
+          },
+        },
+      ])
+      .toArray();
+
+    const summary = summaryAgg[0] || {
+      totalProduct: 0,
+      totalTransport: 0,
+      totalOther: 0,
+      grandTotal: 0,
+    };
+
     return NextResponse.json({
       success: true,
       message: "Purchases retrieved successfully",
@@ -90,6 +118,8 @@ export async function GET(req: NextRequest) {
       pageSize,
       totalData: total,
       totalPages: Math.ceil(total / pageSize),
+
+      summary, // 🔥🔥 THIS IS YOUR TARGET
     });
 
   } catch (error: any) {

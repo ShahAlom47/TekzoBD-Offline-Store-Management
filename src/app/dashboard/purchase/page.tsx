@@ -7,9 +7,10 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
 
-import { Purchase } from "@/Interfaces/purchaseInterface";
+import { Purchase, PurchaseSummaryType } from "@/Interfaces/purchaseInterface";
 import PurchaseDataTable from "@/Components/Purchase/PurchaseDataTable";
 import PurchaseFilter from "@/Components/Purchase/PurchaseFilter";
+import PurchaseSummary from "@/Components/Purchase/PurchaseSummary";
 
 const PurchasePage = () => {
   const [page, setPage] = useState(1);
@@ -56,6 +57,13 @@ const getMonthRange = (month: string) => {
 
   const totalPages = data?.totalPages || 0;
   const purchaseData = (data?.data as Purchase[]) || [];
+const summary = data?.summary as PurchaseSummaryType || {
+  totalProduct: 0,
+  totalTransport: 0,
+  totalOther: 0,
+  grandTotal: 0,
+};
+  console.log(data)
 
   return (
     <div className="p-6 space-y-4">
@@ -65,7 +73,7 @@ const getMonthRange = (month: string) => {
         <h2 className="text-xl font-semibold">Purchase History</h2>
         <Link
           href="/dashboard/purchase/add"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+          className="bg-blue-600 text-white px-4 py-2  rounded-lg"
         >
           + Add Purchase
         </Link>
@@ -73,6 +81,7 @@ const getMonthRange = (month: string) => {
 
       {/* Filters */}
       <PurchaseFilter onChange={setFilters} />
+      <PurchaseSummary summary={summary} />
 
       {/* Table */}
       <div className="bg-white rounded-xl shadow overflow-hidden">

@@ -24,4 +24,12 @@ export interface Purchase {
   note?: string;
 
   createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface PurchaseSummaryType {
+  totalProduct: number;
+  totalTransport: number;
+  totalOther: number;
+  grandTotal: number;
 }
