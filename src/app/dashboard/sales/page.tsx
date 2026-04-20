@@ -50,6 +50,7 @@ const Sales = () => {
 
   return (
     <div>
+      <h1 className="text-2xl font-bold mb-5">Sales</h1>
       <SaleFilter
         search={search}
         setSearch={setSearch}

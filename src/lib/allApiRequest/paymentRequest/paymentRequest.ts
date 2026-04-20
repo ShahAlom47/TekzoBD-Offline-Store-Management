@@ -8,6 +8,7 @@ interface ParamsType {
   startDate?: string;
   endDate?: string;
   status?: string;
+  month?: string; // 🔥 important
 }
 
 export const getPayments = async (params: ParamsType) => {
@@ -18,6 +19,7 @@ export const getPayments = async (params: ParamsType) => {
     startDate,
     endDate,
     status,
+    month,
   } = params;
 
   const queryParams = new URLSearchParams();
