@@ -15,9 +15,6 @@ export const getPayments = async (params: ParamsType) => {
   const {
     currentPage,
     limit,
-    searchTrim,
-    startDate,
-    endDate,
     status,
     month,
   } = params;
@@ -26,11 +23,8 @@ export const getPayments = async (params: ParamsType) => {
 
   queryParams.set("currentPage", String(currentPage));
   queryParams.set("pageSize", String(limit));
-
-  if (searchTrim) queryParams.set("searchTrim", searchTrim);
-  if (startDate) queryParams.set("startDate", startDate);
-  if (endDate) queryParams.set("endDate", endDate);
   if (status) queryParams.set("status", status);
+  if (month) queryParams.set("month", month);
 
   const url = `/payment/allPayment?${queryParams.toString()}`;
 

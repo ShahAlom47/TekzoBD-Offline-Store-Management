@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { getPaymentsCollection } from "@/lib/database/db_collections";
-import { ObjectId } from "mongodb";
-import { summary } from "framer-motion/client";
 
 export async function GET(req: NextRequest) {
   try {
@@ -15,28 +13,14 @@ export async function GET(req: NextRequest) {
     const skip = (currentPage - 1) * pageSize;
 
     // 🔹 Params
-    const searchTrim = url.searchParams.get("searchTrim")?.trim() || "";
-    const startDate = url.searchParams.get("startDate");
-    const endDate = url.searchParams.get("endDate");
-    const method = url.searchParams.get("method");
+ 
     const month = url.searchParams.get("month"); // 🔥 NEW (YYYY-MM)
+    console.log("Month:", month);
+    // Month: 2026-04
 
     // 🔹 Filter
     const filter: any = {};
-
-    // ✅ Search (customerId / _id / saleId)
-    if (searchTrim) {
-      const orConditions: any[] = [];
-      try {
-        const id = new ObjectId(searchTrim);
-        orConditions.push({ _id: id });
-        orConditions.push({ customerId: id });
-        orConditions.push({ saleId: id });
-      } catch {}
-      if (orConditions.length > 0) {
-        filter.$or = orConditions;
-      }
-    }
+   
 
     // ✅ Month filter (priority)
     if (month) {
@@ -50,21 +34,8 @@ export async function GET(req: NextRequest) {
         $lte: end,
       };
     }
-    // ✅ Date filter (fallback)
-    else if (startDate || endDate) {
-      filter.paymentDate = {};
-      if (startDate) {
-        filter.paymentDate.$gte = new Date(`${startDate}T00:00:00Z`);
-      }
-      if (endDate) {
-        filter.paymentDate.$lte = new Date(`${endDate}T23:59:59Z`);
-      }
-    }
+  
 
-    // ✅ Method filter
-    if (method && method !== "all") {
-      filter.method = method;
-    }
 
     // 🔹 Get paginated data
     const payments = await paymentCollection

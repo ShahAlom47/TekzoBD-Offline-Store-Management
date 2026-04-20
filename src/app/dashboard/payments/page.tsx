@@ -1,4 +1,5 @@
 "use client";
+
 import Loading from "@/app/loading";
 import { DashPaginationButton } from "@/Components/CommonComponents/DashPaginationButton";
 import PaymentDataTable from "@/Components/PaymentComponent/PaymentDataTable";
@@ -11,53 +12,56 @@ import { useState } from "react";
 const Payments = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
+
   const [month, setMonth] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("");
+
   const clearFilters = () => {
-    setStartDate("");
-    setEndDate("");
+    setMonth("");
     setStatus("");
+    setPage(1);
   };
 
+ console.log(month)
   const { data, isLoading } = useQuery({
-    queryKey: ["sales", page, startDate, endDate, month],
+    queryKey: ["payments", page,  month, status],
     queryFn: async () => {
       const res = await getPayments({
         currentPage: page,
         limit,
-        startDate,
-        endDate,
         status,
         month,
       });
       return res;
     },
-    placeholderData: (prev) => prev, // keep old data while fetching new
+    placeholderData: (prev) => prev,
   });
 
-  if (isLoading) return <Loading></Loading>;
+  if (isLoading) return <Loading />;
+
   const totalPages = data?.totalPages || 0;
   const paymentData = (data?.data as Payment[]) || [];
-  const totalPaymentAmount = data?.summary?.totalAmount || 0; // 🔥 important
+  const totalPaymentAmount = (data?.summary as { totalAmount?: number }) || {};
 
-  console.log(paymentData);
   return (
     <div className="p-6">
       <div className="bg-white rounded-xl shadow overflow-hidden">
+        <h1 className="text-lg font-bold">Payments</h1>
+        
         <PaymentHeader
           month={month}
           setMonth={setMonth}
-          totalAmount={totalPaymentAmount}
+          totalAmount={totalPaymentAmount?.totalAmount || 0}
           clearFilters={clearFilters}
         />
-        <PaymentDataTable payments={paymentData}></PaymentDataTable>
+
+        <PaymentDataTable payments={paymentData} />
+
         <DashPaginationButton
           totalPages={totalPages}
           currentPage={page}
           onPageChange={setPage}
-        ></DashPaginationButton>
+        />
       </div>
     </div>
   );
