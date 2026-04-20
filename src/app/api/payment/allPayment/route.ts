@@ -13,34 +13,30 @@ export async function GET(req: NextRequest) {
     const skip = (currentPage - 1) * pageSize;
 
     // 🔹 Params
- 
-    const month = url.searchParams.get("month"); // 🔥 NEW (YYYY-MM)
-    console.log("Month:", month);
-    // Month: 2026-04
+    const month = url.searchParams.get("month"); // format: YYYY-MM
 
     // 🔹 Filter
     const filter: any = {};
-   
 
-    // ✅ Month filter (priority)
+    // ✅ Month filter (ISO string safe)
     if (month) {
-      const [year, monthNum] = month.split("-").map(Number);
+      const start = `${month}-01T00:00:00.000Z`;
 
-      const start = new Date(Date.UTC(year, monthNum - 1, 1, 0, 0, 0));
-      const end = new Date(Date.UTC(year, monthNum, 0, 23, 59, 59));
+      // next month calculate
+      const [year, m] = month.split("-").map(Number);
+      const nextMonth = new Date(year, m, 1);
+      const end = nextMonth.toISOString(); // next month start
 
       filter.paymentDate = {
         $gte: start,
-        $lte: end,
+        $lt: end, // 🔥 important (less than next month)
       };
     }
-  
-
 
     // 🔹 Get paginated data
     const payments = await paymentCollection
       .find(filter)
-      .sort({ paymentDate: -1 })
+      .sort({ paymentDate: -1 }) // string ISO works perfectly
       .skip(skip)
       .limit(pageSize)
       .toArray();
@@ -48,7 +44,7 @@ export async function GET(req: NextRequest) {
     // 🔹 Total documents
     const total = await paymentCollection.countDocuments(filter);
 
-    // 🔹 🔥 Total Amount (Summary)
+    // 🔹 Total Amount (Summary)
     const totalAmountAgg = await paymentCollection
       .aggregate([
         { $match: filter },
@@ -71,7 +67,9 @@ export async function GET(req: NextRequest) {
       pageSize,
       totalData: total,
       totalPages: Math.ceil(total / pageSize),
-      summary:{totalAmount:totalAmount}, // 🔥 important
+      summary: {
+        totalAmount,
+      },
     });
   } catch (error: any) {
     console.error("GET /api/payments error:", error);
