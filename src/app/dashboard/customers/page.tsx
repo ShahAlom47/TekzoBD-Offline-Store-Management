@@ -6,7 +6,6 @@ import CustomModal from "@/Components/CommonComponents/CustomModal";
 import { DashPaginationButton } from "@/Components/CommonComponents/DashPaginationButton";
 import SearchBox from "@/Components/CommonComponents/SearchBox";
 import CustomerTable from "@/Components/CustomerComponet/CustomarTable";
-import { useConfirm } from "@/hook/useConfirm";
 import { Customer } from "@/Interfaces/customerInterface";
 import { getCustomer } from "@/lib/allApiRequest/customerRequest/customerRequest";
 import { useQuery } from "@tanstack/react-query";
@@ -19,12 +18,15 @@ const Customers = () => {
 
   const [page, setPage] = useState(1);
   const limit = 10;
+
+  console.log(search)
   const { data, isLoading,  refetch } = useQuery({
-    queryKey: ["getCustomers", page],
+    queryKey: ["getCustomers", page,search],
     queryFn: async () => {
       const response = await getCustomer({
         currentPage: page,
         limit,
+        searchTrim: search.trim(),
       });
       // if (!response || !response.success) {
       //   throw new Error(response.message || "Failed to fetch category data");
@@ -36,7 +38,7 @@ const Customers = () => {
 
   const customer = (data?.data as Customer[]) || [];
 
-  console.log(customer,isLoading);
+  // console.log(customer,isLoading);
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">

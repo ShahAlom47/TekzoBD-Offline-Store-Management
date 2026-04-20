@@ -32,7 +32,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
 
       <button
         onClick={handleBtn} // 👈 parent set এখানে
-        className="bg-blue-500 text-white px-4 py-2 rounded-lg border border-black"
+        className="bg-blue-500 text-white px-4 py-2 rounded-lg border border-black cursor-pointer"
       >
         <Search className="w-4 h-4" />
       </button>
