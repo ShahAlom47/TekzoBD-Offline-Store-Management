@@ -20,12 +20,14 @@ export async function PATCH(
 
     const body = await req.json();
 
+
     if (!body || typeof body !== "object") {
       return NextResponse.json(
         { message: "Invalid request body", success: false },
         { status: 400 }
       );
     }
+    const { _id, ...updateData } = body;
 
     // 🔁 Numeric field validation (same as add API)
     const numericFields: (keyof ProductFormData)[] = [
@@ -56,7 +58,7 @@ export async function PATCH(
 
     const updateResult = await productCollection.updateOne(
       { _id: new ObjectId(id) },
-      { $set: body }
+      { $set: updateData }
     );
 
     if (updateResult.matchedCount === 0) {

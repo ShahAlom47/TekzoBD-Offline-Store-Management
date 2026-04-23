@@ -6,7 +6,6 @@ import { toast } from "react-hot-toast";
 import { useRouter, useParams } from "next/navigation";
 import {
   useQuery,
-  useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
 
