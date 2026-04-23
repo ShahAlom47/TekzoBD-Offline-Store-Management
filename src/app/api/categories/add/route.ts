@@ -37,8 +37,8 @@ export async function POST(req: NextRequest) {
         ? new ObjectId(parentCategoryId)
         : null,
       status: "active",
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     } as Category;
 
     const result = await collection.insertOne(newCategory);

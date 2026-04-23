@@ -38,7 +38,7 @@ const PurchaseDataTable = ({ purchases, onEdit, onDelete }: PropsType) => {
            queryKey: ["purchases"],
         });
   } else {
-    console.log("User cancelled delete");
+
   }
 };
 

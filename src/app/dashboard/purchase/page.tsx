@@ -63,7 +63,7 @@ const summary = data?.summary as PurchaseSummaryType || {
   totalOther: 0,
   grandTotal: 0,
 };
-  console.log(data)
+
 
   return (
     <div className="p-6 space-y-4">

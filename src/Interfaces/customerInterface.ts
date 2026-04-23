@@ -24,6 +24,7 @@ export interface Customer {
   // Status
   isActive: boolean;
   isDeleted?:boolean;
+  deletedAt?: string | null;
 
   // Metadata
   createdAt: string;

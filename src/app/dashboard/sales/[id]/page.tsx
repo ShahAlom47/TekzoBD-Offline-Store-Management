@@ -44,7 +44,7 @@ const SaleDetails = () => {
 
   const sale = data?.data as SaleDetailsType ;
 
-console.log(sale)
+
 
   const customerId = sale?.customerId || '' ;
 

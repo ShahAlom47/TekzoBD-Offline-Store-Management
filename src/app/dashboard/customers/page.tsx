@@ -19,7 +19,7 @@ const Customers = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  console.log(search)
+
   const { data, isLoading,  refetch } = useQuery({
     queryKey: ["getCustomers", page,search],
     queryFn: async () => {
@@ -38,7 +38,6 @@ const Customers = () => {
 
   const customer = (data?.data as Customer[]) || [];
 
-  // console.log(customer,isLoading);
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">

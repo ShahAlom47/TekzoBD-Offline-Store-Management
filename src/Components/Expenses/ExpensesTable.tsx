@@ -48,7 +48,7 @@ const ExpensesTable = ({ expenses }: PropsType) => {
     }
   } else {
 
-    console.log("User cancelled delete");
+   
   }
 };
 

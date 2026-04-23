@@ -17,8 +17,6 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const search = searchParams.get("searchTrim")?.trim() || "";
 
-    console.log('serach',search)
-
     const filter: any = { isDeleted: { $ne: true } };
 
     if (search) {
@@ -63,8 +61,8 @@ export async function GET(req: NextRequest) {
     const payments = await paymentsCollection
       .find({
         $or: [
-          { saleId: { $in: saleIds } },       // sale payment
-          { customerId: { $in: customerIds } } // due payment
+          { saleId: { $in: saleIds } }, // sale payment
+          { customerId: { $in: customerIds } }, // due payment
         ],
       })
       .toArray();
@@ -73,22 +71,20 @@ export async function GET(req: NextRequest) {
     const customersWithDue = customers.map((customer) => {
       const customerSales = sales.filter(
         (s) =>
-          s.customerId &&
-          s.customerId.toString() === customer._id.toString()
+          s.customerId && s.customerId.toString() === customer._id.toString(),
       );
 
       // ✅ total sales
       const totalSales = customerSales.reduce(
         (sum, s) => sum + (s.totalAmount || 0),
-        0
+        0,
       );
 
       // ✅ total paid (sale + due)
       const totalPaid = payments
         .filter(
           (p) =>
-            p.customerId &&
-            p.customerId.toString() === customer._id.toString()
+            p.customerId && p.customerId.toString() === customer._id.toString(),
         )
         .reduce((sum, p) => sum + (p.amount || 0), 0);
 
@@ -119,7 +115,7 @@ export async function GET(req: NextRequest) {
         success: false,
         error: error instanceof Error ? error.message : String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

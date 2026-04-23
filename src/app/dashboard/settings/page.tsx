@@ -29,7 +29,7 @@ export default function Settings() {
 
   const currentUser = data?.currentUser;
   const users = data?.users || [];
-  console.log(data);
+
 
 
 

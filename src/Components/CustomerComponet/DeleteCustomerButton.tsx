@@ -32,7 +32,7 @@ const DeleteCustomerButton = ({ id,refetch }: Props) => {
       setLoading(true);
 
       const res = await deleteCustomer(id);
-      console.log(res)
+   
 
       if (res?.success) {
         toast.success(res?.message || "Customer deleted!");

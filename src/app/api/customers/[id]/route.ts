@@ -53,7 +53,6 @@ export async function GET(
       .sort({ paymentDate: -1 })
       .toArray();
 
-      console.log(payments,sales)
 
     // 🔹 SALE WISE CALCULATION
     const salesWithCalc = sales.map((sale) => {

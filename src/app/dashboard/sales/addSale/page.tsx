@@ -52,7 +52,7 @@ const AddSalePage = () => {
 
   const dueAmount = Math.max(finalAmount - paidAmount, 0);
 
-  console.log(cart, totalCost, totalProfit);
+
 
   // ===============================
   // Submit Sale

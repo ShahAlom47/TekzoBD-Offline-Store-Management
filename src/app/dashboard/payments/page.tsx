@@ -22,7 +22,7 @@ const Payments = () => {
     setPage(1);
   };
 
- console.log(month)
+
   const { data, isLoading } = useQuery({
     queryKey: ["payments", page,  month, status],
     queryFn: async () => {

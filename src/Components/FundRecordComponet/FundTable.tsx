@@ -28,7 +28,7 @@ const FundTable = ({ fundRecords }: PropsType) => {
 
   // ✅ Edit
   const handleEdit = (record: FundRecord) => {
-    console.log(record)
+   
     setSelectedRecord(record);
     setOpenModal(true);
   };
@@ -37,7 +37,7 @@ const FundTable = ({ fundRecords }: PropsType) => {
   const handleSubmit = async (data: FundRecord) => {
    
       const id = selectedRecord?._id;
- console.log(id,selectedRecord)
+
       if (!selectedRecord?._id) {
         toast.error("ID is missing!");
         return;
@@ -46,7 +46,7 @@ const FundTable = ({ fundRecords }: PropsType) => {
       setLoading(true);
 
       const res = await updateFundRecord(selectedRecord?._id.toString(), data);
-      console.log(res)
+   
 
       if (res?.success) {
         toast.success("Updated successfully 🎉");

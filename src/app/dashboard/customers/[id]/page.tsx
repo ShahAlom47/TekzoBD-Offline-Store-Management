@@ -33,7 +33,7 @@ export default function CustomerDetails() {
   const sales = data?.sales || [];
   const paymentHistory= Array.isArray(data?.paymentHistory) ? data?.paymentHistory : []
 
-  console.log(data)
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

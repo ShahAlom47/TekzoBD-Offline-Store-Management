@@ -39,14 +39,14 @@ const Sales = () => {
     placeholderData: (prev) => prev, // keep old data while fetching new
   });
 
-  console.log(data)
+
 
   if (isLoading) return <Loading></Loading>;
   const totalPages = data?.totalPages || 0;
   const salesData = (data?.data as SaleWithPayment[]) || [];
   
 
-  // console.log(data);
+
 
   return (
     <div>

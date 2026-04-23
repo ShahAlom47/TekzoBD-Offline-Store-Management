@@ -12,7 +12,7 @@ interface Props {
 
 const ProductTableView = ({ products }: Props) => {
   const { categories } = useCategories();
-  console.log(categories)
+
 const catName = (catId: string) => {
   const category = categories.find((cat) => cat._id === catId);
   return category ? category.name : "N/A";

@@ -12,7 +12,6 @@ interface ParamsType {
 export const getOverview = async (params: ParamsType) => {
   const { filter, searchTrim, status } = params;
 
-  console.log(filter)
 
   const queryParams = new URLSearchParams();
 
@@ -25,7 +24,7 @@ export const getOverview = async (params: ParamsType) => {
     const start = new Date(year, month - 1, 1);
     const end = new Date(year, month, 0);
     end.setHours(23, 59, 59, 999);
-    console.log( start,end,'ggggggggggg')
+
 
     queryParams.set("startDate", start.toISOString());
     queryParams.set("endDate", end.toISOString());

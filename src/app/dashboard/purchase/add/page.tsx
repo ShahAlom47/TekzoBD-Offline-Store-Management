@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 
  const AddPurchase = () => {
   const handleAdd =async (data: Purchase)  => {
-    console.log("ADD:", data);
+
     const res= await addPurchase(data);
     if(!res?.success){
       toast.error( res?.message||"Failed to add purchase: "  );

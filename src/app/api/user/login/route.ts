@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     if (!phone || !password) {
       return NextResponse.json(
         { success: false, message: "Phone and password required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -22,21 +22,16 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { success: false, message: "User not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user.passwordHash
-    );
-console.log(isPasswordValid,'hhhh')
-
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
     if (!isPasswordValid) {
       return NextResponse.json(
         { success: false, message: "Invalid credentials" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -47,7 +42,7 @@ console.log(isPasswordValid,'hhhh')
         role: user?.role,
       },
       JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "1d" },
     );
 
     const response = NextResponse.json({
@@ -57,8 +52,8 @@ console.log(isPasswordValid,'hhhh')
         _id: user._id.toString(),
         fullName: user.fullName,
         phone: user.phone,
-        role: user.role,  
-      }
+        role: user.role,
+      },
     });
 
     // ✅ Set HTTP-only Cookie
@@ -74,7 +69,7 @@ console.log(isPasswordValid,'hhhh')
   } catch (error) {
     return NextResponse.json(
       { success: false, message: "Server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

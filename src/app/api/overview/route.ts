@@ -36,7 +36,11 @@ const buildDateFilter = (field: string, range: DateRange) => {
 };
 
 // 🔹 Convert filter type to start/end date
-const getDateRangeFromQuery = (type: string, startDate?: string, endDate?: string) => {
+const getDateRangeFromQuery = (
+  type: string,
+  startDate?: string,
+  endDate?: string,
+) => {
   if (type === "custom" && startDate && endDate) return { startDate, endDate };
   if (type === "today") {
     const start = new Date();
@@ -57,9 +61,6 @@ export async function GET(req: NextRequest) {
     const endDate = url.searchParams.get("endDate") || undefined;
 
     const dateRange = getDateRangeFromQuery(type, startDate, endDate);
-
-console.log(startDate,endDate,'deko')
-console.log(dateRange,'deko date  range ' )
 
     // ------------------------
     // Collections
@@ -86,10 +87,6 @@ console.log(dateRange,'deko date  range ' )
     const saleFilter = buildDateFilter("createdAt", dateRange);
     const paymentFilter = buildDateFilter("paymentDate", dateRange);
 
-    // console.log(purchaseFilter)
-
-
-
     // ------------------------
     // Purchases
     // ------------------------
@@ -99,8 +96,6 @@ console.log(dateRange,'deko date  range ' )
         { $group: { _id: null, totalAmount: { $sum: "$grandTotal" } } },
       ])
       .toArray();
-
-      
 
     const totalPurchase = totalPurchaseResult[0]?.totalAmount || 0;
     const totalPurchasesCount =
@@ -115,9 +110,6 @@ console.log(dateRange,'deko date  range ' )
         { $group: { _id: null, totalAmount: { $sum: "$amount" } } },
       ])
       .toArray();
-
- console.log(totalPurchaseResult,totalExpenseResult,totalPurchase,'rtttt')
-
 
     const totalExpense = totalExpenseResult[0]?.totalAmount || 0;
     const totalExpensesCount =
@@ -134,8 +126,7 @@ console.log(dateRange,'deko date  range ' )
       .toArray();
 
     const totalSales = totalSalesResult[0]?.totalAmount || 0;
-    const totalSalesCount =
-      await saleCollection.countDocuments(saleFilter);
+    const totalSalesCount = await saleCollection.countDocuments(saleFilter);
 
     // ------------------------
     // Payments
@@ -167,11 +158,11 @@ console.log(dateRange,'deko date  range ' )
     const inStock = products.filter((p) => p.currentStock > 0).length;
     const outOfStock = products.filter((p) => p.currentStock === 0).length;
     const lowStock = products.filter(
-      (p) => p.currentStock > 0 && p.currentStock < 5
+      (p) => p.currentStock > 0 && p.currentStock < 5,
     ).length;
     const totalStockValue = products.reduce(
       (acc, p) => acc + p.currentStock * p.costPrice,
-      0
+      0,
     );
 
     // ------------------------
@@ -307,7 +298,7 @@ console.log(dateRange,'deko date  range ' )
         message: "Failed to fetch overview",
         error: error.message || String(error),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

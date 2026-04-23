@@ -31,7 +31,7 @@ export async function DELETE(
 
     await collection.updateOne(
       { _id: new ObjectId(customerId) },
-      { $set: { isDeleted: true, deletedAt: new Date(), updatedAt: new Date() } }
+      { $set: { isDeleted: true, deletedAt: new Date().toISOString(), updatedAt: new Date().toISOString() } }
     );
 
     return NextResponse.json({ message: "Customer deleted successfully", success: true });

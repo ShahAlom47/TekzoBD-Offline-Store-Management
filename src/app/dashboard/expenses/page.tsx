@@ -46,7 +46,7 @@ const Expenses = () => {
   const totalPages = data?.totalPages || 1;
   const totalExpenses=data?.data?.totalAmount
 
-  console.log(data)
+
 
   return (
     <div className="p-5">
