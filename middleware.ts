@@ -27,11 +27,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
+  const { pathname } = req.nextUrl;
 
-  if (!token) {
-    return NextResponse.redirect(new URL("/", req.url));
+  // login page এ middleware apply করো না
+  if (pathname.startsWith("/login")) {
+    return NextResponse.next();
   }
 
-  // শুধু token আছে কিনা check
+  if (!token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
   return NextResponse.next();
 }

@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     if (!loading && !user && pathname.startsWith("/dashboard")) {
 
-      router.push("/");
+      router.push("/login");
 
     }
 
@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     setUser(null);
 
-    router.push("/");
+    router.push("/login");
 
   };
 
